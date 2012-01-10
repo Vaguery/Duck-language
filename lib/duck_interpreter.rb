@@ -11,9 +11,28 @@ class DuckInterpreter
   end
   
   
+  def run
+    while @script.length > 0
+      step
+    end
+    self
+  end
+  
+  
   def step
     parse
-    @stack.push @queue.shift
+    next_item = @queue[0]
+    
+    if next_item.kind_of?(MessageItem)
+      msg_text = next_item.value
+      recipient = @stack.rindex{|item| item.respond_to?(msg_text)}
+      if recipient
+        result = @stack.delete_at(recipient).instance_eval(msg_text)
+        @queue.push result if result
+        @queue.delete_at(0)
+      end
+    end
+    @stack.push @queue.delete_at(0) if @queue[0]
     self
   end
   
