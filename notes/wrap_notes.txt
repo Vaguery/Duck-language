@@ -828,7 +828,7 @@ I've learned:
   
 
 I DON'T LIKE THIS:
-Imagine the effect of :foo is to create a Boolean and an Integer, in that order:
+ Imagine the effect of :foo is to create a Boolean and an Integer, in that order:
 "... foo"
   ...
   [«__:or:false»,«__:+:7»]
