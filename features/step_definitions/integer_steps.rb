@@ -4,7 +4,7 @@ Given /^the script is "([^"]*)"$/ do |arg1|
 end
 
 When /^the Script is run$/ do
-  pending
+  @interpreter.run
 end
 
 Then /^the top Stack item should be \-(\d+)$/ do |arg1|

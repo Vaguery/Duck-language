@@ -21,7 +21,7 @@ until something recognizes them, and consumes them. Every message is guaranteed 
 So for example a program like "6.3 2 -" contains three messages separated by whitespace, which are sliced off the script, then sent in left-to-right order into the message-passing chain:
 
 "6.3 2 -"
-  [stack]                    [parse queue]         "script"
+  [stack]                    [parser queue]         "script"
   []                         []                   "6.3 2 -"   
   []                         ["6.3"]              "6.3 2 -"   (1)
   []                         [:Float.new(6.3)]        "2 -"   (2)
