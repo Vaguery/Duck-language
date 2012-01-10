@@ -1,0 +1,931 @@
+wrap language for GP
+
+imperative, stack-based (of course)
+concatenative like Joy
+uses duck-typing
+iteration and collections
+
+
+The Wrap interpreter maintains three components as it runs a script: a string "version" of the state of the script as it's manipulated, a queue of tokens read from that string, and a stack of objects created during the course of interpretation.
+
+In its default behavior, the Wrap interpreter removes a substring from the head of the script, in left-to-right order, using the first successful pattern matcher from a list (default is a string separated by whitespace). Those substrings are parsed into messages by the interpreter, which are sent in turn to:
+
+  1. the interpreter itself
+  2. the script
+  3. the queue
+  4. every item on the stack, starting at the top
+  5. the stack
+
+until something recognizes them, and consumes them. Every message is guaranteed to be consumed by some object in this list.
+
+So for example a program like "6.3 2 -" contains three messages separated by whitespace, which are sliced off the script, then sent in left-to-right order into the message-passing chain:
+
+"6.3 2 -"
+  [stack]                    [parse queue]         "script"
+  []                         []                   "6.3 2 -"   
+  []                         ["6.3"]              "6.3 2 -"   (1)
+  []                         [:Float.new(6.3)]        "2 -"   (2)
+  [:Float.new(6.3)]          []                       "2 -"   (3)
+  [>>6.3]                    []                       "2 -"   (4)
+  [6.3]                      []                       "2 -"   (5)
+  [6.3]                      ["2"]                      "-"
+  [6.3]                      [:Integer.new(2)]          "-"   (6)
+  [6.3,:Integer.new(2)]      []                         "-"
+  [6.3,>>2]                  []                         "-"   (7)
+  [6.3,2]                    []                         "-"   (8)
+  [6.3,2]                    ["-"]                       ""
+  [6.3,2]                    [:-]                        ""   (9)
+  [6.3]                      [:Closure.new(«__:2:-»)]    ""   (10)
+  [6.3,>>:Closure.new(...)]  []                          ""   (11)
+  []                         [:Closure.new(6.3,2,:-)]    ""   (12)
+  [>>:Closure.new(6.3,2,:-)] []                          ""   (13)
+  []                         [:Float.new(4.3)]           ""
+  [>>:Float.new(4.3)]        []                          ""
+  [4.3]                      []                          ""
+
+  
+  (1) a chunk of script is sliced off
+  (2) the queue parser recognizes it as a :Float.new(6.3) message
+  (3) the float message is sent to the stack
+  (4) the :Float.new message is sent to everything on the stack (nothing, now!), then to the stack,
+      which creates a new Float stack object and announces it
+  (5) Nothing cares about the announcement, so the object is done.
+  (6) the parser recognizes the "2" as an integer
+  (7) the :Integer.new is sent to the 6.3, which doesn't care; the stack creates an integer, which is announced
+  (8) ... and 6.3 still doesn't care about integers
+  (9) The parser doesn't actually know what a "-" is, so it just makes it into a message
+  (10) This time, the 2 object on the stack responds to the :-, and queues a message that will make a Closure object to find the first argument [syntax to be determined]
+  (11) The :Closure.new(...) message is sent to the stack...
+  (12) ... but this is a message 6.3 recognizes, which finalizes evaluation of the function
+  (13) the completed Closure message is sent
+  (14) the stack recognizes instantiates this Closure, it recognizes it's complete, and (finally!) to create a Float message for the result
+
+Luckily, we're hardly every going to deal with this whole dynamic of messages and shifting responsibilities; it's provided as an explicit example of the consistency of behavior and responsibility of the script, queue, and stack, and also the important role of stack items in handling closures.
+
+
+"1 2 foo"
+  [1]
+  [1,2]
+  [1,2,:foo]
+  
+If there are no explicit messages active, but an implicit message fails to find a target, then the execution of the triggering explicit message is considered to have "fizzled". The explicit message (having been recognized) has been consumed; unrecognized implicit messages evaporate. This is the case for example when an arithmetic operator message is recognized by its argument, but the other arguments aren't available:
+
+"1 +"
+  [1]  # :+ is recognized (and consumed) by :1, but the search for the other argument fizzles
+  [1]
+
+INTERPRETER MESSAGES
+
+As we'll see below, the behavior of objects when they respond to messages is conditioned on certain state variables of the interpreter. For example, there's a QUOTE flag, which permits strings to be automatically parsed from the script as they're encountered (default off). The KEEP flag prohibits arguments from deleting themselves when they're used. The WRAP flag changes the outcome of certain operations on collections. The SLOPPY flag changes the success criteria for certain messages trying to create collections, and so on.
+
+These flags are toggled by messages :quote, :keep, :wrap and :sloppy, respectively.
+
+SCRIPT MESSAGES
+
+:rescript, :script_length, and others
+
+QUEUE MESSAGES
+
+:depth, :parse
+
+STACK MESSAGES
+
+:bind, :unstack, :depth
+
+Variable names: Global constant bindings can be set up explicitly when the Wrap interpreter is called, which couple certain script tokens (for example "x") to messages (:x), which are eventually recognized by the stack object to create a new instance of the bound object's value on the stack. Rewritable global variables (set by the user call) and local variables (created during interpreter run) are also available.
+
+==========
+
+Too many examples:
+
+"1 2 3 2 parse 4 + false"
+  []
+  [1]
+  [1,2]
+  [1,2,3]
+  [1,2,3,2]
+  [1,2,3,4,:+]        # :parse puts the next N script tokens onto the stack immediately as parsed objects
+  [1,2,3,4,:+,false]
+  
+  
+explicit messages that have NO TARGET get pushed onto the stack; :do is recognized by those messages
+
+"+ 3 5.6 do"
+  []
+  [:+]                # message has no target, so it goes on the stack
+  [:+,3]
+  [:+,3,5.6]          # a later :do message finds the old :+ and activates it
+  [8.6]
+
+
+messages that have a target but can't coordinate the rest of the args are consumed, leaving the arguments
+"+ 3 do"
+  []
+  [:+]            # message has no target, so it goes on the stack
+  [:+,3]
+  [:+,3]          # the subsequent :do message finds the old :+ and activates it as an EXPLICIT message
+  [3]             # :+ has a target, but not the args, so it fizzles and disappears
+
+
+or more simply:
+"3 +"
+  [3]
+  [3]             # :+ is received by 3 as an explicit message, but no args around, so it fizzles
+  
+  
+"1 true 2 false + and" 
+  []
+  [1]
+  [1,true]
+  [1,true,2]
+  [1,true,2,false]
+  [true,false,3]      # messages are sent to the topmost INACTIVE stack item that recognizes them
+  [3,false]           # the activated stack item itself then gathers other arguments from the top
+  
+  
+"true 2 + and"
+  [true]
+  [true,2]
+  [true,2]            # when a message finds a target, but the target fails to find all its args, the message fizzles
+  [true,2]            # both :+ & :and find targets, but those targets can't complete their work
+  
+  
+"1 2 parse negate parse do 3 4 do"
+  []
+  [1]
+  [1,2]               # :parse sent to 2
+  [1,:negate,:parse]  # moves over 2 tokens as parsed stack items, without sending them as messages
+  [:negate,3]         # :do is sent the :parse message on the stack, which grabs its argument (1), and acts
+  [:negate,3,4]       # :do is recognized first by the :negate
+  [3,-4]              #   ...and it is sent to the topmost recipient, 4
+  
+  
+"1 2.34 +"
+  []
+  [1]
+  [1,2.34]            # :+ is sent to 2.34, which finds 1 as a second argument, and the result is a float
+  [3.34]
+  
+  
+"1 2 3 false 4 5 3 alike"
+  []
+  ...
+  [1,2,3,false,4,5,3]    # :alike is sent to an integer N, which looks at the top item on the stack,
+  [1,2,false,(3,4,5)]    # ... then builds a collection of N items that all have IDENTICAL signatures to that
+  
+  
+"1 false 2 8 alike"
+  []
+  [1]
+  [1,false]
+  [1,false,2]
+  [1,false,2,8]          # 8 cannot find enough items with signatures identical to 2's
+  [1,false,2,8]          # but the message fizzles in the recipient, leaving it
+
+
+"1 false 2 sloppy 8 alike"
+  []
+  [1]
+  [1,false]
+  [1,false,2]
+  [1,false,2]           # sloppy sets an interpreter toggle to permit incomplete collection operations
+  [1,false,2,8]
+  [false,(1,2)]         # with the sloppy flag set, the :alike message just gathers up to 8 items
+
+
+"3 parse + 2"
+  []
+  [3]
+  [3]                   # 3 can't find 3 tokens to parse, so the message fizzles
+  [3]                   # 3 can't find anything responding to :+ on the stack, so that message fizzles
+  [3,2]
+
+
+"3 sloppy parse + 2"
+  []
+  [3]
+  [3]                   # sloppy flag is toggled
+  [:+, 2]               # 3 manages to parse 2 of 3 desired tokens, so the message "succeeds"
+
+
+"2 1 keep +"
+  []
+  [2]
+  [2,1]
+  [2,1]                 # keep toggles a flag so that arguments are not removed when used
+  [2,1,3]
+  
+  
+conditionals
+"1 2 3 4 < pick"
+  ...
+  [1,2,3,4]         # :< ends up comparing the top numbers
+  [1,2,true]        # :pick finds a boolean, and that wants two items
+  [1]               # :pick discards the second item because the boolean is false
+  
+
+comparisons (<, <<, >>, >, <=, <<==, >=, >>==, =, ==, !=, !!==)
+  both arguments recognize them:
+    the :<, :>, :<=, :>=, :=, :!= messages can compare floats and ints, for example
+  both arguments have the identical signatures:
+    :<<, :>>, :<<==, :>>==, :==, :!!== are recognized by any item, but compare to an identical item only
+
+  
+"false 1 true 3 keep and keep +"
+  []
+  [false]
+  [false,1]
+  [false,1,true]
+  [false,1,true,3]
+  [false,1,true,3]            # keep is ON
+  [false,1,true,3,false]      # arguments remain in place
+  [false,1,true,3,false]      # keep is OFF
+  [false,true,false,4]        # :+ is sent to 3, and it consumes the args (including itself)
+  
+  
+"1 keep false 2 sloppy 8 alike"
+  []
+  [1]
+  [1]                    # keep is ON
+  [1,false]
+  [1,false,2]
+  [1,false,2]            # sloppy is ON
+  [1,false,2,8]
+  [1,false,2,8,(1,2)]    # we keep the arguments when 8 creates a collection like 2
+
+  
+"1.23 false true depth decrement clones 1 parse and 2 4 search"
+  []
+  [1.23]
+  [1.23,false]
+  [1.23,false,true]
+  [1.23,false,true,3]                      # depth
+  [1.23,false,true,2]                      # decrement top number
+  [1.23,false,true,false,true]             # :clones copies the top 2 items
+  [1.23,false,true,false,true,1]
+  [1.23,false,true,false,true,:and]
+  [1.23,false,true,false,true,:and,2]
+  [1.23,false,true,false,true,:and,2,4]
+  [1.23,2,4,(false,true,false,true)]       # :search collects N (=4) items with signatures IDENTICAL
+                                           # to the topmost item WHICH RESPONDS TO :and
+  
+"... search"
+  ...
+  [1,2,99,:+]   # search can't find 99 items that with identical signatures to 2
+  [1,2,99,:+]
+
+
+"... sloppy search"
+  ...
+  [1,2,99,:+]   # search gathers whatever it can
+  [(1,2)]
+
+
+"1 2 3 2 alike 4 5 2 alike join"
+  []
+  [1]
+  [1,2]
+  [1,2,3]
+  [1,2,3,2]
+  [1,(2,3)]
+  [1,(2,3),4]
+  [1,(2,3),4,5]
+  [1,(2,3),4,5,2]
+  [1,(2,3),(4,5)]   # join sent to top collection, then it looks for a collection with the IDENTICAL signature
+  [1,(4,5,2,3)]
+  
+  
+"9 1 2 3 3 3 parse alike dup do alike dup join shatter unstack"
+  []
+  [9]
+  [9,1]
+  [9,1,2]
+  [9,1,2,3]
+  [9,1,2,3,3]
+  [9,1,2,3,3,3]
+  [9,1,2,3,3,:alike,:dup,:do]
+  [9,1,2,3,(:alike,:dup,:do)]
+  [9,1,2,3,(:alike,:dup,:do),(:alike,:dup,:do)]
+  [9,1,2,3,(:alike,:dup,:do,:alike,:dup,:do)]
+  [9,1,2,3,:alike,:dup,:do,:alike,:dup,:do] # :shatter is sent to the top collection
+  [9,1,2,:alike,:dup,:do]                   # :unstack puts 3 items [:alike, :dup, :do] back on top of the token stack
+  [9,1,:alike,(:dup,:do)]                   # :alike sent to 2
+  [9,1,:alike,(:dup,:do),(:dup,:do)]        # :dup sent to top item
+  [(:dup,:do),(:dup,:do),(9)]               # :do sent to alike, which is sent to 1
+  
+  
+"... map"
+  [2,5,8,:+,(1,2,4)]    # :map is sent to a MESSAGE, which finds the first COLLECTION,
+  [9,7,6]               # ... and then looks for each case's args separately
+  
+  
+"... map"
+  [2,3.33,8,:+,(1,false,2)]    # once we start mapping, the result or the arg is returned for each item
+  [9,false,5.33]               # ...in turn, using up arguments only when an item doesn't fizzle!
+                               # ... in other words, the "default result" for an item is that item
+
+  
+"... map"
+  [0,0,:*,(1,2,4)]      # as with normal execution,
+  [0,0,4]               # map gets whatever arguments it can before quitting, dumping the remaining collection
+  
+
+"... keep map"
+  [0,0,:+,(1,2,4)]        # with the KEEP toggled ON
+  [0,0,:+,(1,2,4),1,2,4]  # note that :map keeps finding the same arguments for each collection item
+  
+  
+"... wrap map"
+  [6,7,8,:*,(1,false,4)]  # with WRAP toggled ON
+  [(6,false,32)]
+
+
+"... map"               
+  [1,7,false,2.22,true,:+,:or,:do,(:+,:-,:*,:and,:bundle)] # :do is mapped to each item in the top collection
+      [1,7,false,2.22,true,:+,:or,(:+,:-,:*,:and,:bundle)] # :+ looks for its arguments, finds them as (7 and 2.22)
+      [1,false,true,:+,:or,(9.22,:-,:*,:and,:bundle)]      # :- looks for its arguments, fizzles
+      [1,false,true,:+,:or,(9.22,:-,:*,:and,:bundle)]      # :* looks for its arguments, fizzles
+      [1,:+,:or,(9.22,:-,:*,false,:bundle)]                # :and looks for its arguments, gets (false,true)
+      [:+,(9.22,:-,:*,false,(:or))]                        # :bundle looks for its arguments, gets (1, :or)
+
+
+"... inject"
+  [:+,(1,2,3,4)]  # sent to a message THAT RESPONDS to :inject (only some!)
+  [10]            # which then finds a collection to target
+
+
+"... inject"
+  [:less_than,(1,2,3,4)]  # integers respond to :less_than, but it doesn't respond to :inject (produces a bool)
+
+
+# as opposed to:
+"... map"
+  [:less_than,1,2,5,(1,2,3,4)]
+    ...[1,2,(true,2,3,4)]          # 1 < 5?
+    ...[1,(true,false,3,4)]        # 2 < 2?
+    ...[(true,false,false,4)]      # 3 < 1?
+    ...[(true,false,false,4)]      # 4 has no matching argument
+  [true,false,false,4]
+  
+  
+"... select"
+  [false,true,false,false,(1,2,3,4)]  # sent to the top collection, which searches for booleans as args
+  [2]
+  
+  
+"... select"
+  [true,true,(1,2,3,4)]  # when argument boolean is missing, it defaults to true
+  [1,2,3,4]
+
+
+"... wrap map"
+  [2,5,8,:+,(1,2,4)]     # :wrap sets a global toggle to ON (and back OFF)
+  [(9,7,6)]              # ... so that results that were unwrapped are not
+
+
+"... wrap map"
+  [5,8,:+,(1,2,4)]       # when a collection result remains incomplete
+  [9,7,4]                # ... it is still unwrapped even with the WRAP toggle set to ON
+
+
+"... keep wrap map"
+  [3,:*,(1,2,4)]           # with the KEEP and WRAP toggled ON
+  [3,:*,(1,2,4),(3,6,12)]  # note that :map keeps finding the same arguments for each collection item
+
+
+"... keep wrap map keep shatter wrap + map"
+  [3,:*,(1,2,4)]                   # KEEP is on
+  [3,:*,(1,2,4)]                   # WRAP is on
+  [3,:*,(1,2,4),(3,6,12)]          
+  [3,:*,(1,2,4),(3,6,12)]          # KEEP is off
+  [3,:*,(1,2,4),3,6,12]
+  [3,:*,(1,2,4),3,6,12]            # WRAP is off
+  [3,:*,(1,2,4),3,18]            
+  [3,:*,(1,2,4),3,18]              # :map is sent to :*
+  [18,6,12]                        # ... and so the result is unwrapped
+
+
+"... keep wrap inject swap shatter wrap + 2 unstack keep alike map"
+  [:+,(1,2,3,4)]                   # KEEP is on
+  [:+,(1,2,3,4)]                   # WRAP is on
+  [:+,(1,2,3,4)]                   # inject sent to :+
+  [:+,(1,2,3,4),(10)]              # :swap flips top two stack items
+  [:+,(10),(1,2,3,4)]              # :shatter
+  [:+,(10),1,2,3,4]                # WRAP is off
+  [:+,(10),1,2,3,4,7]
+  [:+,(10),1,2,3,4,7,2]            # keep the argument even for :unstack
+  [:+,(10),1,2,3,4,7,2]            # tokens are now "7 2 keep alike map"
+  [:+,(10),1,2,3,4,7,2,7]          # tokens are now "2 keep alike map"
+  [:+,(10),1,2,3,4,7,2,7,2]        # tokens are now "keep alike map"
+  [:+,(10),1,2,3,4,7,2,7,2]        # KEEP is off
+  [:+,(10),1,2,3,4,7,(2,7)]        # alike
+  [:+,(10),1,2,3,9,11]             # mapped, no wrapping
+  
+  
+"1 5.55 2 6.66 3 every every"
+  []
+  [1]
+  [1,5.55]
+  [1,5,55,2]
+  [1,5.55,2,6.66]
+  [1,5.55,2,6.66,3]
+  [5.55,6.66,(1,2,3)]              # :every is sent to the top item, and gathers up EVERY item with that signature
+  [(1,2,3),(5.55,6.66)]            # note that order is preserved
+  
+
+"1 false 2 true 3.45 1 parse :+ recognize"
+  []                              
+  [1]
+  ...
+  [1,false,2,true,3.45,1]         
+  [1,false,2,true,3.45,:+]       # parse 1 item
+  [1,false,2,true,3.45,:+]       # :recognize is sent to an integer, and takes a message, returning N booleans
+  [1,false,false,true]           #  showing whether those top items respond to that message
+                                 #  note that WRAP is off
+  
+  
+"sloppy keep wrap 1 false 11 true 3.45 1 parse and recognize"
+  ...                            # SLOPPY, WRAP and KEEP are on
+  [1,false,11,true,3.45,1]         
+  [1,false,11,true,3.45,1,:and]  # parse 1 item
+  [1,false,11,true,3.45,1,:and]  # :recognize is sent to 11, which gets :and and tests "the top 11 items"
+  [1,false,11,true,3.45,1,:and,(false,true,false,true,false,false,false)]  
+
+
+"1 2 3 -1 alike"
+  ...
+  [1,2,3,-1]
+  [1,2,3,()]     # a negative or 0 argument creates an empty collection
+                 
+
+"... inject"
+  ...
+  [1,2,3,:+,()]
+  [1,2,3,()]     # :inject is sent to the :+, it gets the collection but has no elements so it fizzles
+  
+  
+"... 2 rewrap"
+  ...
+  [(1,2,3,4,5,6,7)]     # there's a collection on the stack
+  [(1,2,3,4,5,6,7),2]
+  [(1,2),(3,4),(5,6),7] # :rewrap is sent to an integer, and the top list is rebroken into sublists of that size
+  
+  
+"... -2 rewrap"
+  ...
+  [(1,2,3,4,5,6,7)]    # there's a collection on the stack
+  [(1,2,3,4,5,6,7),-2]
+  [(«1»),2,3,4,5,6,7]  # if the integer more than 0, it creates one empty collection w/signature like the 1st item
+  
+  
+"... times"
+  ...
+  [:+,1,2,3,4,5,2]     # :times sent to an integer, and it issues a message that many times
+  [1,2,12]             # send :+ 2 times
+  
+
+"1 false 3 parse + do and 3 bundle"
+  [1]
+  [1,false]
+  [1,false,3]
+  [1,false,:+,:do,:and]
+  [1,false,:+,:do,:and,3]
+  [1,false,(:+,:do,:and)]     # :bundle sent to an integer, which collects that many objects
+  
+  
+"1 10 clones 3 bundle 2 bundle"
+  [1]
+  [1,10]
+  [1,1,1,1,1,1,1,1,1,1]
+  [1,1,1,1,1,1,1,1,1,1,3]
+  [1,1,1,1,1,1,1,(1,1,1)]
+  [1,1,1,1,1,1,(1,(1,1,1))]   # yes, a collection can be an element in a collection
+  
+  
+"1 6 clones 5 bundle swap count"
+  [1]
+  [1,6]
+  [1,1,1,1,1,1]
+  [1,1,1,1,1,1,5]
+  [1,(1,1,1,1,1)]
+  [(1,1,1,1,1),1]
+  [5]             # :count returns the number of occurrences of the top item in the first [different] collection
+  
+
+"1 4 clones 4 bundle 2 rewrap count"
+  [1]
+  [1,4]
+  [1,1,1,1]
+  [1,1,1,1,4]
+  [(1,1,1,1)]
+  [(1,1,1,1),2]
+  [(1,1),(1,1)]
+  [0]           # :count is sent to the top collection, but it isn't within the other (it's the same)
+
+  
+"1 6 clones 2 bundle 2 bundle swap count"
+  [1]
+  [1,6]
+  [1,1,1,1,1,1]
+  [1,1,1,1,(1,1)]
+  [1,1,1,(1,(1,1))]
+  [1,1,(1,(1,1)),1]
+  [1,1,1]           # :count is sent to the 1, which appears only once in the collection's root
+
+
+"... 2 unstack"
+  [(:do,:+,(9,false)),4]
+  [(:do,:+,(9,false)),4,2]
+  [(:do,:+,(9,false)),4]      # top 2 items are unstacked, but collections can't be tokens
+  []                          # tokens: "do + 9 false 4 4"
+  ... and so on
+  
+  
+"local"
+  []
+  [:local00001]            # :local creates a unique local message, and pushes that onto the stack
+  
+  
+"local 3 clones 12 bind do swap dup do"
+  []
+  [:local00001]
+  [:local00001,3]
+  [:local00001,:local00001,:local00001]
+  [:local00001,:local00001,:local00001,12]
+  [:local00001,:local00001,:local00001::12]   # a binding is created
+  [:local00001,12]                            # :do is intercepted by :local00001, which is captured by the binding
+  [12,:local00001]
+  [12,:local00001,:local00001]
+  [12,:local00001,:local00001]                # nothing recognizes :local00001 any more, so it is pushed
+
+
+"keep local dup 3 bind bind"
+  []                           # KEEP is toggled on
+  [:l1]                        # local variable created
+  [:l1,:l1,:l1]                # dup creates two copies of the arg, which it normally destroys!
+  [:l1,:l1,:l1,3]
+  [:l1,:l1,:l1,3,:l1::3]       # binding
+  [:l1,:l1,:l1,3,:l1::l1::3]   # the :next l1 down is now bound to its own binding!
+
+
+"foo bar bind"
+  [:foo]
+  [:foo,:bar]
+  [:bar::foo]
+
+
+"sloppy foo 2 bind bar baz 3 alike"
+  ...                   # sloppy is set
+  [:foo::2]
+  ...
+  [:foo::2,:bar,:baz]
+  [:foo::2,:bar,:baz,2]
+  [:foo::2,(:bar,:baz)] # message ≠ binding
+
+
+"1 parse + 7 bind"
+  [1]
+  [:+]
+  [:+,7]
+  [:+,7]        # :+ cannot be reassigned! only locals recognize :bind
+  
+  
+"foo 7 bind"
+  [:foo]
+  [:foo,7]
+  [:foo::7]            # :foo was created as a local, and responds to :bind messages
+
+
+"1 5 clones 2 bundle 2 bundle flatten"
+  [1]
+  [1,5]
+  [1,1,1,1,1]
+  [1,1,1,1,1,2]
+  [1,1,1,(1,1)]
+  [1,1,1,(1,1),2]
+  [1,1,(1,(1,1))]
+  [1,1,(1,1,1)]    # unlike :shatter, which breaks at the root, :flatten does what it sounds like
+
+
+"3 5 clones 1 2 3 4 5 5 bundle 1 parse < filter"
+  ...
+  [3,3,3,3,3,(1,2,3,4,5),1]
+  [3,3,3,3,3,(1,2,3,4,5),:<]
+  [1,2]               # :filter is sent to a message that responds to it (which give bool results)
+                      # and returns only the items in a collection for which the result is true
+
+
+"1 2 gibberish + bind"
+  []
+  [1]
+  [1,2]
+  [1,2,:gibberish]    # any unrecognized token is considered an unknown message
+  [:gibberish,3]
+  [:gibberish::3]
+  
+
+"foo 12 bind 1 unstack"
+  []
+  [:foo]
+  [:foo,12]
+  [:foo::12]
+  [:foo::12,1]
+  []                 # can't unstack a binding; only the value is unstacked -> "12"  
+
+
+"foo foo 3 bind swap 8 bind foo foo"
+  [:foo]
+  [:foo,:foo]
+  [:foo,:foo,3]
+  [:foo,:foo::3]
+  [:foo::3,:foo]
+  [:foo::3,:foo,8]
+  [:foo::3,:foo::8]
+  [:foo::3,8]
+  [3,8]
+  
+STRING objects
+
+"1 13 readstring parse 3 2 8 false false"
+  [1]
+  [1,13]
+  [1,"parse 3 2 8 f"]                # :read slices N raw characters off the script, creating a string
+  [1,"parse 3 2 8 f", :alse]
+  [1,"parse 3 2 8 f", :alse, false]
+  
+  
+"1 readstring ' extractstring 'this string comes out' 'not this'"
+  [1]
+  ["'"]
+  ["this string comes out"]
+  ["this string comes out", :'not]           # because QUOTE is off, and "'" isn't the quote anyway
+  ["this string comes out", :'not, :this']
+  
+  
+"3 readstring foo extractstring 2 3foo771\n\n\tfoobar"
+  ["foo"]
+  ["771\n\n\t"]             # :extract slices out the wrapped text from the script
+  ["771\n\n\t", 2, :3bar]
+  
+"3 readstring foo extractstring 2 3"
+  ["foo"]
+  []            # extract fails because it can't find the match in the script
+  [2]
+  [2,3]
+
+"sloppy 3 readstring foo extractstring 2 3"
+  []            # SLOPPY is set
+  ["foo"]
+  []            # but it still fails because there is not even one match
+  [2]
+  [2,3]
+  
+"sloppy 3 readstring foo extractstring 2 foo 3"
+  []            # SLOPPY is set
+  ["foo"]
+  [" 3"]        # starts at first instance, consumes rest of script to end
+  [" 3", 2]
+
+"keep 3 readstring 2 1 +"
+  []            # KEEP is on
+  [3]
+  [3,"2 1"]
+  [3,"2 1",2]   # :readstring doesn't delete characters when KEEP is on
+  [3,"2 1",2,1]
+  [3,"2 1",2,1,3]
+  
+"keep 1 readstring ' extractstring 2 'string' 3"
+  []            # KEEP is on
+  [1]
+  [1,"'"]
+  [1,"'","string"]
+  [1,"'","string",2]
+  [1,"'","string",2,:'string']
+  [1,"'","string",2,:'string',3]
+
+
+when the QUOTE flag is set (default: off), then double-quoted strings are parsed as string objects
+'quote 3 5 "this is a string" "also" "but not'
+  []             # QUOTE is on
+  [3]
+  [3,5]
+  [3,5,"this is a string"]
+  [3,5,"this is a string","also"]
+  [3,5,"this is a string","also",:"but]
+  [3,5,"this is a string","also",:"but,:not]
+
+  
+'quote sloppy "remaining script'
+  [] QUOTE is on
+  [] SLOPPY is on
+  ["remaining script"]
+
+
+"quote \"'\" setquote 'this' 'changes word breaks' 'contextually"
+  []         # QUOTE is on
+  ["'"]
+  []         # :setquote affects how the interpreter slices the script
+  ["this"]
+  ["this","changes word breaks"]
+  ["this", "changes word breaks",:'contextually]  # SLOPPY is off, so the last string is not captured
+  
+  
+"quote \"g\" setquote sloppy 'hanging garden' 4 g\"foo\""
+  [1]
+  ["g"]
+  []           # the string quote character is now 'g'
+  []           # SLOPPY is on
+  [:'han]
+  [:'han,"in"]
+  [:'han,"in","arden' 4 "]   # NOTE the setquote ADDS a new quote string,
+                               in addition to double quotes. Also, quotes capture whitespace
+  [:'han,"in","arden' 4","foo"]
+   
+
+"quote \"2 3 +\" rescript"
+  []           # QUOTE is on
+  ["2 3 +"]
+  []           # the string is inserted at the head of the script
+  [2]
+  [2,3]
+  [5]
+  
+"quote \"+\" 3 5 reparse do"
+  []
+  ["+"]
+  ["+",3]
+  ["+",3,5]
+  [3,5,:+]
+  [8]
+  
+
+
+
+THE REALLY FANCY SHIT FOR LATER
+
+
+
+allow messages received by stack objects to create "active complexes" that stay on stack and consume later things (what? when?)
+
+Is it "partial application" or "currying"?
+
+What happens to the unresolved links at the end? Do they "dissolve"?
+
+"1 - false or 4.31 true"
+  []
+  [1]                       # :1 is not recognized by any stack item,
+                              but the stack catches it and makes an Integer instance;
+                              the ANNOUNCEMENT of 1's creation is also ignored
+  [«__:-:1»]                # 1 recognizes :-,
+                              and spawns a closure message which isn't recognized, creating a closure object;
+                              the closure's ANNOUNCEMENT is also ignored
+  [«__:-:1»,false]              # false falls through the stack, then creates a Boolean instance;
+                                  the ANNOUNCEMENT is ignored
+  [«__:-:1»,«__:or:false»]      # :or is recognized by the Boolean, but there's no partner, so again a closure arises;
+                                  the ANNOUNCEMENT is ignored
+  [«__:-:1»,«__:or:false»,4.31] # neither closure recognizes :4.31, so the Integer is created and ANNOUNCED...
+  [«__:or:false»,3.31]          # the closure creates a message :3.31, which passes through the stack;
+                                  finally the stack creates a Float, which is ANNOUNCED
+  [«__:or:false»,3.31,true]     # the :true message is ignored, creates a Boolean instance, which is ANNOUNCED...
+  [3.31,true]                   # the closure responds to the announcement, creating a new Boolean
+                                  which is also ANNOUNCED, but nobody cares
+    
+    
+"3 bundle 2 :+ :dup 3 4"
+  [3]
+  [«__:__:__:bundle»]       # NOTE :bundle without SLOPPY creates a closure with exactly 3 items;
+                             if SLOPPY were on, it would gather all the items it could and not form a closure at all
+  [«__:__:__:bundle»,2]     # :bundle closure does NOT capture messages sent, just message STACK objects, so 2 is made
+  [«__:__:2:bundle»]        # but immediately the closure hears the announcement of 2, and grabs it
+  [«__:__:2:bundle»,:+]     # nothing captures the MESSAGE :+, so a note is made and ANNOUNCED
+  [«__::+:2:bundle»]        # ... and it gets gobbled by the bundle closure
+  [«__::+:2:bundle»,«__::+:2:bundle»]    # the closure recognizes :dup...
+  [(«__::+:2:bundle»,:+,2)]   # amusingly, the new closure is itself captured by the first closure
+  [(«__::+:2:bundle»,:+,2),4] # the collection doesn't care about the new integer, and we're done
+
+
+I've learned:
+* Closures do not capture messages, they capture "Note objects" (stack objects that contain messages).
+* Creating a new stack object produces an announcement message. Closures (and the like?) recognize these, and enter into negotiations with the new object; if negotiations fail, the announcement moves on down the stack, and is lost if nobody pays attention.
+
+
+"keep 3 bundle  2 :+ :dup 3 4"
+  []  # KEEP is on, but closures delete their immediate predecessors
+  [3]
+  [3,«__::__::__::bundle»]
+  [3,«__::__::__::bundle»,2]
+  [3,2,«__::__::2::bundle»]
+  [3,2,«__::__::2::bundle»,5] # 3+2
+  [3,2,5,«__::5::2::bundle»]  # is captured
+  [3,2,5,«__::5::2::bundle»,«__::5::2::bundle»]  # :dup
+  [3,2,5,«__::5::2::bundle»,(«__::5::2::bundle»,5,2)]  # but the NEW bundle is captured
+  [3,2,5,(«__::5::2::bundle»,5,2),((«__::5::2::bundle»,5,2),5,2)]  # recursive negotiation among the closures
+  [3,2,5,(«__::5::2::bundle»,5,2),((«__::5::2::bundle»,5,2),5,2),3]
+  [3,2,5,(«__::5::2::bundle»,5,2),((«__::5::2::bundle»,5,2),5,2),3,4]
+
+I've learned:
+* "... keep ... bundle ..." is dangerous if KEEP means the bundle closure itself stays; we'll say instead that a closure leaves its "consumed" arguments intact, but itself does NOT remain (except as a new object on the top of the stack)
+  
+
+I DON'T LIKE THIS:
+Imagine the effect of :foo is to create a Boolean and an Integer, in that order:
+"... foo"
+  ...
+  [«__:or:false»,«__:+:7»]
+  [«__:or:false»,«__:+:7»,false,88]  # the false is ANNOUNCED first, then the 88
+  [«false:or:false»,«__:+:7»,88]     # but we don't create the new thing until we clear the announcement queue...
+  [«false:or:false»,«88:+:7»]        
+  [«88:+:7»,false]                   # now we have the results, also all of them "at once" but in order
+  [false,95]                         # and the cycle repeats, announcing the false, then the 95...
+  
+I've learned:
+  * When multiple objects are created "at once", all the announcements and matchmaking negotiations are handled before any new objects are made, in 
+
+
+"1 2 3 bundle 1 parse + map foo bar 7 3 3 3 3 3 3 3"
+  [1]
+  [1,2]
+  [1,2,3]
+  [«__::2::3::bundle»]
+    ...[«__::2::3::bundle»,1]
+  [(1,2,3)]
+  [(1,2,3),«__::parse»]
+  [«__::parse»,«__::(1,2,3)::+»]
+  [«__::parse»,«__::(1,2,3)::+»,«__::__::map»]
+  [«__::parse»,«__::(1,2,3)::+»,«__::foo::map»]
+  [«__::parse»,«__::(1,2,3)::+»,«__::foo::map»,:bar]
+  [«__::(1,2,3)::+»,«__::foo::map»,3,3,3,3,3,3,3]  # 7 :3 messages are parsed
+
+
+
+"1 2 5 bundle foo bar baz"
+  [1]
+  [1,2]
+  [1,2,5]
+  [«__:__:__:1:2:bundle»]
+  []
+  
+  
+Might be useful as recognizers and classifiers of objects in collections. :respondto or something?
+
+
+INSPECT methods, rescript, and writing parser filters.
+
+The Wrap parser typically ignores all whitespace unless it's within a special structure (like a quoted string), including whitespace at the beginning and end of the script. A default parser reads a script as words; with QUOTE on it will recognize double quotes; after receiving a :setquote it will also capture text delimited by the new setquote substring (like a 'here doc').
+  
+  /"(?:[^"\\]|\\.)*"/  # everything between double quotes (including escaped quotes), when QUOTE is on
+  /\S+/   # everything up to the next whitespace
+
+Typical literals (integers, floats, booleans, and even complex strings) and instructions seem as though they should all fit into this scheme. Even complex expressions can be built up out of incremental concatenations.
+
+But the Wrap language works both ways: :rescript and :unstack messages make objects jump back into the script or message queue. How? Especially for collections, closures or library items like matrices?
+
+One approach would be to add additional matchers: a Matrix matcher that used square brackets, for example, and sent the resulting string to a class method that created the object. The script version "[[1,2,3],[4,3,2]]" makes the results of :restack obvious for a Matrix stack object.
+
+But what about a Closure stack object? Or a Collection containing collections of closures and bindings?
+
+
+
+can FLAGS go on the stack, too?
+
+"1 2 wrap +"
+  [1]
+  [1,2]
+  [1,2,flag:WRAP:on]
+  [flag:WRAP:on,3]
+  
+are they consumed?
+
+
+
+should WRAP make every result be a collection?
+  "wrap 1 2 +"
+    [1,2]
+    [(3)]  ??
+
+fork statements => substacks, see other notes
+
+yield statements
+
+explicit reference to object signatures
+  "2 signature"
+  [2]
+  [«:2:signature»]
+
+
+regular expressions over messages
+  
+locking stack items (like a local KEEP)
+
+indirect dictionary storage for complex objects: long strings, matrices, etc
+  "'I am a string' [[1,2,3],[4,5,6]]"
+  []
+  [«string»001]
+    «string»001 'I am a string'
+  [«string»001,«matrix»001]
+    «string»001 'I am a string'
+    «matrix»001 [[1,2,3],[4,5,6]]
+
+
+    
+  
