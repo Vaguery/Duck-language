@@ -1,1 +1,1 @@
-require File.join(File.dirname(__FILE__), '..', '..', 'lib', 'duck_interpreter')
+require File.join(File.dirname(__FILE__), '..', '..', 'lib', 'duck')

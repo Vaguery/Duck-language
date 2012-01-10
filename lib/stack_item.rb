@@ -6,7 +6,12 @@ class StackItem
   end
   
   def disappear
+    []
     # no return item
+  end
+  
+  def dup
+    [self.clone,self.clone]
   end
 end
 

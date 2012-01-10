@@ -20,7 +20,7 @@ class DuckInterpreter
   
   
   def step
-    parse
+    parse if @queue.empty?
     next_item = @queue[0]
     
     if next_item.kind_of?(MessageItem)
@@ -28,7 +28,7 @@ class DuckInterpreter
       recipient = @stack.rindex{|item| item.respond_to?(msg_text)}
       if recipient
         result = @stack.delete_at(recipient).instance_eval(msg_text)
-        @queue.push result if result
+        @queue += result
         @queue.delete_at(0)
       end
     end
