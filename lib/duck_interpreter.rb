@@ -3,12 +3,15 @@ class DuckInterpreter
   attr_accessor :queue
   
   def initialize(script="")
-    @script = script
+    @script = script.strip
     @queue = []
   end
   
-  def step
-    
+  
+  def parse
+    leader,token,@script = @script.partition(/\S+\s*/)
+    @queue.push token.strip
+    self
   end
   
 end
