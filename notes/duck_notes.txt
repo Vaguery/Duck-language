@@ -22,43 +22,22 @@ So for example a program like "6.3 2 -" contains three messages separated by whi
 
 "6.3 2 -"
   [stack]                    [parser queue]         "script"
-  []                         []                   "6.3 2 -"   
-  []                         ["6.3"]              "6.3 2 -"   (1)
-  []                         [:Float.new(6.3)]        "2 -"   (2)
-  [:Float.new(6.3)]          []                       "2 -"   (3)
-  [>>6.3]                    []                       "2 -"   (4)
-  [6.3]                      []                       "2 -"   (5)
-  [6.3]                      ["2"]                      "-"
-  [6.3]                      [:Integer.new(2)]          "-"   (6)
-  [6.3,:Integer.new(2)]      []                         "-"
-  [6.3,>>2]                  []                         "-"   (7)
-  [6.3,2]                    []                         "-"   (8)
-  [6.3,2]                    ["-"]                       ""
-  [6.3,2]                    [:-]                        ""   (9)
-  [6.3]                      [:Closure.new(«__:2:-»)]    ""   (10)
-  [6.3,>>:Closure.new(...)]  []                          ""   (11)
-  []                         [:Closure.new(6.3,2,:-)]    ""   (12)
-  [>>:Closure.new(6.3,2,:-)] []                          ""   (13)
-  []                         [:Float.new(4.3)]           ""
-  [>>:Float.new(4.3)]        []                          ""
-  [4.3]                      []                          ""
-
+  []                         []                    "6.3 2 -"
+  []                         [Float.new("6.3")]        "2 -"
+  [?(),6.3]                  []                        "2 -"      (1)
+  [6.3]                      []                        "2 -"
+  [6.3]                      [Int.new("2")]              "-"
+  [?(6.3),2]                 []                          "-"      (2)
+  [?(),6.3,2]                []                          "-"      (3)
+  [6.3,2]                    []                          "-"
+  [6.3,2]                    [Message.new("-")]           ""
+  [6.3,?(2),:-]              []                           ""      (4)
+  [6.3]                      [Closure.new(?(:neg),2,:-)]  ""      (5)
+  [?(6.3),Closure.new(?(:neg),2,:-)] []                   ""      (6)
+  []                         [Float.new("4.3")]           ""      (7)
+  [?(),4.3]                  []                           ""
+  [4.3]
   
-  (1) a chunk of script is sliced off
-  (2) the queue parser recognizes it as a :Float.new(6.3) message
-  (3) the float message is sent to the stack
-  (4) the :Float.new message is sent to everything on the stack (nothing, now!), then to the stack,
-      which creates a new Float stack object and announces it
-  (5) Nothing cares about the announcement, so the object is done.
-  (6) the parser recognizes the "2" as an integer
-  (7) the :Integer.new is sent to the 6.3, which doesn't care; the stack creates an integer, which is announced
-  (8) ... and 6.3 still doesn't care about integers
-  (9) The parser doesn't actually know what a "-" is, so it just makes it into a message
-  (10) This time, the 2 object on the stack responds to the :-, and queues a message that will make a Closure object to find the first argument [syntax to be determined]
-  (11) The :Closure.new(...) message is sent to the stack...
-  (12) ... but this is a message 6.3 recognizes, which finalizes evaluation of the function
-  (13) the completed Closure message is sent
-  (14) the stack recognizes instantiates this Closure, it recognizes it's complete, and (finally!) to create a Float message for the result
 
 Luckily, we're hardly every going to deal with this whole dynamic of messages and shifting responsibilities; it's provided as an explicit example of the consistency of behavior and responsibility of the script, queue, and stack, and also the important role of stack items in handling closures.
 

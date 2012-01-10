@@ -26,9 +26,9 @@ class DuckInterpreter
     if next_item.kind_of?(MessageItem)
       msg_text = next_item.value
       recipient = @stack.rindex{|item| item.respond_to?(msg_text)}
-      if recipient
-        result = @stack.delete_at(recipient).instance_eval(msg_text)
-        @queue += result
+      unless recipient.nil?
+        respondent = @stack.delete_at(recipient)
+        @queue += respondent.instance_eval(msg_text)
         @queue.delete_at(0)
       end
     end

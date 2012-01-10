@@ -1,7 +1,7 @@
 class StackItem
   attr_reader :value
   
-  def initialize(value)
+  def initialize(value="")
     @value = value
   end
   
@@ -16,8 +16,20 @@ class StackItem
 end
 
 
-class IntegerItem < StackItem
+class NumericItem < StackItem
 end
+
+
+class IntegerItem < NumericItem
+  def add
+    [ClosureItem.new("add")]
+  end
+end
+
+
+class ClosureItem < StackItem
+end
+
 
 class MessageItem < StackItem
 end
