@@ -12,7 +12,7 @@ class DuckInterpreter
   
   
   def run
-    while @script.length > 0
+    while @script.length > 0 || @queue.length > 0
       step
     end
     self

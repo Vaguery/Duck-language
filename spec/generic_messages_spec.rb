@@ -32,6 +32,5 @@ describe "generic StackItem messages" do
       @ducky.stack[-1].value.should == 2
       @ducky.queue[0].value.should == 2
     end
-    
   end
 end

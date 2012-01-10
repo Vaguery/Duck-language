@@ -59,3 +59,18 @@ describe "running a simple script" do
     DuckInterpreter.new("1 2 3 4").run.stack.length.should == 4
   end
 end
+
+
+describe "running a growing script that makes new tokens" do
+  it "should clear the script" do
+    DuckInterpreter.new("1 dup dup").run.script.should == ""
+  end
+  
+  it "should clear the queue" do
+    DuckInterpreter.new("1 dup dup").run.queue.length.should == 0
+  end
+  
+  it "should have the stack items in the right order" do
+    DuckInterpreter.new("1 dup 2 dup").run.stack.collect{|i| i.value}.should == [1,1,2,2]
+  end
+end
