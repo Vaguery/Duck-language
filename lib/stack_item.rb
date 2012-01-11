@@ -13,6 +13,10 @@ class StackItem
   def dup
     [self.clone,self.clone]
   end
+  
+  def to_s
+    "#{self.class}(#{value})"
+  end
 end
 
 

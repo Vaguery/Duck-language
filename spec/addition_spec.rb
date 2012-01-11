@@ -30,8 +30,7 @@ describe "IntegerItem addition" do
     it "should have the right ClosureItem" do
       pending
       @ducky.step.step
-      @ducky.stack[-1].value.should == "something"
-      
+      @ducky.stack[-1].to_s.should == "ClosureItem(IntItem(1).add)(abs)"
     end
   end
 end

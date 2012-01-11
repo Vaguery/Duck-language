@@ -39,6 +39,11 @@ So for example a program like "6.3 2 -" contains three messages separated by whi
   [4.3]
   
 
+The tricky part is the "presentation" of new objects on the Stack. Suppose all StackItems carry around "wants" and "offers". A FloatItem has no wants as such, but it offers any message it can recognize. A ClosureItem has both wants and offers; it is looking for other objects that respond to certain messages, and it also can respond to some messages itself.
+
+So in the example, when FloatItem(6.3) appears, its wants (none) and offers (its and its ancestors' methods) are "shown" by the interpreter to everything else on the stack, and to the Stack object itself (in the case of Messages), and the other components of the Interpreter. As soon as a match is made, the business is done.
+
+
 Luckily, we're hardly every going to deal with this whole dynamic of messages and shifting responsibilities; it's provided as an explicit example of the consistency of behavior and responsibility of the script, queue, and stack, and also the important role of stack items in handling closures.
 
 
