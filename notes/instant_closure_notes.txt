@@ -1,0 +1,56 @@
+ClosureItem.new(actor,message,args,needs)
+
+for example, ClosureItem.new(int(3),"+",[],[["abs"]])
+
+
+So what happens if Duck messages immediately become closures?
+
+"+ 3 - 9"
+1  []                                         [closure(msg("+"),"respond_to",[],["+"])]
+2  [closure(msg("+"),"respond_to",[],["+"])]  []
+3  [closure(msg("+"),"respond_to",[],["+"])]  [int(3)]
+4  []                                         [closure(int(3),"+",[],["neg"])]
+5  [closure(int(3),"+",[],["neg"])]           []
+6  [closure(int(3),"+",[],["neg"])]           [closure(msg("-"),"respond_to",[],["-"])]
+7  [closure(int(3),"+",[],["neg"]),closure(msg("-"),"respond_to",[],["-"])]   [int(9)]
+8  [closure(int(3),"+",[],["neg"])]           [closure(int(9),"-",[],["neg"])]
+9  [closure(int(3),"+",[],["neg"]),closure(int(9),"-",[],["neg"])]
+
+
+1. "+" message becomes a closure, is staged
+2. nothing on the stack satisfies ITS needs; it satisfies nothing else's needs, so it gets pushed
+3. int(3) gets staged
+4. nothing on the stack satisfies ITS needs (it has none); it satisfies the closure's,
+   so a new closure gets staged...
+5. ... and stacked
+6. the "-" becomes a staged closure, nothing on the stack satisfies ITS needs;
+   it satisfies nobody's, so it gets stacked
+7. the int(9) comes along to the stage; it wants nothing, but it satisfies the "-" needs for "respond_to"...
+8. so it gets staged
+9... and stacked
+
+NOTE this negotiation cycle introduces an order-dependency that's kinda weird: Closures tend to be used LIFO (which is true about arguments as well, after all!!)
+
+
+"1 3 alike 7 2 + 9.1 map"
+1  []  [int(1)]
+2  [int(1)] []
+3  [int(1)] [int(3)]
+4  [int(1),int(3)] []
+5  [int(1),int(3)] [closure(msg("alike"),"respond_to",[],["alike"])]
+6  []     [closure(int(3),"wrap",[int(1)],["++","++"])]
+7  [closure(int(3),"wrap",[int(1)],["++","++"])]    []
+8  [closure(int(3),"wrap",[int(1)],["++","++"])]    [int(7)]
+9  []   [closure(int(3),"wrap",[int(1),int(7),["++"])]
+10 [closure(int(3),"wrap",[int(1),int(7),["++"])]  [int(2)]
+11 []  [closure(int(3),"wrap",[int(1),int(7),int(2)])]
+12 []  [collection(int(1),int(7),int(9))]
+13 [collection(int(1),int(7),int(9))] []
+14 [collection(int(1),int(7),int(9))] [closure(msg("+"),"respond_to",[],["+"])]
+15 [collection(int(1),int(7),int(9)),closure(msg("+"),"respond_to",[],["+"])]  []
+16 [collection(int(1),int(7),int(9)),closure(msg("+"),"respond_to",[],["+"])]  [float(9.1)]
+17 [collection(int(1),int(7),int(9))]  [closure(float(9.1),"+",[],["neg"])]
+18 [collection(int(1),int(7),int(9)),closure(float(9.1),"+",[],["neg"])]   []
+19 [collection(int(1),int(7),int(9)),closure(float(9.1),"+",[],["neg"])]  
+      [closure(msg("map"),"respond_to",[],["map"])]
+20 ... I got confused...
