@@ -28,9 +28,8 @@ describe "IntegerItem addition" do
     end
     
     it "should have the right ClosureItem" do
-      pending
       @ducky.step.step
-      @ducky.stack[-1].to_s.should == "ClosureItem(IntItem(1).add)(abs)"
+      @ducky.stack[-1].to_s.should == 'closure(int(1),"+",[],["neg"])'
     end
   end
 end
