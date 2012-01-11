@@ -20,22 +20,22 @@ class StackItem
 end
 
 
-class NumericItem < StackItem
+class Number < StackItem
 end
 
 
-class IntegerItem < NumericItem
+class Int < Number
   def to_s
     "int(#{self.value})"
   end
   
   def add
-    [ClosureItem.new(self,"+",[],["neg"])]
+    [Closure.new(self,"+",[],["neg"])]
   end
 end
 
 
-class ClosureItem < StackItem
+class Closure < StackItem
   attr_reader :actor
   attr_reader :method
   attr_accessor :args
@@ -54,5 +54,5 @@ class ClosureItem < StackItem
 end
 
 
-class MessageItem < StackItem
+class Message < StackItem
 end

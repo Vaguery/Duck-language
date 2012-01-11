@@ -23,7 +23,7 @@ class DuckInterpreter
     parse if @queue.empty?
     next_item = @queue[0]
     
-    if next_item.kind_of?(MessageItem)
+    if next_item.kind_of?(Message)
       msg_text = next_item.value
       recipient = @stack.rindex{|item| item.respond_to?(msg_text)}
       unless recipient.nil?
@@ -47,9 +47,9 @@ class DuckInterpreter
   def recognize(string)
     case string
     when /^[-+]?[0-9]+$/
-      IntegerItem.new(string.to_i)
+      Int.new(string.to_i)
     else
-      MessageItem.new(string)
+      Message.new(string)
     end
   end
   
