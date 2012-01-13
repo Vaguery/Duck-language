@@ -25,17 +25,8 @@ class DuckInterpreter
     
     next_item = @queue[0]
     
+    @stack.push next_item
     
-    if next_item.kind_of?(Message)
-      msg_text = next_item.value
-      recipient = @stack.rindex{|item| item.respond_to?(msg_text)}
-      unless recipient.nil?
-        respondent = @stack.delete_at(recipient)
-        @queue += respondent.instance_eval(msg_text)
-        @queue.delete_at(0)
-      end
-    end
-    @stack.push @queue.delete_at(0) if @queue[0]
     self
   end
   
@@ -52,7 +43,7 @@ class DuckInterpreter
     when /^[-+]?[0-9]+$/
       Int.new(string.to_i)
     else
-      Message.new(string)
+      Closure.new(Message.new(string),string,[],[string])
     end
   end
   

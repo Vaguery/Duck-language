@@ -11,13 +11,14 @@ describe "parse next word" do
     @ducky.parse
   end
   
-  it "should put the result of parsing onto the queue" do
-    @ducky.queue.length.should == 0
-    @ducky.parse
+  it "should append the result of parsing to the queue" do
+    @ducky.queue += ["foo"]
     @ducky.queue.length.should == 1
+    @ducky.parse
+    @ducky.queue.length.should == 2
   end
   
-  it "should shorten the script" do
+  it "should shorten the script by one token" do
     @ducky.parse
     @ducky.script.should == "-912 4.56 -67.8 false foo +"
   end
