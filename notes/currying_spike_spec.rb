@@ -14,11 +14,11 @@
 require 'rspec'
 
 class Closure
-  attr_reader :proc
+  attr_reader :closure
   attr_reader :needs
   
-  def initialize(proc,needs)
-    @proc = proc
+  def initialize(closure,needs)
+    @closure = closure
     @needs = needs
   end
   
@@ -29,9 +29,9 @@ class Closure
   def grab(object)
     if can_use?(object)
       if @needs.length > 1
-        Closure.new(@proc.curry[object],@needs.drop(1))
+        Closure.new(@closure.curry[object],@needs.drop(1))
       else
-        @proc.curry[object]
+        @closure.curry[object]
       end
     else
       self
@@ -42,6 +42,7 @@ end
 
 class MyInt
   attr_reader :value
+  
   def initialize(value)
     @value = value
   end
@@ -71,6 +72,7 @@ end
 
 describe "partial application" do
   before(:each) do
+    @minus = Closure.new(Proc.new {|arg| arg.-},["-"])
     @aa = MyInt.new(8)
     @bb = MyInt.new(5)
     @cc = @aa.-
@@ -78,6 +80,13 @@ describe "partial application" do
   end
   
   describe "closures" do
+    it "should be possible to create an empty closure and have it grab its arg" do
+      step_one = @minus.grab(@aa)
+      step_one.should be_a_kind_of(Closure)
+      step_one.can_use?(@aa).should == true
+      step_one.grab(@aa).value.should == 0
+    end
+    
     it "should create a closure when you send #- to a MyInt instance" do
       @cc.should be_a_kind_of(Closure)
     end
