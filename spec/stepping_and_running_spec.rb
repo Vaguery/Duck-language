@@ -3,23 +3,6 @@ require_relative './spec_helper'
 describe "interpreter steps" do
   
   describe "literals" do
-    before(:each) do
-      @ducky = DuckInterpreter.new("123 -912")
-    end
-    
-    it "should be repeatable" do
-      lambda {@ducky.step.step}.should_not raise_error
-    end
-  
-    it "should move a new item onto the stack when it's a literal" do
-      @ducky.step.step
-      @ducky.stack[0].value.should == 123
-      @ducky.stack[1].value.should == -912
-    end
-    
-    it "should recognize IntegerItems" do
-      DuckInterpreter.new("123 -912").step.stack[-1].value.should == 123
-    end
   end
   
   describe "messages" do
@@ -59,6 +42,22 @@ describe "running a simple script" do
     DuckInterpreter.new("1 2 3 4").run.stack.length.should == 4
   end
 end
+
+describe "staged items" do
+  before(:each) do
+    @closet = DuckInterpreter.new("1 + 2")
+  end
+  
+  it "should check the staged item's needs before pushing it" do
+    pending
+  end
+  
+  it "should check whether the staged item fills stack items' needs" do
+    pending
+  end
+end
+
+
 
 
 describe "running a growing script that makes new tokens" do

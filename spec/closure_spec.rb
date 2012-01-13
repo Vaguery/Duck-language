@@ -10,10 +10,10 @@ describe "initialization" do
     Closure.new(Int.new(12),"+",[],[]).method.should == "+"
   end
   
-  it "should have an args attribute" do
-    Closure.new(Int.new(12),"+",[Int.new(2)],[]).args[0].value.should == 2
+  it "should have an arguments attribute" do
+    Closure.new(Int.new(12),"+",[],[]).arguments.should == []
   end
-  
+    
   it "should have a needs attribute" do
     Closure.new(Int.new(12),"+",[],["+"]).needs[0].should == "+"
   end

@@ -32,4 +32,29 @@ describe "Int addition" do
       @ducky.stack[-1].to_s.should == 'closure(int(1),"+",[],["neg"])'
     end
   end
+  
+  describe "finishing up addition" do
+    it "should delete the arguments and the closure" do
+      pending
+      DuckInterpreter.new("1 2 add").run.stack.length.should == 1
+      DuckInterpreter.new("1 add 2").run.stack.length.should == 1
+      DuckInterpreter.new("add 1 2").run.stack.length.should == 1
+    end
+    
+    it "should produce the correct result for 'straight' addition" do
+      pending
+      DuckInterpreter.new("1 2 add").run.stack[-1].value.should == 3
+    end
+    
+    it "should produce the expected result for 'infix' addition" do
+      pending
+      DuckInterpreter.new("-11 add -22").run.stack[-1].value.should == 3
+    end
+    
+    it "should even work if the closure forms first" do
+      pending
+      DuckInterpreter.new("add 1 2").run.stack[-1].value.should == 3
+    end
+    
+  end
 end

@@ -34,7 +34,6 @@ describe "parse next word" do
     end
   end
   
-  
   describe "messages" do
     it "shouldn't recognize '+' or '-' as an IntegerItem" do
       not_a_number = DuckInterpreter.new("+ - +12 -34").parse.parse.parse.parse

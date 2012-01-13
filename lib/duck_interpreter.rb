@@ -2,6 +2,7 @@ class DuckInterpreter
   attr_accessor :script
   attr_accessor :queue
   attr_accessor :stack
+  attr_accessor :stage
   
   
   def initialize(script="")
@@ -12,7 +13,7 @@ class DuckInterpreter
   
   
   def run
-    while @script.length > 0 || @queue.length > 0
+    while @script.length > 0 || @queue.length > 0 || @stage
       step
     end
     self
@@ -21,7 +22,9 @@ class DuckInterpreter
   
   def step
     parse if @queue.empty?
+    
     next_item = @queue[0]
+    
     
     if next_item.kind_of?(Message)
       msg_text = next_item.value
