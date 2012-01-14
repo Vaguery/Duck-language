@@ -2,7 +2,7 @@ class DuckInterpreter
   attr_accessor :script
   attr_accessor :queue
   attr_accessor :stack
-  attr_accessor :stage
+  attr_accessor :staged_item
   
   
   def initialize(script="")
@@ -24,19 +24,23 @@ class DuckInterpreter
     parse if @queue.empty?
     unless @queue.empty?
       @staged_item = @queue.delete_at(0)
-      clear_staged_item_args
+      fill_staged_item_needs
       consume_staged_item_as_arg
-      @stack.push @staged_item if @staged_item
+      if @staged_item
+        @stack.push @staged_item
+        @staged_item = nil
+      end
     end
     self
   end
   
   
-  def clear_staged_item_args
+  def fill_staged_item_needs
     while next_arg = @stack.rindex {|item| @staged_item.can_use?(item)}
       @staged_item = @staged_item.grab(@stack.delete_at(next_arg))
     end
   end
+  
   
   def consume_staged_item_as_arg
     if arg_for = @stack.rindex {|item| item.can_use?(@staged_item)}

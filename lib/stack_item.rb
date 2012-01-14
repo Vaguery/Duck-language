@@ -7,13 +7,16 @@ class Item
     @needs = []
   end
   
+  
   def grab(object)
     self
   end
   
+  
   def can_use?(object)
     !@needs.empty? && object.respond_to?(@needs[0]) 
   end
+  
   
   def to_s
     "#{self.class.to_s.downcase}(#{value})"
@@ -33,19 +36,36 @@ class Int < Number
     needs = ["neg"]
     Closure.new(Proc.new {|summand| Int.new(self.value + summand.value)},needs)
   end
+  
+  def -
+    needs = ["neg"]
+    Closure.new(Proc.new {|arg1| Int.new(arg1.value - self.value)},needs)
+  end
 end
 
 
 class Closure < Item
-  attr_reader :closure
-  attr_reader :needs
-  attr_reader :value
+  attr_reader :closure, :needs, :value
+  attr_accessor :string_version
   
-  def initialize(closure,needs)
-    @value = nil
+  
+  def initialize(closure,needs,string = nil)
     @closure = closure
     @needs = needs
+    string ||= template_string
+    @string_version = string
+    @value = self.to_s
   end
+  
+  
+  def template_string
+    unless @needs.empty?
+      "f(" + "*,"*(needs.length-1) + "*)"
+    else
+      "f()"
+    end
+  end
+  
   
   def grab(object)
     if can_use?(object)
@@ -57,5 +77,10 @@ class Closure < Item
     else
       self
     end
+  end
+  
+  
+  def to_s
+    "closure(#{@string_version},#{@needs.inspect})"
   end
 end

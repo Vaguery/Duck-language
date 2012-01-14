@@ -9,10 +9,13 @@ describe "parse next word" do
   it "should recognize the next word of script" do
     @ducky.should_receive(:recognize).with("123")
     @ducky.parse
+    @ducky.should_receive(:recognize).with("-912")
+    @ducky.parse
+    
   end
   
   it "should append the result of parsing to the queue" do
-    @ducky.queue += ["foo"]
+    @ducky.queue += ["arbitrary thing"]
     @ducky.queue.length.should == 1
     @ducky.parse
     @ducky.queue.length.should == 2
@@ -22,6 +25,7 @@ describe "parse next word" do
     @ducky.parse
     @ducky.script.should == "-912 4.56 -67.8 false foo +"
   end
+  
   
   describe "integers" do
     it "should recognize integers" do
@@ -45,7 +49,10 @@ describe "parse next word" do
     end
   end
   
-  it "should turn gibberish into a message" do
-    DuckInterpreter.new("::«91__\\»\" :foo").parse.queue[-1].value == "::«91__\\»\""
+  it "should consider any gibberish as space-delimited messages" do
+    messy = DuckInterpreter.new("::«91__\\»\" :foo")
+    what_it_saw = messy.parse.queue[-1]
+    what_it_saw.should be_a_kind_of(Closure)
+    what_it_saw.needs.should include '::«91__\\»"'
   end
 end

@@ -9,11 +9,11 @@ describe "new Duck interpreter" do
   end
   
   describe "created with a script" do
-    it "should strip whitespace" do
+    it "should strip whitespace from the ends of the script" do
       DuckInterpreter.new("   foo   ").script.should == "foo"
     end
     
-    it "should disappear whitespace-only scripts" do
+    it "should totally disappear whitespace-only scripts" do
       DuckInterpreter.new("\t\t \n\r  ").script.should == ""
     end
   end
