@@ -20,12 +20,30 @@ class DuckInterpreter
   end
   
   
+  def parse
+    leader,token,@script = @script.partition(/\S+\s*/)
+    @queue.push recognize(token.strip)
+    self
+  end
+  
+  
+  def recognize(string)
+    case string
+    when /^[-+]?[0-9]+$/
+      Int.new(string.to_i)
+    else
+      Message.new(string)
+    end
+  end
+  
+  
   def step
     parse if @queue.empty?
     unless @queue.empty?
       @staged_item = @queue.delete_at(0)
-      fill_staged_item_needs
-      consume_staged_item_as_arg
+      fill_staged_item_needs if @staged_item
+      consume_staged_item_as_arg if @staged_item
+      check_for_interpreter_response if @staged_item
       if @staged_item
         @stack.push @staged_item
         @staged_item = nil
@@ -51,20 +69,17 @@ class DuckInterpreter
   end
   
   
-  def parse
-    leader,token,@script = @script.partition(/\S+\s*/)
-    @queue.push recognize(token.strip)
-    self
-  end
-  
-  
-  def recognize(string)
-    case string
-    when /^[-+]?[0-9]+$/
-      Int.new(string.to_i)
-    else
-      Closure.new( Proc.new {|receiver| receiver.__send__(string)},[string])
+  def check_for_interpreter_response
+    if @staged_item.kind_of?(Message)
+      if self.respond_to?(@staged_item.value)
+        self.__send__(@staged_item.value)
+        @staged_item = nil
+      end
     end
   end
   
+  
+  def depth
+    @stack.push Int.new(@stack.length)
+  end
 end

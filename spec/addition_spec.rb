@@ -7,8 +7,8 @@ describe "addition" do
       @ducky.step
     end
     
-    it "should produce a Closure" do
-      @ducky.stack[-1].should be_a_kind_of(Closure)
+    it "should produce a Message" do
+      @ducky.stack[-1].should be_a_kind_of(Message)
     end
     
     it "should be waiting for one argument that responds to '+'" do
@@ -16,7 +16,8 @@ describe "addition" do
     end
   end
   
-  describe "partial '+' message" do
+  
+  describe "partial '+' application" do
     before(:each) do
       @ducky = DuckInterpreter.new("1 +")
       @ducky.step.step
@@ -30,6 +31,7 @@ describe "addition" do
       @ducky.stack[-1].needs.should == ['neg']
     end
   end
+  
   
   describe "finishing up addition" do
     it "should delete the arguments and the closure" do
@@ -66,7 +68,7 @@ describe "addition" do
     
     it "should produce some closures when there aren't enough args" do
       "1 + -3 + +".split.permutation do |p|
-        [Int,Closure].should include DuckInterpreter.new(p.join(" ")).run.stack[-1].class
+        [Int,Message,Closure].should include DuckInterpreter.new(p.join(" ")).run.stack[-1].class
       end
     end
     

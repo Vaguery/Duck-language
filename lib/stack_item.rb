@@ -102,3 +102,17 @@ class Closure < Item
     "closure(#{@string_version},#{@needs.inspect})"
   end
 end
+
+
+class Message < Closure
+  
+  def initialize(string)
+    @closure = Proc.new {|receiver| receiver.__send__(string) }
+    @needs = [string]
+    @value = string.intern
+  end
+  
+  def to_s
+    ":#{@value}"
+  end
+end

@@ -7,8 +7,8 @@ describe "division" do
       @ducky.step
     end
     
-    it "should produce a Closure" do
-      @ducky.stack[-1].should be_a_kind_of(Closure)
+    it "should produce a Message" do
+      @ducky.stack[-1].should be_a_kind_of(Message)
     end
     
     it "should be waiting for one argument that responds to '/'" do
@@ -82,7 +82,7 @@ describe "division" do
     
     it "should produce some closures when there aren't enough args" do
       "21 * -3 * *".split.permutation do |p|
-        [Int,Closure].should include DuckInterpreter.new(p.join(" ")).run.stack[-1].class
+        [Int,Closure,Message].should include DuckInterpreter.new(p.join(" ")).run.stack[-1].class
       end
     end
     
