@@ -25,6 +25,12 @@ end
 
 
 class Number < Item
+  @@divzero_result = 0
+  
+  def self.divzero_result=(new_value)
+    @@divzero_result=new_value
+  end
+  
   def neg
     self.class.new(-@value)
   end
@@ -40,6 +46,18 @@ class Int < Number
   def -
     needs = ["neg"]
     Closure.new(Proc.new {|arg1| Int.new(arg1.value - self.value)},needs)
+  end
+  
+  def *
+    needs = ["neg"]
+    Closure.new(Proc.new {|multiplier| Int.new(self.value * multiplier.value)},needs)
+  end
+  
+  def /
+    needs = ["neg"]
+    self.value != 0 ? 
+      Closure.new(Proc.new {|numerator| Int.new(numerator.value / self.value)},needs) :
+      Closure.new(Proc.new {|numerator| Int.new(@@divzero_result)},needs)
   end
 end
 

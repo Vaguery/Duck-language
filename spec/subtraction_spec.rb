@@ -31,17 +31,17 @@ describe "subtraction" do
     end
   end
   
-  describe "finishing up addition" do
+  describe "finishing up subtraction" do
     it "should delete the arguments and the closure" do
       ducky = DuckInterpreter.new("1 2 -").run
       ducky.stack.length.should == 1
     end
     
-    it "should produce the correct result for 'straight' addition" do
+    it "should produce the correct result for 'straight' subtraction" do
       DuckInterpreter.new("13 27 -").run.stack[-1].value.should == -14
     end
     
-    it "should produce the expected result for 'infix' addition" do
+    it "should produce the expected result for 'infix' subtraction" do
       DuckInterpreter.new("13 - 27").run.stack[-1].value.should == 14
     end
     
@@ -50,7 +50,7 @@ describe "subtraction" do
     end
   end
   
-  describe "delayed addition" do
+  describe "delayed subtraction" do
     it "should work over complex sequences" do
       ducky = DuckInterpreter.new("1 2 - 3 - 4 -")
       ducky.run
