@@ -1,5 +1,7 @@
 Duck is a language designed to be used in [genetic programming] (http://www.gp-field-guide.org.uk/). It's an (extreme) variation on [Lee Spector and Maarten Keijzer's Push] (http://push.i3ci.hampshire.edu/), but has ended up much closer in spirit to the exotic concatenative language [XY] (http://www.nsl.com/k/xy/xy.htm).
 
+It has a very limited function set, but is being built for extensibility in domain modeling.
+
 
 ### Duck language features:
 
@@ -8,6 +10,7 @@ Duck is a language designed to be used in [genetic programming] (http://www.gp-f
 * concatenative, like XY
 * uses duck-typing to map arguments to function calls, not static types
 * uses first-class functions and partial application
+* [pending] simple list/collection structures
 
 
 ### Executing scripts
