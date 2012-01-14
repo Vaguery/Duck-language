@@ -35,16 +35,15 @@ describe "parse next word" do
     end
   end
   
+  
   describe "messages" do
-    it "shouldn't recognize '+' or '-' as an IntegerItem" do
-      not_a_number = DuckInterpreter.new("+ - +12 -34").parse.parse.parse.parse
-      not_a_number.queue[0].value.should == "+"
-      not_a_number.queue[1].value.should == "-"
-      not_a_number.queue[2].value.should == 12
-      not_a_number.queue[3].value.should == -34
+    it "should create a Closure looking for a recipient when it encounters a message" do
+      no_numbers = DuckInterpreter.new("+ - foo")
+      no_numbers.parse.queue[-1].needs.should include("+")
+      no_numbers.parse.queue[-1].needs.should include("-")
+      no_numbers.parse.queue[-1].needs.should include("foo")
     end
   end
-  
   
   it "should turn gibberish into a message" do
     DuckInterpreter.new("::«91__\\»\" :foo").parse.queue[-1].value == "::«91__\\»\""

@@ -1,64 +1,61 @@
-class StackItem
+class Item
   attr_reader :value
-  attr_accessor :arguments
-  attr_accessor :needs
+  attr_reader :needs
   
   def initialize(value="")
     @value = value
-    @arguments = []
     @needs = []
   end
   
-  def disappear
-    []
-    # no return item
+  def grab(object)
+    self
   end
   
-  def dup
-    [self.clone,self.clone]
+  def can_use?(object)
+    !@needs.empty? && object.respond_to?(@needs[0]) 
   end
   
   def to_s
-    "object(#{value})"
-  end
-  
-  def want?(object)
-    @needs.index{|need| object.respond_to?(need)}
+    "#{self.class.to_s.downcase}(#{value})"
   end
 end
 
 
-class Number < StackItem
+class Number < Item
+  def neg
+    self.class.new(-@value)
+  end
 end
 
 
 class Int < Number
-  def to_s
-    "int(#{self.value})"
-  end
-  
-  def add
-    [Closure.new(self,"+",[],["neg"])]
+  def +
+    needs = ["neg"]
+    Closure.new(Proc.new {|summand| Int.new(self.value + summand.value)},needs)
   end
 end
 
 
-class Closure < StackItem
-  attr_reader :actor
-  attr_reader :method
+class Closure < Item
+  attr_reader :closure
+  attr_reader :needs
+  attr_reader :value
   
-  def initialize(actor,method,args,needs)
-    @actor=actor
-    @method=method
-    @arguments=args
-    @needs=needs
+  def initialize(closure,needs)
+    @value = nil
+    @closure = closure
+    @needs = needs
   end
   
-  def to_s
-    "closure(#{actor.to_s},\"#{method}\",#{arguments.inspect},#{needs.inspect})"
+  def grab(object)
+    if can_use?(object)
+      if @needs.length > 1
+        Closure.new(@closure.curry[object],@needs.drop(1))
+      else
+        @closure.curry[object]
+      end
+    else
+      self
+    end
   end
-end
-
-
-class Message < StackItem
 end

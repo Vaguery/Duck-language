@@ -4,7 +4,7 @@ require_relative './spec_helper'
 describe "to_s representations" do
   describe "StackItems" do
     it "should be human-readable for even generic items" do
-      StackItem.new("foo").to_s.should == "object(foo)"
+      Item.new("foo").to_s.should == "item(foo)"
     end
     
     it "Ints should show the value" do
@@ -12,8 +12,7 @@ describe "to_s representations" do
     end
     
     it "Closures should show all their arguments" do
-      ci = Closure.new(Int.new(8),"-",[],["neg"])
-      ci.to_s.should == 'closure(int(8),"-",[],["neg"])'
+      pending
     end
   end
 end

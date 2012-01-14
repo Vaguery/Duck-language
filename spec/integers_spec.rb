@@ -17,19 +17,6 @@ describe "Integer stack item" do
       @ducky.stack[0].should be_a_kind_of(Int)
       @ducky.stack[0].value.should == 123
     end
-    
-    # it should poll the StackItems to look for one that satisfies its #needs
-    
-    it "should poll the StackItems to look for one whose need it satisfies" do
-      pending
-      @ducky.step
-      @ducky.stack[-1].should_receive(:want?).and_return(false)
-      @ducky.step
-    end
-
-    it "should recognize IntegerItems" do
-      DuckInterpreter.new("123 -912").step.stack[-1].value.should == 123
-    end
   end
   
 end
