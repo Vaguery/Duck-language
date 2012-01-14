@@ -40,7 +40,7 @@ class DuckInterpreter
       @staged_item = @staged_item.grab(@stack.delete_at(next_arg))
     end
   end
-  
+    
   
   def consume_staged_item_as_arg
     if arg_for = @stack.rindex {|item| item.can_use?(@staged_item)}
