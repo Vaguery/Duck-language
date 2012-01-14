@@ -1,4 +1,5 @@
 class DuckInterpreter
+  attr_reader :old_script
   attr_accessor :script
   attr_accessor :queue
   attr_accessor :stack
@@ -7,8 +8,19 @@ class DuckInterpreter
   
   def initialize(script="")
     @script = script.strip
+    @old_script = @script
     @queue = []
     @stack = []
+    @staged_item = nil
+  end
+  
+  
+  def reset(script=@old_script)
+    @script = script
+    @queue = []
+    @stack = []
+    @staged_item = nil
+    self
   end
   
   

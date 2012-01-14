@@ -18,3 +18,27 @@ describe "new Duck interpreter" do
     end
   end
 end
+
+describe "resetting an Interpreter" do
+  it "should reset all the initial settings" do
+    old = DuckInterpreter.new("1 2 3 1 4 1 foo bar").run
+    old.script.should == ""
+    old.stack.length.should == 8
+    old.queue.length.should == 0
+    old.staged_item.should == nil
+
+    old.reset("new script")
+    old.script.should == "new script"
+    old.stack.length.should == 0
+    old.queue.length.should == 0
+    old.staged_item.should == nil
+  end
+  
+  it "should default to resetting to the original state" do
+    starting_script = "1 2 3 1 4 1 foo bar"
+    old = DuckInterpreter.new(starting_script).run
+    old.script.should == ""
+    old.reset
+    old.script.should == starting_script
+  end
+end

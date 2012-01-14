@@ -40,24 +40,24 @@ end
 class Int < Number
   def +
     needs = ["neg"]
-    Closure.new(Proc.new {|summand| Int.new(self.value + summand.value)},needs)
+    Closure.new(Proc.new {|summand| Int.new(self.value + summand.value)},needs,"#{self.value} + ?")
   end
   
   def -
     needs = ["neg"]
-    Closure.new(Proc.new {|arg1| Int.new(arg1.value - self.value)},needs)
+    Closure.new(Proc.new {|arg1| Int.new(arg1.value - self.value)},needs,"? - #{self.value}")
   end
   
   def *
     needs = ["neg"]
-    Closure.new(Proc.new {|multiplier| Int.new(self.value * multiplier.value)},needs)
+    Closure.new(Proc.new {|multiplier| Int.new(self.value * multiplier.value)},needs,"#{self.value} * ?")
   end
   
   def /
     needs = ["neg"]
     self.value != 0 ? 
-      Closure.new(Proc.new {|numerator| Int.new(numerator.value / self.value)},needs) :
-      Closure.new(Proc.new {|numerator| Int.new(@@divzero_result)},needs)
+      Closure.new(Proc.new {|numerator| Int.new(numerator.value / self.value)},needs,"? / #{self.value}") :
+      Closure.new(Proc.new {|numerator| Int.new(@@divzero_result)},needs,"DIV0")
   end
 end
 
@@ -113,6 +113,12 @@ class Message < Closure
   end
   
   def to_s
-    ":#{@value}"
+    @value
+  end
+  
+  def grab(object)
+    can_use?(object) ?
+      @closure.curry[object] :
+      self
   end
 end
