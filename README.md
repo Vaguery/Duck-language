@@ -5,11 +5,12 @@ It has a very limited function set, but is being built for extensibility in doma
 
 ### Duck language features:
 
-* integer arithmetic
+* integer arithmetic and numerical comparisons
+* boolean operators
 * stack-based, like Forth or Push
 * concatenative, like XY
 * uses duck-typing to map arguments to function calls, not static types
-* uses first-class functions and partial application
+* uses first-class functions and [greedy] partial application
 * [pending] simple list/collection structures
 
 
@@ -28,3 +29,7 @@ This seems a very convoluted way to approach simple arithmetic, doesn't it? But 
 `DuckInterpreter#run` returns the entire Interpreter object, with all its contents. Determining which stack item, if any, to examine in order to evaluate how well a Duck script satisfies one's goal is a matter of domain modeling---not programming.
 
 I suspect sometime soon I'll add some convenience methods to interrogate the stack.
+
+### Examples
+
+See the directory `/examples` for scripts that exercise some of the quirks of the Duck language
