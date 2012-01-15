@@ -22,6 +22,9 @@ describe "finding arguments" do
       def foo
         :bar
       end
+      
+      # kludge
+      @recognized_messages = (self.instance_methods - Object.instance_methods) 
     end
     
     it "should return itself when the object it tries to grab doesn't respond to the 1st need" do

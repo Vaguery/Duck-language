@@ -1,6 +1,8 @@
 #encoding:utf-8
 
 class Item
+  class << self; attr_accessor :recognized_messages end
+  
   attr_reader :value
   attr_reader :needs
   attr_reader :messages
@@ -15,7 +17,7 @@ class Item
   end
   
   def recognize_message?(string)
-    (self.class.instance_methods - Object.instance_methods).include?(string.intern)
+    self.class.recognized_messages.include?(string.intern)
   end
   
   def can_use?(object)
@@ -33,6 +35,9 @@ class Item
   def if
     Closure.new(Proc.new{|bool| bool.value ? self : Message.new("noop")},["¬"],"#{self.value} IF ?")
   end
+  
+  # keep at end of class definition!
+  @recognized_messages = (self.instance_methods - Object.instance_methods)
 end
 
 
@@ -66,6 +71,9 @@ class Number < Item
   def eql
     Closure.new(Proc.new {|arg1| Bool.new(arg1.value == self.value)},["neg"],"? == #{self.value}")
   end
+  
+  # keep at end of class definition!
+  @recognized_messages = (self.instance_methods - Object.instance_methods)
 end
 
 
@@ -103,6 +111,9 @@ class Int < Number
   def to_s
     "#{@value}"
   end
+  
+  # keep at end of class definition!
+  @recognized_messages = (self.instance_methods - Object.instance_methods)
 end
 
 
@@ -125,6 +136,8 @@ class Bool < Item
     Closure.new(Proc.new {|arg2| Bool.new(self.value || arg2.value)},needs,"#{self.value} ∨ ?")
   end
   
+  # keep at end of class definition!
+  @recognized_messages = (self.instance_methods - Object.instance_methods)
 end
 
 
@@ -167,6 +180,9 @@ class Closure < Item
   def to_s
     "λ(#{@string_version},#{@needs.inspect})"
   end
+  
+  # keep at end of class definition!
+  @recognized_messages = (self.instance_methods - Object.instance_methods)
 end
 
 
@@ -178,13 +194,19 @@ class Message < Closure
     @value = string.intern
   end
   
+  
   def to_s
     ":#{@value}"
   end
+  
   
   def grab(object)
     can_use?(object) ?
       @closure.curry[object] :
       self
   end
+  
+  
+  # keep at end of class definition!
+  @recognized_messages = (self.instance_methods - Object.instance_methods)
 end

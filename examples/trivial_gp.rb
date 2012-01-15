@@ -100,8 +100,8 @@ cycles.times do |c|
     mom, dad = population[mom_index], population[dad_index]
     
     crossover1,crossover2 = mom.crossover_result(dad)
-    baby1 = Answer.new(crossover1).mutant(4,@all_tokens) # some innovative junk gets inserted, here
-    baby2 = Answer.new(crossover2).mutant(4,@all_tokens)
+    baby1 = Answer.new(crossover1).mutant(2,@all_tokens) # some innovative junk gets inserted, here
+    baby2 = Answer.new(crossover2).mutant(2,@all_tokens)
     
     baby1.evaluate(@x_y_values)
     baby2.evaluate(@x_y_values)

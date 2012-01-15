@@ -1,5 +1,7 @@
 #encoding:utf-8
 class DuckInterpreter
+  class << self; attr_accessor :recognized_messages end
+  
   attr_reader :old_script
   attr_reader :old_bindings
   attr_accessor :script
@@ -98,7 +100,7 @@ class DuckInterpreter
   
   
   def recognize_message?(string)
-    (DuckInterpreter.instance_methods - Object.instance_methods).include?(string.intern)
+    DuckInterpreter.recognized_messages.include?(string.intern)
   end
   
   
@@ -152,4 +154,7 @@ class DuckInterpreter
   def noop
     # black hole
   end
+  
+  # this line needs to follow all method definitions
+  @recognized_messages = (self.instance_methods - Object.instance_methods) 
 end
