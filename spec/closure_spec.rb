@@ -1,3 +1,4 @@
+#encoding: utf-8
 require_relative './spec_helper'
 
 describe "initialization" do
@@ -51,8 +52,8 @@ describe "string representation" do
   end
   
   it "should say it's a closure" do
-    @simple.to_s.should =~ /closure\(.*\)/
-    @complicated.to_s.should =~ /closure\(.*\)/
+    @simple.to_s.should =~ /λ\(.*\)/
+    @complicated.to_s.should =~ /λ\(.*\)/
   end
   
   it "should say what it needs" do

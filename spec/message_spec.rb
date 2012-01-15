@@ -34,7 +34,7 @@ describe "Message object" do
   
   describe "visualization" do
     it "should look like a Ruby symbol" do
-      Message.new("foo").to_s.should == :foo
+      DuckInterpreter.new("foo bar baz").run.stack.inspect.should == "[:foo, :bar, :baz]"
     end
   end
 end

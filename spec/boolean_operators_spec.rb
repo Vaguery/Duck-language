@@ -25,7 +25,7 @@ describe "boolean and" do
   
   it "should have a legible Closure representation" do
     d = DuckInterpreter.new("∧ F").run
-    d.stack[-1].to_s.should == 'closure(false ∧ ?,["¬"])'
+    d.stack[-1].to_s.should == 'λ(false ∧ ?,["¬"])'
   end
   
   it "should produce the appropriate Bool value" do
@@ -52,7 +52,7 @@ describe "boolean or" do
   
   it "should have a legible Closure representation" do
     d = DuckInterpreter.new("∨ F").run
-    d.stack[-1].to_s.should == 'closure(false ∨ ?,["¬"])'
+    d.stack[-1].to_s.should == 'λ(false ∨ ?,["¬"])'
   end
   
   it "should produce the appropriate Bool value" do

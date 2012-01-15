@@ -63,12 +63,24 @@ class Int < Number
       Closure.new(Proc.new {|numerator| Int.new(numerator.value / self.value)},needs,"? / #{self.value}") :
       Closure.new(Proc.new {|numerator| Int.new(@@divzero_result)},needs,"DIV0")
   end
+  
+  def inc
+    Int.new(@value + 1)
+  end
+  
+  def dec
+    Int.new(@value - 1)
+  end
+  
+  def to_s
+    "#{@value}"
+  end
 end
 
 
 class Bool < Item
   def to_s
-    "bool(#{@value ? 'T' : 'F'})"
+    "#{@value ? 'T' : 'F'}"
   end
   
   def ¬
@@ -125,7 +137,7 @@ class Closure < Item
   
   
   def to_s
-    "closure(#{@string_version},#{@needs.inspect})"
+    "λ(#{@string_version},#{@needs.inspect})"
   end
 end
 
@@ -139,7 +151,7 @@ class Message < Closure
   end
   
   def to_s
-    @value
+    ":#{@value}"
   end
   
   def grab(object)

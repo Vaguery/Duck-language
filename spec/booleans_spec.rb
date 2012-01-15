@@ -16,9 +16,9 @@ describe "Boolean stack item" do
   end
   
   describe "visualization" do
-    it "should look like 'bool(T) or bool(F)" do
+    it "should look like 'T' or 'F'" do
       DuckInterpreter.new("F true false T").run.stack.inspect.should ==
-        "[bool(F), bool(T), bool(F), bool(T)]"
+        "[F, T, F, T]"
     end
   end
 end

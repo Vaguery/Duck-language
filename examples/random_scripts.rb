@@ -20,7 +20,7 @@ end
 
 # let's just sample all the tokens we have available, and add some extra literals in
 def random_script(length)
-  tokens = ["+","-","*","/","neg","¬","∧","∨","depth"] + ['T','F','k']*3
+  tokens = ["+","-","*","/","neg","¬","∧","∨","depth","inc","dec"] + ['T','F','k']*3
 
   template = length.times.collect do |t|
     t = tokens.sample
@@ -31,9 +31,15 @@ def random_script(length)
 end
 
 
-# how do random scripts 'look'? What happens when they run?
-100.times do
+# how do random scripts 'look'? What do they produce?
+puts "some random Duck scripts, and the final stack state when they're run...\n"
+10.times do
   s = random_script(100)
   d = DuckInterpreter.new(s).run
-  puts "#{d.old_script.inspect} -> \n\n#{d.stack.inspect}\n\n\n\n"
+  puts "script:\n#{d.old_script.inspect}\n\nproduces:\n#{d.stack.inspect}\n\n\n"
 end
+
+
+# What happens when they run?
+puts "Tracing execution of a random Duck script:"
+DuckInterpreter.new(random_script(30)).cartoon_trace

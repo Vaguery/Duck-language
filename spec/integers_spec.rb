@@ -19,4 +19,10 @@ describe "Integer stack item" do
     end
   end
   
+  describe "visualization" do
+    it "should look like the raw value" do
+      DuckInterpreter.new("-121 9912 33 1 0").run.stack.inspect.should ==
+        "[-121, 9912, 33, 1, 0]"
+    end
+  end
 end
