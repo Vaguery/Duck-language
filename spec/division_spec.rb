@@ -49,10 +49,6 @@ describe "division" do
       DuckInterpreter.new("/ -12 60").run.stack[-1].value.should == -5
     end
     
-    it "should do type-casting correctly so it keeps fractions" do
-      pending
-    end
-    
     it "should not fail for division by 0" do
       lambda { DuckInterpreter.new("/ 0 60").run }.should_not raise_error
     end

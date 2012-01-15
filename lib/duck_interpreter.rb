@@ -43,6 +43,10 @@ class DuckInterpreter
     case string
     when /^[-+]?[0-9]+$/
       Int.new(string.to_i)
+    when 'true','T'
+      Bool.new(true)
+    when 'false','F'
+      Bool.new(false)
     else
       Message.new(string)
     end
