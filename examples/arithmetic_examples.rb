@@ -41,7 +41,7 @@ ducky.cartoon_of_state
 
 # an amusing arithmetic experiment
 puts "\n\n\nAn Amusing Experiment"
-jumble_tokens = "1 -22 33 + *".split
+jumble_tokens = "11 -22 33 + *".split
 jumble_tokens.permutation.each do |s|
   script = s.join(" ")
   puts "running \"#{script}\" ---> #{ducky.reset(script).run.stack.inspect}"
