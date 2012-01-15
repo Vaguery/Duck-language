@@ -13,17 +13,29 @@ class DuckInterpreter
       cartoon_of_state
     end
   end
+  
+  def topmost_respondent(message)
+    @stack.rindex {|i| i.recognize_message?(message)}
+  end
 end
 
 
 # let's just sample all the tokens we have available, and add some extra literals in
 def random_script(length)
-  tokens = ["+","-","*","/","neg","¬","∧","∨","depth","inc","dec","eql","<",">","≤","≥","be","pop","swap", "copy", "if", "greedy?", "greedy", "ungreedy"] + ['T','F','k','k','k','x','x','x']*5
-
-  template = length.times.collect do |t|
-    t = tokens.sample
-    t = (rand(1000)-500).to_s if t == 'k'
-    t
-  end
+  template = random_tokens(length)
   template.join(" ")
 end
+
+@all_functions = ["+","-","*","/","neg","¬","∧","∨","depth","inc","dec","eql","<",">","≤","≥","be","pop","swap", "copy", "if", "greedy?", "greedy", "ungreedy"]
+@biased_literals = ['T','F','k','k','k','x','x','x']*5
+
+
+def random_tokens(length,tokens=@all_functions+@biased_literals)
+  length.times.collect do |t|
+    t = tokens.sample
+    t = (rand(20)-10).to_s if t == 'k'
+    t
+  end
+end
+
+
