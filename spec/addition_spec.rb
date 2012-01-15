@@ -25,6 +25,7 @@ describe "addition" do
     
     it "should produce a Closure" do
       @ducky.stack[-1].should be_a_kind_of(Closure)
+      @ducky.stack[-1].should_not be_a_kind_of(Message)
     end
     
     it "should be waiting for one Number argument" do

@@ -1,4 +1,3 @@
-#encoding: utf-8
 require_relative './spec_helper'
 
 describe "initialization" do
@@ -12,6 +11,27 @@ describe "initialization" do
   
   it "should accept an optional #string_value" do
     Closure.new(Proc.new {:foo},["bar"],"HI THERE").string_version.should == "HI THERE"
+  end
+end
+
+
+describe "finding arguments" do
+  describe "grab" do
+    class Fooer < Item
+      def foo
+        :bar
+      end
+    end
+    
+    it "should return itself when the object it tries to grab doesn't respond to the 1st need" do
+      bad_match = Closure.new(Proc.new {:foo},["foo"])
+      bad_match.grab(Int.new(88)).should == bad_match
+    end
+    
+    it "should return a modified closure if it grabs successfully" do      
+      bad_match = Closure.new(Proc.new {:foo},["foo"])
+      bad_match.grab(Fooer.new(1)).should_not == bad_match
+    end
   end
 end
 

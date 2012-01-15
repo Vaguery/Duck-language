@@ -17,9 +17,24 @@ describe "Message object" do
     end
   end
   
+  
+  describe "message checking isolation" do
+    it "should not allow stack items to respond to Ruby messages" do
+      overflow = DuckInterpreter.new("2 object_id").run
+      overflow.stack[-1].should_not be_a_kind_of(Fixnum) #meaning it has returned its object_id
+    end
+    
+    it "should call Item#recognize_message?" do
+      fooer = DuckInterpreter.new("2 foo").step
+      fooer.stack[-1].should_receive(:recognize_message?).with("foo")
+      fooer.step
+    end
+  end
+  
+  
   describe "visualization" do
     it "should look like a Ruby symbol" do
-      Message.new("foo").to_s.should == ":foo"
+      Message.new("foo").to_s.should == :foo
     end
   end
 end

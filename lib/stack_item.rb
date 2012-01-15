@@ -1,22 +1,24 @@
 class Item
   attr_reader :value
   attr_reader :needs
+  attr_reader :messages
   
   def initialize(value="")
     @value = value
     @needs = []
-  end
-  
+  end  
   
   def grab(object)
     self
   end
   
-  
-  def can_use?(object)
-    !@needs.empty? && object.respond_to?(@needs[0]) 
+  def recognize_message?(string)
+    (self.class.instance_methods - Object.instance_methods).include?(string.intern)
   end
   
+  def can_use?(object)
+    !@needs.empty? && object.recognize_message?(@needs[0]) 
+  end
   
   def to_s
     "#{self.class.to_s.downcase}(#{value})"
