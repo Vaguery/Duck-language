@@ -2,6 +2,8 @@
 
 require_relative './spec_helper'
 
+# [for cutting and pasting: ¬ ∧ ∨ ]
+
 describe "boolean not" do
   it "should be recognized by Bool items" do
     d = DuckInterpreter.new("¬").step
