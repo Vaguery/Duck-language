@@ -1,23 +1,5 @@
 require_relative '../lib/duck'
-
-
-# a couple of convenience methods in the DuckInterpreter class, for this example
-class DuckInterpreter
-  def cartoon_of_state
-    puts "#{@stack.inspect}   <<<  #{@queue.inspect}  <<<  #{@script.inspect}"
-  end
-  
-  def cartoon_trace
-    puts "\n\nrunning \"#{self.script}\""
-    puts "(stack) <<< (queue) <<< (script)"
-    self.cartoon_of_state
-    until @queue.empty? && @script == "" do
-      self.step
-      cartoon_of_state
-    end
-  end
-end
-
+require_relative './conveniences'
 
 # seeing arithmetic 'Forth' style (postfix only)
 ducky = DuckInterpreter.new("1 2 3 4 5 + * - +")

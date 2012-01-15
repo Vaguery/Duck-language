@@ -1,3 +1,4 @@
+#encoding:utf-8
 class DuckInterpreter
   attr_reader :old_script
   attr_reader :old_bindings
@@ -6,6 +7,7 @@ class DuckInterpreter
   attr_accessor :stack
   attr_accessor :staged_item
   attr_accessor :bindings
+  attr_accessor :greedy_flag
   
   
   def initialize(script="",bindings={})
@@ -18,6 +20,8 @@ class DuckInterpreter
     @queue = []
     @stack = []
     @staged_item = nil
+    
+    @greedy_flag = true
   end
   
   
@@ -27,6 +31,7 @@ class DuckInterpreter
     @queue = []
     @stack = []
     @staged_item = nil
+    @greedy_flag = true
     self
   end
   
@@ -65,7 +70,7 @@ class DuckInterpreter
     unless @queue.empty?
       @staged_item = @queue.delete_at(0)
       fill_staged_item_needs if @staged_item
-      consume_staged_item_as_arg if @staged_item
+      consume_staged_item_as_arg if (@staged_item && @greedy_flag)
       check_for_interpreter_response if @staged_item
       if @staged_item
         @stack.push @staged_item
@@ -108,6 +113,21 @@ class DuckInterpreter
         @staged_item = nil
       end
     end
+  end
+  
+  
+  def greedy?
+    @queue.unshift Bool.new(@greedy_flag)
+  end
+  
+  
+  def greedy
+    @greedy_flag = true
+  end
+  
+  
+  def ungreedy
+    @greedy_flag = false
   end
   
   
