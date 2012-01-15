@@ -128,4 +128,8 @@ class DuckInterpreter
   def copy
     @stack.push(@stack[-1].clone) unless @stack.empty?
   end
+  
+  def noop
+    # black hole
+  end
 end

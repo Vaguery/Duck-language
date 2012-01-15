@@ -29,6 +29,10 @@ class Item
   def be
     self
   end
+  
+  def if
+    Closure.new(Proc.new{|bool| bool.value ? self : Message.new("noop")},["¬"],"#{self.value} IF ?")
+  end
 end
 
 
