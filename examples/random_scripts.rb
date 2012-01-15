@@ -20,7 +20,7 @@ end
 
 # let's just sample all the tokens we have available, and add some extra literals in
 def random_script(length)
-  tokens = ["+","-","*","/","neg","¬","∧","∨","depth","inc","dec"] + ['T','F','k']*3
+  tokens = ["+","-","*","/","neg","¬","∧","∨","depth","inc","dec","eql","<",">","≤","≥"] + ['T','F','k','k','k']*5
 
   template = length.times.collect do |t|
     t = tokens.sample

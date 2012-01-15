@@ -38,6 +38,26 @@ class Number < Item
   def neg
     self.class.new(-@value)
   end
+  
+  def <
+    Closure.new(Proc.new {|arg1| Bool.new(arg1.value < self.value)},["neg"],"? < #{self.value}")
+  end
+  
+  def ≤
+    Closure.new(Proc.new {|arg1| Bool.new(arg1.value <= self.value)},["neg"],"? ≤ #{self.value}")
+  end
+  
+  def ≥
+    Closure.new(Proc.new {|arg1| Bool.new(arg1.value >= self.value)},["neg"],"? ≥ #{self.value}")
+  end
+  
+  def >
+    Closure.new(Proc.new {|arg1| Bool.new(arg1.value > self.value)},["neg"],"? > #{self.value}")
+  end
+  
+  def eql
+    Closure.new(Proc.new {|arg1| Bool.new(arg1.value == self.value)},["neg"],"? == #{self.value}")
+  end
 end
 
 
