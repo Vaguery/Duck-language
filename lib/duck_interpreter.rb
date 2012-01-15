@@ -1,22 +1,29 @@
 class DuckInterpreter
   attr_reader :old_script
+  attr_reader :old_bindings
   attr_accessor :script
   attr_accessor :queue
   attr_accessor :stack
   attr_accessor :staged_item
+  attr_accessor :bindings
   
   
-  def initialize(script="")
+  def initialize(script="",bindings={})
     @script = script.strip
     @old_script = @script
+    
+    @bindings = bindings
+    @old_bindings = bindings.clone
+    
     @queue = []
     @stack = []
     @staged_item = nil
   end
   
   
-  def reset(script=@old_script)
+  def reset(script=@old_script,bindings=@old_bindings)
     @script = script
+    @bindings = bindings
     @queue = []
     @stack = []
     @staged_item = nil
@@ -91,9 +98,13 @@ class DuckInterpreter
   
   
   def check_for_interpreter_response
+    msg = @staged_item.value.to_s
     if @staged_item.kind_of?(Message)
-      if self.recognize_message?(@staged_item.value)
-        self.__send__(@staged_item.value)
+      if @bindings[msg]
+        @queue.unshift @bindings[msg]
+        @staged_item = nil
+      elsif self.recognize_message?(msg)
+        self.__send__(msg)
         @staged_item = nil
       end
     end
