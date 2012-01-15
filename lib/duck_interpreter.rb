@@ -81,9 +81,14 @@ class DuckInterpreter
   end
   
   
+  def recognize_message?(string)
+    (DuckInterpreter.instance_methods - Object.instance_methods).include?(string.intern)
+  end
+  
+  
   def check_for_interpreter_response
     if @staged_item.kind_of?(Message)
-      if self.respond_to?(@staged_item.value)
+      if self.recognize_message?(@staged_item.value)
         self.__send__(@staged_item.value)
         @staged_item = nil
       end
