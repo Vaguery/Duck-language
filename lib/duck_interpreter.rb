@@ -114,4 +114,9 @@ class DuckInterpreter
   def depth
     @stack.push Int.new(@stack.length)
   end
+  
+  
+  def pop
+    @stack.pop
+  end
 end

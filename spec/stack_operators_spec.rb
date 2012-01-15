@@ -15,3 +15,16 @@ describe "the :depth message" do
     DuckInterpreter.new("depth").run.stack[-1].should be_a_kind_of(Int)
   end
 end
+
+
+describe "the :pop message" do
+  it "should be something the DuckInterpreter recognizes" do
+    DuckInterpreter.new.should respond_to(:pop)
+  end
+  
+  it "should make the top stack item disappear" do
+    d = DuckInterpreter.new("3 4 5 pop +")
+    d.run
+    d.stack[-1].value.should == 7
+  end
+end

@@ -25,6 +25,10 @@ class Item
   def to_s
     "#{self.class.to_s.downcase}(#{value})"
   end
+  
+  def be
+    self
+  end
 end
 
 
