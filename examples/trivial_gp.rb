@@ -20,6 +20,7 @@ require_relative './conveniences'
 
 
 class Answer
+  @@evaluations = 0
   attr_accessor :score
   attr_accessor :script
   attr_accessor :tokens
@@ -32,7 +33,6 @@ class Answer
   
   
   def crossover_result(other_answer)
-    
     cut_point = rand(@tokens.length)
     babies = [
       @tokens[0..cut_point] + other_answer.tokens[cut_point+1..-1],
@@ -58,7 +58,8 @@ class Answer
         (x_y_pairs_hash[x] - d.stack[observed_y_location].value).abs
     end
     self.score = (residuals.inject(:+))
-    puts "#{self.score},#{self.script.length}"
+    @@evaluations += 1
+    puts "#{@@evaluations},#{self.score},#{self.script.length}"
   end
 end
 
@@ -72,8 +73,8 @@ end
 @all_tokens = @all_functions+@biased_literals
 
 pop_size = 100
-updates = pop_size*3
-cycles = 100
+updates = pop_size*5
+cycles = 500
 population = pop_size.times.collect {Answer.new(random_tokens(50,@simpler_tokens))}
 
 
@@ -89,9 +90,15 @@ cycles.times do |c|
     puts "# #{a.score}: #{a.script.inspect}"
   end
   
+  # new blood
+  (-10..-6).each do |i|
+    population[i] = Answer.new(random_tokens(50,@simpler_tokens))
+  end
+  
   # magic polisher [see exercises]
   (-5..-1).each do |i|
-    population[i] = Answer.new((population[0].script.gsub(/\d/) {|d| rand(10).to_s}).split)
+    rough = rand(10)
+    population[i] = Answer.new((population[rough].script.gsub(/\d/) {|d| rand(10).to_s}).split)
   end
   
   updates.times do |g|
@@ -103,13 +110,13 @@ cycles.times do |c|
     mom, dad = population[mom_index], population[dad_index]
     
     crossover1,crossover2 = mom.crossover_result(dad)
-    baby1 = Answer.new(crossover1).mutant(4,@all_tokens) # some innovative junk gets inserted here
-    baby2 = Answer.new(crossover2).mutant(4,@simpler_tokens)
+    baby1 = Answer.new(crossover1).mutant(6,@all_tokens) # some innovative junk gets inserted here
+    baby2 = Answer.new(crossover2).mutant(6,@all_tokens)
     
     baby1.evaluate(@x_y_values)
     baby2.evaluate(@x_y_values)
   
-    family = [mom,dad,baby1,baby2].sort_by {|a| a.score}
+    family = [baby1,baby2,mom,dad].sort_by {|a| a.score}  # EXERCISE: reverse the order of this array
     population[mom_index] = family[0]
     population[dad_index] = family[1]
   end
