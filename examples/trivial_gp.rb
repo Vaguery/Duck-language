@@ -72,9 +72,9 @@ end
 @all_tokens = @all_functions+@biased_literals
 
 pop_size = 100
-updates = pop_size
+updates = pop_size*3
 cycles = 100
-population = pop_size.times.collect {Answer.new(random_tokens(32,@simpler_tokens))}
+population = pop_size.times.collect {Answer.new(random_tokens(50,@simpler_tokens))}
 
 
 puts "\n\n# evaluating initial population..."
@@ -89,7 +89,10 @@ cycles.times do |c|
     puts "# #{a.score}: #{a.script.inspect}"
   end
   
-  (95..-1).each {|i| population[i] = Answer.new(random_tokens(32,@simpler_tokens))}
+  # magic polisher [see exercises]
+  (-5..-1).each do |i|
+    population[i] = Answer.new((population[0].script.gsub(/\d/) {|d| rand(10).to_s}).split)
+  end
   
   updates.times do |g|
     population.each do |a|
@@ -100,8 +103,8 @@ cycles.times do |c|
     mom, dad = population[mom_index], population[dad_index]
     
     crossover1,crossover2 = mom.crossover_result(dad)
-    baby1 = Answer.new(crossover1).mutant(2,@all_tokens) # some innovative junk gets inserted, here
-    baby2 = Answer.new(crossover2).mutant(2,@all_tokens)
+    baby1 = Answer.new(crossover1).mutant(4,@all_tokens) # some innovative junk gets inserted here
+    baby2 = Answer.new(crossover2).mutant(4,@simpler_tokens)
     
     baby1.evaluate(@x_y_values)
     baby2.evaluate(@x_y_values)
