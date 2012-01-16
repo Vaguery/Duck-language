@@ -2,7 +2,7 @@ require_relative '../lib/duck'
 require_relative './conveniences'
 
 
-#   A trivial (and not too smart) implementation of genetic programming in Duck:
+#   A trivial (and not at all smart!) implementation of genetic programming in Duck:
 #   
 #   A population of Answer objects is created at random, evaluated, and
 #   then pairs are chosen at random for "breeding" by one-point crossover
@@ -15,8 +15,15 @@ require_relative './conveniences'
 #   iterations, a complete list of the Answers in the population is printed, sorted by
 #   score.
 #
+#   (The trace can be saved to a csv file and read into an R variable with the R code:
+#     d = read.csv([filename],comment.char="#",blank.lines.skip=TRUE,
+#         col.names=c("step","score","chars")))
+#
 #   The target function can be modified by changing the hash @x_y_values
 #   to contain numerical values for data being "modeled" by the programs.
+#
+#   Various exercises are called out in the code; these are part of a planned workshop, but
+#   the implications might be apparent to GP practitioners.
 
 
 class Answer
@@ -32,11 +39,12 @@ class Answer
   end
   
   
-  def crossover_result(other_answer)
-    cut_point = rand(@tokens.length)
+  def crossover_result(other_answer,even=true)
+    my_cut_point = rand(@tokens.length)
+    other_cut_point = even ? my_cut_point : rand(other_answer.tokens.length)
     babies = [
-      @tokens[0..cut_point] + other_answer.tokens[cut_point+1..-1],
-      other_answer.tokens[0..cut_point] + @tokens[cut_point+1..-1]]
+      @tokens[0..my_cut_point] + other_answer.tokens[other_cut_point+1..-1],
+      other_answer.tokens[0..other_cut_point] + @tokens[my_cut_point+1..-1]]
     return babies
   end
   
@@ -63,19 +71,25 @@ class Answer
   end
 end
 
+
 # target data for symbolic regression
 @x_y_values = {}
-(-10..10).each {|i| @x_y_values[i] = i*i - 15*i + 2012}
+(-10..10).each {|i| @x_y_values[i] = (i*i - 15*i + 2012)}  
 
-
+#####
+#
 # simpleminded steady-state GP
-@simpler_tokens = ["+","-","*","/","inc","dec"]+['k','k','k','x','x','x']*2
+#
+#####
+
+@simpler_tokens = ["+","-","*","/","inc","dec"]+['k','k','k','x','x','x']*2  # EXERCISE (toolkit)
 @all_tokens = @all_functions+@biased_literals
 
+# EXERCISE (time and materials)
 pop_size = 100
-updates = pop_size*5
-cycles = 500
-population = pop_size.times.collect {Answer.new(random_tokens(50,@simpler_tokens))}
+updates = pop_size*2
+cycles = 100
+population = pop_size.times.collect {Answer.new(random_tokens(30,@simpler_tokens))}
 
 
 puts "\n\n# evaluating initial population..."
@@ -90,15 +104,15 @@ cycles.times do |c|
     puts "# #{a.score}: #{a.script.inspect}"
   end
   
-  # new blood
-  (-10..-6).each do |i|
-    population[i] = Answer.new(random_tokens(50,@simpler_tokens))
+  # EXERCISE (new blood)
+  (pop_size-10..pop_size-6).each do |i|
+    population[i] = Answer.new(random_tokens(30,@simpler_tokens))
   end
   
-  # magic polisher [see exercises]
-  (-5..-1).each do |i|
-    rough = rand(10)
-    population[i] = Answer.new((population[rough].script.gsub(/\d/) {|d| rand(10).to_s}).split)
+  # EXERCISE (polishing)
+  template_source = rand(10)
+  (pop_size-5..-1).each do |i|
+    population[i] = Answer.new((population[template_source].script.gsub(/\d/) {|d| rand(10).to_s}).split)
   end
   
   updates.times do |g|
@@ -109,15 +123,16 @@ cycles.times do |c|
     mom_index, dad_index = rand(pop_size), rand(pop_size)
     mom, dad = population[mom_index], population[dad_index]
     
+    # EXERCISE (recombination)
     crossover1,crossover2 = mom.crossover_result(dad)
-    baby1 = Answer.new(crossover1).mutant(6,@all_tokens) # some innovative junk gets inserted here
-    baby2 = Answer.new(crossover2).mutant(6,@all_tokens)
+    baby1 = Answer.new(crossover1).mutant(3,@all_tokens) # EXERCISE (ontological creep)
+    baby2 = Answer.new(crossover2).mutant(3,@all_tokens)
     
     baby1.evaluate(@x_y_values)
     baby2.evaluate(@x_y_values)
   
-    family = [baby1,baby2,mom,dad].sort_by {|a| a.score}  # EXERCISE: reverse the order of this array
-    population[mom_index] = family[0]
+    family = [baby1,baby2,mom,dad].sort_by {|a| a.score}  # EXERCISE (selection pressure)
+    population[mom_index] = family[0]                     # EXERCISE (selection off)
     population[dad_index] = family[1]
   end
   
