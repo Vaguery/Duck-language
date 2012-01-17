@@ -89,14 +89,17 @@ end
 #
 #####
 
-@simpler_tokens = ["+","-","*","/","inc","dec"]+['k','k','k','x','x','x']*2  # EXERCISE (toolkit)
-@all_tokens = @all_functions+@biased_literals
+SIMPLE_TOKENS = ["+","-","*","/","inc","dec"]+['k','k','k','x','x','x']*2  # EXERCISE (toolkit)
+NUMBERLESS_TOKENS = ["+","-","*","/","inc","dec"]+['x']*4  # EXERCISE (one hand tied)
+ALL_TOKENS = @all_functions+@biased_literals
+
+@experiment_tokens = SIMPLE_TOKENS
 
 # EXERCISE (time and materials)
 pop_size = 200
-updates = pop_size*5
-cycles = 300
-population = pop_size.times.collect {Answer.new(random_tokens(30,@simpler_tokens))}
+updates = pop_size*3
+cycles = 200
+population = pop_size.times.collect {Answer.new(random_tokens(30,@experiment_tokens))}
 
 
 puts "\n\n# evaluating initial population..."
@@ -113,7 +116,7 @@ cycles.times do |c|
   
   # EXERCISE (new blood)
   (pop_size-10..pop_size-6).each do |i|
-    population[i] = Answer.new(random_tokens(30,@simpler_tokens))
+    population[i] = Answer.new(random_tokens(30,@experiment_tokens))
   end
   
   # EXERCISE (polishing)
@@ -132,8 +135,8 @@ cycles.times do |c|
     
     # EXERCISE (recombination)
     crossover1,crossover2 = mom.crossover_result(dad)
-    baby1 = Answer.new(crossover1).mutant(3,@all_tokens) # EXERCISE (ontological creep)
-    baby2 = Answer.new(crossover2).mutant(3,@simpler_tokens)
+    baby1 = Answer.new(crossover1).mutant(3,@experiment_tokens) # EXERCISE (ontological creep)
+    baby2 = Answer.new(crossover2).mutant(3,@experiment_tokens)
     
     baby1.evaluate(@x_y_values)
     baby2.evaluate(@x_y_values)

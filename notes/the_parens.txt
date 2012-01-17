@@ -1,0 +1,34 @@
+Exploring the notions of collections in source code.
+
+The :alike(N,item) and :bundle(N,items...) messages seem reasonable ways to create collections in the stack from "loose code" and calculated objects. What about collections in code?
+
+After all, the whole (standard) interpreter loop looks an awful lot like a parser itself....
+
+Suppose the '(' character (whether in a word or alone) starts a new bundle closure? And that ')' closes it up?
+
+Consider:
+
+"1 (2 3 9) 7"
+  [1]
+  [1,c((?).append,[:be])]    # say here the parser sees the paren in the script and queues '('?
+  [1,c((2,?).append),[:be]]  # the closure bundles items as they arrive...
+  [1,c((2,3,?).append),[:be]]
+  [1,c((2,3,9,?))]           # again, the paren ')' is re-queued
+  [1,(2,3,9)]                # the paren creates the collection
+  [1,(2,3,9),7]
+  
+
+This seems fun, until somebody puts nested parens in a script and loses an eye...
+
+") ( 1 ( 2 3 ) 4 )"
+  [:)]  # the 'close' isn't recognized, so it gets messaged as a smiley
+  [:),c((?).append,[:be])]
+  [:),c((1,?).append,[:be])]
+  [:),c((1,?).append,[:be]),c((?).append,[:be])] # the next open-paren creates a new closure...
+  [:),c((1,c((2,?).append,[:be])?).append,[:be])] # which gets swallowed by the greedy first one
+  ... and we're off track, semantically
+  
+  UNLESS we treat a closure like this as passing arguments into itself, recursively? Nothing says the act of 'adding' a thing to a collection doesn't first ask all that collection's current items whether any of them want it....
+  
+
+  
