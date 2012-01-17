@@ -31,6 +31,7 @@ class Answer
   attr_accessor :score
   attr_accessor :script
   attr_accessor :tokens
+  attr_accessor :birth_order
   
   def initialize(tokens)
     @tokens = tokens
@@ -65,8 +66,11 @@ class Answer
       observed_y = observed_y_location.nil? ? 1000000 :
         (x_y_pairs_hash[x] - d.stack[observed_y_location].value).abs
     end
-    self.score = (residuals.inject(:+))
+    @score = residuals.inject(:+)
+    # EXERCISE (resonance) @score += rand(@score/100)
     @@evaluations += 1
+    @birth_order = @@evaluations
+
     puts "#{@@evaluations},#{self.score},#{self.script.length}"
   end
 end
@@ -74,7 +78,10 @@ end
 
 # target data for symbolic regression
 @x_y_values = {}
-(-10..10).each {|i| @x_y_values[i] = (i*i - 15*i + 2012)}  
+(-10..10).each do |i| 
+  x = i*3
+  @x_y_values[x] = (x*x - 15*x + 2012)
+end
 
 #####
 #
@@ -86,9 +93,9 @@ end
 @all_tokens = @all_functions+@biased_literals
 
 # EXERCISE (time and materials)
-pop_size = 100
-updates = pop_size*2
-cycles = 100
+pop_size = 200
+updates = pop_size*5
+cycles = 300
 population = pop_size.times.collect {Answer.new(random_tokens(30,@simpler_tokens))}
 
 
@@ -101,7 +108,7 @@ cycles.times do |c|
   population.sort_by! {|a| a.score}
   puts "# After #{c*updates} updates"
   population.each do |a|
-    puts "# #{a.score}: #{a.script.inspect}"
+    puts "# #{a.birth_order} : #{a.score} : #{a.script.inspect}"
   end
   
   # EXERCISE (new blood)
@@ -126,7 +133,7 @@ cycles.times do |c|
     # EXERCISE (recombination)
     crossover1,crossover2 = mom.crossover_result(dad)
     baby1 = Answer.new(crossover1).mutant(3,@all_tokens) # EXERCISE (ontological creep)
-    baby2 = Answer.new(crossover2).mutant(3,@all_tokens)
+    baby2 = Answer.new(crossover2).mutant(3,@simpler_tokens)
     
     baby1.evaluate(@x_y_values)
     baby2.evaluate(@x_y_values)
