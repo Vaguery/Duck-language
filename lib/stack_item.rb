@@ -21,7 +21,7 @@ class Item
   end
   
   def can_use?(object)
-    !@needs.empty? && object.recognize_message?(@needs[0]) 
+    !@needs.empty? && object.recognize_message?(@needs[0])
   end
   
   def to_s
@@ -198,10 +198,15 @@ class Bundle < Item
   
   def initialize(*items)
     @contents = items
+    @needs = []
   end
   
   def shatter
     @contents
+  end
+  
+  def to_s
+    (@contents.inject("(") {|s,i| s+i.to_s+", "}).chomp(", ") + ")"
   end
   
   # keep at end of class definition!
