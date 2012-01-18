@@ -162,6 +162,11 @@ class DuckInterpreter
   end
   
   
+  def copy
+    @stack.push @stack[-1].clone unless @stack.empty?
+  end
+  
+  
   def swap
     @stack[-1],@stack[-2] = @stack[-2],@stack[-1] if @stack.length > 1
   end

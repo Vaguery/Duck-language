@@ -28,4 +28,5 @@ describe "the :copies message" do
     d.stack.length.should == 0
     d.stack.inspect.should == "[]"
   end
+  
 end

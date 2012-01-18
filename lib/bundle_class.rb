@@ -10,6 +10,10 @@ class Bundle < Item
     @contents
   end
   
+  def count
+    Int.new(@contents.length)
+  end
+  
   def to_s
     (@contents.inject("(") {|s,i| s+i.to_s+", "}).chomp(", ") + ")"
   end

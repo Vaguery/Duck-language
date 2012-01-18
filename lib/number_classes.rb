@@ -67,7 +67,8 @@ class Int < Number
   end
   
   def copies
-    Closure.new(Proc.new {|item| self.value.times.collect {item.clone}},["be"],"#{self.value} of ?")
+    i = self.value
+    Closure.new(Proc.new {|item| i.times.collect {|i| item.clone}},["be"],"#{i} of ?")
   end
   
   
