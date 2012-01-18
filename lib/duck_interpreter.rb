@@ -85,10 +85,16 @@ class DuckInterpreter
   
   def fill_staged_item_needs
     while next_arg = @stack.rindex {|item| @staged_item.can_use?(item)}
-      @staged_item = @staged_item.grab(@stack.delete_at(next_arg))
+      grab_result = @staged_item.grab(@stack.delete_at(next_arg))
+      unless grab_result.kind_of?(Array)
+        @staged_item = grab_result
+      else
+        @staged_item = grab_result.delete_at(0)
+        @queue = grab_result + @queue
+      end
     end
   end
-    
+  
   
   def consume_staged_item_as_arg
     if arg_for = @stack.rindex {|item| item.can_use?(@staged_item)}
