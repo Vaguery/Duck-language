@@ -61,17 +61,18 @@ describe "addition" do
     end
     
     
-    it "should produce a number when all args and methods are accounted for" do
-      "1 2 + 3 +".split.permutation do |p|
-        DuckInterpreter.new(p.join(" ")).run.stack[-1].should be_a_kind_of(Int)
-      end
+  it "should produce a number when all args and methods are accounted for" do
+    "1 2 + 3 +".split.permutation do |p|
+      ducky = DuckInterpreter.new(p.join(" "))
+      ducky.run.stack[-1].should be_a_kind_of(Int)
     end
-    
-    it "should produce some closures when there aren't enough args" do
-      "1 + -3 + +".split.permutation do |p|
-        [Int,Message,Closure].should include DuckInterpreter.new(p.join(" ")).run.stack[-1].class
-      end
+  end
+  
+  it "should produce some closures when there aren't enough args" do
+    "1 + -3 + +".split.permutation do |p|
+      [Int,Message,Closure].should include DuckInterpreter.new(p.join(" ")).run.stack[-1].class
     end
+  end
     
   end
 end

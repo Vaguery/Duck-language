@@ -2,8 +2,7 @@
 class DuckInterpreter
   class << self; attr_accessor :recognized_messages end
   
-  attr_reader :old_script
-  attr_reader :old_bindings
+  attr_reader :old_script,:old_bindings
   attr_accessor :script
   attr_accessor :queue
   attr_accessor :stack
@@ -85,21 +84,26 @@ class DuckInterpreter
   
   def fill_staged_item_needs
     while next_arg = @stack.rindex {|item| @staged_item.can_use?(item)}
-      grab_result = @staged_item.grab(@stack.delete_at(next_arg))
-      unless grab_result.kind_of?(Array)
-        @staged_item = grab_result
-      else
-        @staged_item = grab_result.delete_at(0)
-        @queue = grab_result + @queue
-      end
+      place_intermediate_result @staged_item.grab(@stack.delete_at(next_arg))
+    end
+  end
+  
+  
+  def place_intermediate_result(returned_item)
+    unless returned_item.kind_of?(Array)
+      @staged_item = returned_item
+    else
+      @staged_item = returned_item.delete_at(0)
+      @queue = returned_item + @queue
     end
   end
   
   
   def consume_staged_item_as_arg
     if arg_for = @stack.rindex {|item| item.can_use?(@staged_item)}
-      @queue.unshift( @stack[arg_for].grab(@staged_item))
+      place_intermediate_result @stack[arg_for].grab(@staged_item)
       @stack.delete_at(arg_for)
+      @queue.unshift @staged_item.clone
       @staged_item = nil
     end
   end

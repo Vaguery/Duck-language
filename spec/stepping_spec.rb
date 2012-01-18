@@ -102,14 +102,6 @@ describe "interpreter step" do
         @ducky.step
       end
       
-      it "should end up placing the result of being used as an argument at the BOTTOM of the queue" do
-        @ducky.script = "+ + 1"
-        @ducky.step.step # pushes two closures
-        @ducky.step
-        @ducky.queue.length.should == 1
-        @ducky.queue[0].should be_a_kind_of(Closure)
-      end
-      
       it "should clear the staged_item when it's done" do
         @ducky.script = "2"
         @ducky.step
