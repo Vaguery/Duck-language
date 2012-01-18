@@ -42,21 +42,3 @@ describe "the :swap message" do
   end
 end
 
-
-describe "the :copy message" do
-  it "should be something the DuckInterpreter recognizes" do
-    DuckInterpreter.new.should respond_to(:copy)
-  end
-  
-  it "should make the top stack item disappear" do
-    d = DuckInterpreter.new("3 4 5 copy")
-    d.run
-    d.stack.inspect.should == "[3, 4, 5, 5]"
-  end
-  
-  it "should not just replicate the pointer" do
-    d = DuckInterpreter.new("3 4 5 copy")
-    d.run
-    d.stack[-1].object_id.should_not == d.stack[-2].object_id
-  end
-end

@@ -16,4 +16,16 @@ describe "the :copies message" do
     d.stack.length.should == 5
     d.stack.inspect.should == "[99, 99, 99, 99, 99]"
   end
+  
+  it "should work for Int = 0" do
+    d = DuckInterpreter.new("0 copies 99").run
+    d.stack.length.should == 0
+    d.stack.inspect.should == "[]"
+  end
+  
+  it "should do nothing for a negative Int" do
+    d = DuckInterpreter.new("-1 copies 99").run
+    d.stack.length.should == 0
+    d.stack.inspect.should == "[]"
+  end
 end

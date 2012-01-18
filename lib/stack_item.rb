@@ -35,6 +35,10 @@ class Item
     Closure.new(Proc.new{|bool| bool.value ? self : Message.new("noop")},["¬"],"#{self.value} IF ?")
   end
   
+  def copy
+    [self.clone, self.clone]
+  end
+  
   def know?
     Closure.new(
       Proc.new{|msg| Bool.new(self.class.recognized_messages.include?(msg.value))},
