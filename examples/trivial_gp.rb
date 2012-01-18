@@ -59,7 +59,7 @@ class Answer
   end
   
   
-  def evaluate(x_y_pairs_hash={})
+  def evaluate(x_y_pairs_hash={},out_file = nil)
     residuals = x_y_pairs_hash.collect do |x,y|
       d = DuckInterpreter.new(@script,{"x" => Int.new(x)}).run
       observed_y_location = d.topmost_respondent("neg")
@@ -71,7 +71,7 @@ class Answer
     @@evaluations += 1
     @birth_order = @@evaluations
 
-    puts "#{@@evaluations},#{self.score},#{self.script.length}"
+    out_file.puts "#{@@evaluations},#{self.score},#{self.script.length}" unless out_file.nil?
   end
 end
 
@@ -89,61 +89,63 @@ end
 #
 #####
 
-SIMPLE_TOKENS = ["+","-","*","/","inc","dec"]+['k','k','k','x','x','x']*2  # EXERCISE (toolkit)
+SIMPLE_TOKENS = ["+","-","*","/","inc","dec","if"]+['k','k','k','x','x','x']*2  # EXERCISE (toolkit)
 NUMBERLESS_TOKENS = ["+","-","*","/","inc","dec"]+['x']*4  # EXERCISE (one hand tied)
 ALL_TOKENS = @all_functions+@biased_literals
 
-@experiment_tokens = NUMBERLESS_TOKENS
+@experiment_tokens = SIMPLE_TOKENS
 
 # EXERCISE (time and materials)
 pop_size = 200
 updates = pop_size*3
-cycles = 200
+cycles = 500
 population = pop_size.times.collect {Answer.new(random_tokens(30,@experiment_tokens))}
 
+File.open("./data/scores.csv", "w") do |tracefile|
 
-puts "\n\n# evaluating initial population..."
-population.each do |a|
-  a.evaluate(@x_y_values) if a.score.nil?
-end
-
-cycles.times do |c|
-  population.sort_by! {|a| a.score}
-  puts "# After #{c*updates} updates"
+  puts "\n\n# evaluating initial population..."
   population.each do |a|
-    puts "# #{a.birth_order} : #{a.score} : #{a.script.inspect}"
+    a.evaluate(@x_y_values,tracefile) if a.score.nil?
   end
-  
-  # EXERCISE (new blood)
-  (pop_size-10..pop_size-6).each do |i|
-    population[i] = Answer.new(random_tokens(30,@experiment_tokens))
-  end
-  
-  # EXERCISE (polishing)
-  template_source = rand(10)
-  (pop_size-5..-1).each do |i|
-    population[i] = Answer.new((population[template_source].script.gsub(/\d/) {|d| rand(10).to_s}).split)
-  end
-  
-  updates.times do |g|
+
+  cycles.times do |c|
+    population.sort_by! {|a| a.score}
+    puts "# After #{c*updates} updates"
     population.each do |a|
-      a.evaluate(@x_y_values) if a.score.nil?
+      puts "# #{a.birth_order} : #{a.score} : #{a.script.inspect}"
     end
+
+    # EXERCISE (new blood)
+    (pop_size-10..pop_size-6).each do |i|
+      population[i] = Answer.new(random_tokens(30,@experiment_tokens))
+    end
+
+    # EXERCISE (polishing)
+    template_source = rand(10)
+    (pop_size-5..-1).each do |i|
+      population[i] = Answer.new((population[template_source].script.gsub(/\d/) {|d| rand(10).to_s}).split)
+    end
+
+    updates.times do |g|
+      population.each do |a|
+        a.evaluate(@x_y_values,tracefile) if a.score.nil?
+      end
+
+      mom_index, dad_index = rand(pop_size), rand(pop_size)
+      mom, dad = population[mom_index], population[dad_index]
   
-    mom_index, dad_index = rand(pop_size), rand(pop_size)
-    mom, dad = population[mom_index], population[dad_index]
-    
-    # EXERCISE (recombination)
-    crossover1,crossover2 = mom.crossover_result(dad)
-    baby1 = Answer.new(crossover1).mutant(3,@experiment_tokens) # EXERCISE (ontological creep)
-    baby2 = Answer.new(crossover2).mutant(3,@experiment_tokens)
-    
-    baby1.evaluate(@x_y_values)
-    baby2.evaluate(@x_y_values)
+      # EXERCISE (recombination)
+      crossover1,crossover2 = mom.crossover_result(dad)
+      baby1 = Answer.new(crossover1).mutant(3,@experiment_tokens) # EXERCISE (ontological creep)
+      baby2 = Answer.new(crossover2).mutant(3,@experiment_tokens)
   
-    family = [baby1,baby2,mom,dad].sort_by {|a| a.score}  # EXERCISE (selection pressure)
-    population[mom_index] = family[0]                     # EXERCISE (selection off)
-    population[dad_index] = family[1]
+      baby1.evaluate(@x_y_values,tracefile)
+      baby2.evaluate(@x_y_values,tracefile)
+
+      family = [baby1,baby2,mom,dad].sort_by {|a| a.score}  # EXERCISE (selection pressure)
+      population[mom_index] = family[0]                     # EXERCISE (selection off)
+      population[dad_index] = family[1]
+    end
+
   end
-  
-end
+end  # end of file writing
