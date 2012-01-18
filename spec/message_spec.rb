@@ -22,6 +22,10 @@ describe "Message object" do
     it "should not allow stack items to respond to Ruby messages" do
       overflow = DuckInterpreter.new("2 object_id").run
       overflow.stack[-1].should_not be_a_kind_of(Fixnum) #meaning it has returned its object_id
+      
+      duper = DuckInterpreter.new("2 clone").run
+      duper.stack[-1].should be_a_kind_of(Message)
+      duper.stack[-1].value.should == :clone
     end
     
     it "should call Item#recognize_message?" do

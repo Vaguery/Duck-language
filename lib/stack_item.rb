@@ -36,6 +36,13 @@ class Item
     Closure.new(Proc.new{|bool| bool.value ? self : Message.new("noop")},["¬"],"#{self.value} IF ?")
   end
   
+  def know?
+    Closure.new(
+      Proc.new{|msg| Bool.new(self.class.recognized_messages.include?(msg.value))},
+      ["do"],
+      "#{self.value}.knows(?)")
+  end
+  
   # keep at end of class definition!
   @recognized_messages = (self.instance_methods - Object.instance_methods)
 end
@@ -199,6 +206,9 @@ class Message < Closure
     ":#{@value}"
   end
   
+  def do
+    self
+  end
   
   def grab(object)
     can_use?(object) ?

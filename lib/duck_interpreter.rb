@@ -138,6 +138,15 @@ class DuckInterpreter
   end
   
   
+  def quote
+    if @queue.empty? && @script.length > 0
+      leader,token,@script = @script.partition(/\S+\s*/)
+      @queue.push recognize(token.strip)
+    end
+    @stack.push @queue.shift unless queue.empty? 
+  end
+  
+  
   def pop
     @stack.pop
   end
