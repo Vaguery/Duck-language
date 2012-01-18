@@ -110,7 +110,7 @@ ALL_TOKENS = @all_functions+@biased_literals
 
 # EXERCISE (time and materials)
 pop_size = 100
-updates = pop_size*2
+updates = pop_size*5
 cycles = 200
 population = pop_size.times.collect {Answer.new(random_tokens(50,@experiment_tokens))}
 
@@ -129,7 +129,7 @@ File.open("./data/alps_scores_ignore.csv", "w") do |tracefile|
     end
     
     # NEW BLOOD
-    200.times do
+    pop_size.times do
       population << Answer.new(random_tokens(50,@experiment_tokens))
     end
     
@@ -147,6 +147,8 @@ File.open("./data/alps_scores_ignore.csv", "w") do |tracefile|
       family = [mom,dad]
       family << Answer.new(crossover1).mutant(3,@experiment_tokens)
       family << Answer.new(crossover2).mutant(3,@experiment_tokens)
+      family << Answer.new((family[2].script.gsub(/\d/) {|d| rand(10).to_s}).split)
+      family << Answer.new((family[3].script.gsub(/\d/) {|d| rand(10).to_s}).split)
       
       family.each {|a| a.evaluate(@x_y_values,tracefile) if a.scores.empty?}
       

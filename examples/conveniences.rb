@@ -33,7 +33,7 @@ end
 def random_tokens(length,tokens=@all_functions+@biased_literals)
   length.times.collect do |t|
     t = tokens.sample
-    t = (rand(20)-10).to_s if t == 'k'
+    t = (rand(2000)-1000).to_s if t == 'k'
     t
   end
 end
