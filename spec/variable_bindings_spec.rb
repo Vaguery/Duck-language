@@ -45,8 +45,8 @@ describe "initialization" do
       it "should look up the binding (and recognize it) after the normal negotiations are done" do
         ducky = DuckInterpreter.new("x +",{"x" => Int.new(12)})
         ducky.bindings["x"].value.should == 12
-        ducky.queue.should_receive(:unshift)
         ducky.run
+        ducky.stack.inspect.should include("12")
       end
       
       it "should produce the thing bound" do
@@ -67,6 +67,20 @@ describe "initialization" do
         ducky = DuckInterpreter.new("x op 2",{"x" => Int.new(3),"op" => Message.new("+")})
         ducky.run
         ducky.stack[-1].value.should == 5
+      end
+    end
+    
+    describe "handling arrays of 'inputs'" do
+      it "should work for array bindings" do
+        ducky = DuckInterpreter.new("x x",{"x" => [Int.new(3),Int.new(4)]})
+        ducky.run
+        ducky.stack.inspect.should == "[3, 4, 3, 4]"
+      end
+      
+      it "should work for empty arrays" do
+        ducky = DuckInterpreter.new("x x 3",{"x" => []})
+        ducky.run
+        ducky.stack.inspect.should == "[3]"
       end
     end
   end

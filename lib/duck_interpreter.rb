@@ -117,9 +117,14 @@ class DuckInterpreter
   def check_for_interpreter_response
     msg = @staged_item.value.to_s
     if @staged_item.kind_of?(Message)
-      if @bindings[msg]
-        @queue.unshift @bindings[msg]
+      looked_up = @bindings[msg]
+      if looked_up != nil
         @staged_item = nil
+        unless looked_up.kind_of?(Array)
+          @queue.unshift looked_up
+        else
+          @queue = looked_up + @queue
+        end
       elsif self.recognize_message?(msg)
         self.__send__(msg)
         @staged_item = nil
