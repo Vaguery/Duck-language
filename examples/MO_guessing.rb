@@ -95,16 +95,17 @@ guesses = 100
 cycles = 100
 answers_found_so_far = []
 
-File.open("./data/MOguessing_scores_ignore.csv", "w") do |tracefile|
+File.open("./data/MOguessing_scores_4d20_tokens_ignore.csv", "w") do |tracefile|
   cycles.times do |c|
     answers_found_so_far.sort_by! {|a| a.scores[:error]*100 + a.scores[:script_length]}
     puts "\n\n"
     answers_found_so_far.each do |a|
+      tracefile.puts "##{c} : #{a.scores[:error]} : #{a.scores[:youth]} : #{a.script}"
       puts "##{c} : #{a.scores[:error]} : #{a.scores[:youth]} : #{a.script}"
     end
     
     guesses.times do |g|
-      answers_found_so_far << Answer.new(random_tokens(50,@experiment_tokens))
+      answers_found_so_far << Answer.new(random_tokens(rand(20)+rand(20)+rand(20)+rand(20),@experiment_tokens))
     
       answers_found_so_far.each do |a|
         a.evaluate(@x_y_values,tracefile) if a.scores.empty?
