@@ -54,6 +54,8 @@ class DuckInterpreter
   
   def recognize(string)
     case string
+    when /^\)$/
+      Bundler.new()
     when /^[-+]?[0-9]+$/
       Int.new(string.to_i)
     when 'true','T'

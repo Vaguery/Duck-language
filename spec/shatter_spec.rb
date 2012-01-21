@@ -29,4 +29,10 @@ describe "shatter message" do
     @d.run
     @d.stack.inspect.should == "[(1, F), 2]"
   end
+  
+  it "should work on script-produced bundles" do
+    @d.reset("( 1 2 3 4 5 ( 6 7 8 ) ) 9 shatter")
+    @d.run
+    @d.stack.inspect.should == "[9, 1, 2, 3, 4, 5, (6, 7, 8)]"
+  end
 end
