@@ -26,6 +26,15 @@ class Bundle < Item
       [Bundle.new(*@contents[1..-1]),@contents[0]]
   end
   
+  def pop
+    @contents.empty? ? self :
+      begin
+        item = @contents.pop
+        return [Bundle.new(*@contents),item]
+      end
+      
+  end
+  
   def count
     Int.new(@contents.length)
   end
