@@ -105,7 +105,7 @@ File.open("./data/MOguessing_scores_4d20_tokens_ignore.csv", "w") do |tracefile|
     end
     
     guesses.times do |g|
-      answers_found_so_far << Answer.new(random_tokens(rand(20)+rand(20)+rand(20)+rand(20),@experiment_tokens))
+      answers_found_so_far << Answer.new(random_tokens(rand(50)+rand(50)+rand(50)+rand(50),@experiment_tokens))
     
       answers_found_so_far.each do |a|
         a.evaluate(@x_y_values,tracefile) if a.scores.empty?

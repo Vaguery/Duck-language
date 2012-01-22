@@ -3,36 +3,36 @@ class Bundle < Item
   attr_accessor :contents
   
   def initialize(*items)
-    @contents = items
+    @contents = items.clone
     @needs = []
   end
   
   def shatter
-    @contents
+    @contents.clone
   end
   
   def +
-    Closure.new(Proc.new {|other_bundle| Bundle.new(*(other_bundle.contents + @contents))},
+    Closure.new(Proc.new {|other_bundle| Bundle.new(*(other_bundle.contents.clone + @contents.clone))},
       ["count"],"#{self.to_s}+(?)")
   end
   
   def <<
-    Closure.new(Proc.new {|item| Bundle.new(*(@contents<<item))},
+    Closure.new(Proc.new {|item| Bundle.new(*(@contents.clone<<item))},
       ["be"],"#{self.to_s}<<?")
   end
   
   def unshift
     @contents.empty? ? self :
-      [Bundle.new(*@contents[1..-1]),@contents[0]]
+      [Bundle.new(*@contents[1..-1].clone),@contents[0].clone]
   end
   
   def pop
-    @contents.empty? ? self :
-      begin
-        item = @contents.pop
-        return [Bundle.new(*@contents),item]
-      end
-      
+    if @contents.empty?
+      self
+    else
+      item = @contents.pop.clone
+      return [Bundle.new(*@contents.clone),item]
+    end
   end
   
   def count
@@ -54,11 +54,11 @@ class Bundler < Closure
   def initialize(item_array=[])
     @contents = item_array
     @closure = Proc.new {|item| item.value == "(".intern ?
-      Bundle.new(*@contents) : Bundler.new(@contents.unshift(item))}
+      Bundle.new(*@contents.clone) : Bundler.new(@contents.unshift(item).clone)}
     @needs = ["be"]
   end
   
-  define_method( "(".intern ) {Bundle.new(*@contents)}
+  define_method( "(".intern ) {Bundle.new(*@contents.clone)}
   
   def to_s
     "λ( " + (@contents.inject("(") {|s,i| s+i.to_s+", "}).chomp(", ") + ", ?) )"

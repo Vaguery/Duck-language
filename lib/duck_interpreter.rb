@@ -38,10 +38,15 @@ class DuckInterpreter
   
   
   def run
-    while @script.length > 0 || @queue.length > 0
-      step
+    begin
+      while @script.length > 0 || @queue.length > 0
+        step
+      end
+      self
+    rescue Exception
+      puts "ERROR when running #{@old_script} at #{@script}"
+      raise
     end
-    self
   end
   
   
