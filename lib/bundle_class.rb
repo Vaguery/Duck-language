@@ -16,17 +16,22 @@ class Bundle < Item
       ["count"],"#{self.to_s}+(?)")
   end
   
-  def <<
+  def << #push
     Closure.new(Proc.new {|item| Bundle.new(*(@contents.clone<<item.clone))},
-      ["be"],"#{self.to_s}<<?")
+      ["be"],"#{self.to_s} << ?")
   end
   
-  def unshift
+  def >> #unshift
+    Closure.new(Proc.new {|item| Bundle.new(*(@contents.clone.unshift(item.clone)))},
+      ["be"],"? >> #{self.to_s}")
+  end
+  
+  def shift # release the first item
     @contents.empty? ? self :
       [Bundle.new(*@contents[1..-1].clone),@contents[0].clone]
   end
   
-  def pop
+  def pop # release the last item
     if @contents.empty?
       self
     else

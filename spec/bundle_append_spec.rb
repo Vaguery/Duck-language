@@ -19,7 +19,7 @@ describe "the :<< message for Bundles" do
   
   it "the Closure should be descriptive when printed" do
     d = DuckInterpreter.new("( 1 2 3 ) <<").run
-    d.stack.inspect.should == "[λ((1, 2, 3)<<?,[\"be\"])]"
+    d.stack.inspect.should == "[λ((1, 2, 3) << ?,[\"be\"])]"
   end
   
   it "should work with empty Bundles" do
