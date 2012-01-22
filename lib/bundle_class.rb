@@ -16,6 +16,11 @@ class Bundle < Item
       ["count"],"#{self.to_s}+(?)")
   end
   
+  def <<
+    Closure.new(Proc.new {|item| Bundle.new(*(@contents<<item))},
+      ["be"],"#{self.to_s}<<?")
+  end
+  
   def count
     Int.new(@contents.length)
   end
