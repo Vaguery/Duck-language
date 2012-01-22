@@ -14,11 +14,4 @@ require_relative '../examples/conveniences'
 # DuckInterpreter.new("x x < 509 inc inc < x x * x ∨ depth ∧ 328 ∧ > > -980 - x x depth x + eql depth x x < eql ∨ * ∨ x > inc dec * * x > ∧ * eql / - inc - eql depth 320 depth -",{"x" => [10, 3, 6, 0, 5, 0, 5, 2, 2, 0, 4, 5, 0, 6, 1, 2, 3, 5, 5, 0].collect{|i| Int.new(i)}}).cartoon_trace
 
 
-DuckInterpreter.new("1121 ( ) shatter").cartoon_trace
-
-# DuckInterpreter.new("depth x x -744 < x inc 290 ≥ T -323 ( ( -688 ≥ 314 x eql dec neg F ¬ -636 224 ∧ x ∧ / neg x be ( ungreedy ) ∨ ( neg dec dec -242 F T ( 960 T x F dec / F -451 F -771 T -156 shatter T",{"x" => [10, 3, 6, 0, 5, 0, 5, 2, 2, 0, 4, 5, 0, 6, 1, 2, 3, 5, 5, 0].collect{|i| Int.new(i)}}).cartoon_trace
-# 
-# # 
-# "x ungreedy do x ∧ -652 dec inc ( do > T -410 ≥ x F x T inc F > 679 pop -332 x - ≤ T depth F x depth x -455 -60 61 inc - T -368 T ( ) shatter x"
-# 
-# "if ( greedy know? ( 26 T shatter 240 x 978 < do shatter x do be be x T F swap x ungreedy x x F ≤ ( ) ≤ x ≥ pop copy -269 109 T shatter -479 x x greedy x 273 ( x F 852 x / x > x ≥ T / F T pop x F"
+DuckInterpreter.new("x - ( eql x shatter x if depth 455 x copy -120 neg ) know? x T know? be 397 x 17 ungreedy + / 921 989 -633 x 609 + F ≤ 109 be 439 depth if ) - + 514 x ¬ know? x pop if x",{"x" => Int.new(7)}).cartoon_trace

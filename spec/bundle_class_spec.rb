@@ -61,6 +61,11 @@ describe "Bundle objects" do
       d = DuckInterpreter.new(') 1 2 (').run
       d.stack.inspect.should == "[(2, 1)]"
     end
+    
+    it "should work ungreedily when ungreedy has been toggled" do
+      d = DuckInterpreter.new('ungreedy 1 2 7 9 ) - 2 3 greedy (').run
+      d.stack.inspect.should == "[:-, 2, 3, (1, 2, 7, 9)]"
+    end
   end
   
   
