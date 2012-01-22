@@ -21,6 +21,11 @@ class Bundle < Item
       ["be"],"#{self.to_s}<<?")
   end
   
+  def unshift
+    @contents.empty? ? self :
+      [Bundle.new(*@contents[1..-1]),@contents[0]]
+  end
+  
   def count
     Int.new(@contents.length)
   end
