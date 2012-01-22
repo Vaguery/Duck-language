@@ -35,4 +35,9 @@ describe "shatter message" do
     @d.run
     @d.stack.inspect.should == "[9, 1, 2, 3, 4, 5, (6, 7, 8)]"
   end
+  
+  it "should not fail when the bundle is empty" do
+    @d.reset("1121 ( ) shatter")
+    lambda {@d.run}.should_not raise_error
+  end
 end

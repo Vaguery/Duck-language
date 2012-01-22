@@ -2,7 +2,7 @@
 class DuckInterpreter
   class << self; attr_accessor :recognized_messages end
   
-  attr_reader :old_script,:old_bindings
+  attr_accessor :old_script,:old_bindings
   attr_accessor :script
   attr_accessor :queue
   attr_accessor :stack
@@ -13,7 +13,7 @@ class DuckInterpreter
   
   def initialize(script="",bindings={})
     @script = script.strip
-    @old_script = @script
+    @old_script = script.strip
     
     @bindings = bindings
     @old_bindings = bindings.clone
@@ -72,10 +72,10 @@ class DuckInterpreter
     parse if @queue.empty?
     unless @queue.empty?
       @staged_item = @queue.delete_at(0)
-      fill_staged_item_needs if @staged_item
-      consume_staged_item_as_arg if (@staged_item && @greedy_flag)
-      check_for_interpreter_response if @staged_item
-      if @staged_item
+      fill_staged_item_needs unless @staged_item.nil?
+      consume_staged_item_as_arg unless (@staged_item.nil? || !@greedy_flag)
+      check_for_interpreter_response unless @staged_item.nil?
+      unless @staged_item.nil?
         @stack.push @staged_item
         @staged_item = nil
       end
@@ -85,7 +85,7 @@ class DuckInterpreter
   
   
   def fill_staged_item_needs
-    while next_arg = @stack.rindex {|item| @staged_item.can_use?(item)}
+    while next_arg = @stack.rindex {|item| @staged_item.can_use?(item) unless @staged_item.nil?}
       place_intermediate_result @staged_item.grab(@stack.delete_at(next_arg))
     end
   end
@@ -95,8 +95,12 @@ class DuckInterpreter
     unless returned_item.kind_of?(Array)
       @staged_item = returned_item
     else
-      @staged_item = returned_item.delete_at(0)
-      @queue = returned_item + @queue
+      unless returned_item.empty?
+        @staged_item = returned_item.delete_at(0)
+        @queue = returned_item + @queue
+      else
+        @staged_item = nil
+      end
     end
   end
   

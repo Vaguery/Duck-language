@@ -88,7 +88,7 @@ SIMPLE_TOKENS = ["+","-","*","/","inc","dec","if"]+['k','k','k','x','x','x']*2
 NUMBERLESS_TOKENS = ["+","-","*","/","inc","dec"]+['x']*4
 ALL_TOKENS = @all_functions + @biased_literals # from ./conveniences.rb
 
-@experiment_tokens = SIMPLE_TOKENS
+@experiment_tokens = ALL_TOKENS
 
 
 guesses = 100
