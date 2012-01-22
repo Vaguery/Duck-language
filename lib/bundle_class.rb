@@ -8,16 +8,16 @@ class Bundle < Item
   end
   
   def shatter
-    @contents.clone
+    @contents
   end
   
   def +
-    Closure.new(Proc.new {|other_bundle| Bundle.new(*(other_bundle.contents.clone + @contents.clone))},
+    Closure.new(Proc.new {|other_bundle| Bundle.new(*(other_bundle.contents + @contents))},
       ["count"],"#{self.to_s}+(?)")
   end
   
   def <<
-    Closure.new(Proc.new {|item| Bundle.new(*(@contents.clone<<item))},
+    Closure.new(Proc.new {|item| Bundle.new(*(@contents.clone<<item.clone))},
       ["be"],"#{self.to_s}<<?")
   end
   
@@ -30,8 +30,8 @@ class Bundle < Item
     if @contents.empty?
       self
     else
-      item = @contents.pop.clone
-      return [Bundle.new(*@contents.clone),item]
+      item = @contents.pop
+      return [Bundle.new(*@contents),item]
     end
   end
   
