@@ -177,6 +177,9 @@ class DuckInterpreter
     @stack.pop
   end
   
+  def empty
+    @stack.clear
+  end
   
   def copy
     @stack.push @stack[-1].clone unless @stack.empty?

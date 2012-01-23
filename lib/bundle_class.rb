@@ -40,6 +40,14 @@ class Bundle < Item
     end
   end
   
+  def reverse
+    Bundle.new(*@contents.clone.reverse)
+  end
+  
+  def empty
+    Bundle.new
+  end
+  
   def count
     Int.new(@contents.length)
   end

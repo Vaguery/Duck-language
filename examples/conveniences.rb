@@ -26,7 +26,7 @@ def random_script(length)
   template.join(" ")
 end
 
-@all_functions = ["+","-","*","/","neg","¬","∧","∨","depth","inc","dec","eql","<",">","≤","≥","be","pop","swap",  "if", "greedy?", "greedy", "ungreedy", "do", "know?", "shatter", "copy", "(", ")", "<<", ">>", "pop", "shift", "unshift" ]
+@all_functions = ["+","-","*","/","neg","¬","∧","∨","depth","inc","dec","eql","<",">","≤","≥","be","pop","swap",  "if", "greedy?", "greedy", "ungreedy", "do", "know?", "shatter", "copy", "(", ")", "<<", ">>", "pop", "shift", "unshift", "reverse", "empty"]
 @biased_literals = ['T','F','k','k','k','x','x','x']*5
 
 
