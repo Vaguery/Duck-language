@@ -82,8 +82,8 @@ class DuckInterpreter
       check_for_interpreter_response unless @staged_item.nil?
       unless @staged_item.nil?
         @stack.push @staged_item
-        @staged_item = nil
       end
+      @staged_item = nil
     end
     self
   end

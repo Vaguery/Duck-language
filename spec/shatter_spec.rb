@@ -40,4 +40,9 @@ describe "shatter message" do
     @d.reset("1121 ( ) shatter")
     lambda {@d.run}.should_not raise_error
   end
+  
+  it "should work with bound variables" do
+    @d.reset("x x x shatter", {"x" => Bundle.new(*[Int.new(3),Int.new(4)])}).run
+    @d.stack.inspect.should == "[(3, 4), (3, 4), 3, 4]"
+  end
 end

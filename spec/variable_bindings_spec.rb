@@ -56,11 +56,11 @@ describe "initialization" do
       end
       
       it "should be flexible enough to handle bindings changed after initialization" do
-        ducky = DuckInterpreter.new("x x +",{"x" => Int.new(3)})
+        ducky = DuckInterpreter.new("x x + x",{"x" => Int.new(3)})
         ducky.step
         ducky.bindings["x"] = Int.new(77)
         ducky.run
-        ducky.stack[-1].value.should == 80
+        ducky.stack.inspect.should == "[80, 77]"
       end
       
       it "should work for quite complex bindings" do
@@ -77,10 +77,17 @@ describe "initialization" do
         ducky.stack.inspect.should == "[3, 4, 3, 4]"
       end
       
+      
       it "should work for empty arrays" do
         ducky = DuckInterpreter.new("x x 3",{"x" => []})
         ducky.run
         ducky.stack.inspect.should == "[3]"
+      end
+      
+      it "should handle Bundle inputs" do
+        ducky = DuckInterpreter.new("x x x shatter 3",{"x" => Bundle.new(*[Int.new(8)])})
+        ducky.run
+        ducky.stack.inspect.should == "[(8), (8), 8, 3]" 
       end
     end
   end

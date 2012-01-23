@@ -8,7 +8,7 @@ class Bundle < Item
   end
   
   def shatter
-    @contents
+    @contents.clone
   end
   
   def +
