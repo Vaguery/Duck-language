@@ -36,6 +36,11 @@ class Closure < Item
   end
   
   
+  def zap
+    nil
+  end
+  
+  
   def to_s
     "λ(#{@string_version},#{@needs.inspect})"
   end
