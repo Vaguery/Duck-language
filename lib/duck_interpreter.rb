@@ -193,6 +193,10 @@ class DuckInterpreter
     @stack[-1],@stack[-2] = @stack[-2],@stack[-1] if @stack.length > 1
   end
   
+  def shift
+    @queue.unshift @stack.delete_at(0) unless @stack.empty?
+  end
+  
   def noop
     # black hole
   end
