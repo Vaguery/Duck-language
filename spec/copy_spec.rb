@@ -5,9 +5,6 @@ require 'timeout'
 
 describe "the :copy message" do
   it "should be something the Interpreter recognizes" do
-    Int.new.should_not respond_to(:copy)
-    Bool.new.should_not respond_to(:copy)
-    Bundle.new.should_not respond_to(:copy)
     DuckInterpreter.new.should respond_to(:copy)
   end
   

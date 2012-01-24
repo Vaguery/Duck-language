@@ -48,7 +48,10 @@ class Bundle < Item
     else
       self
     end
-    
+  end
+  
+  def copy
+    @contents.empty? ? self : Bundle.new(*(@contents.clone << @contents[-1].clone))
   end
   
   def reverse
