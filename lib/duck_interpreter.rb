@@ -185,6 +185,9 @@ class DuckInterpreter
     @stack.push @stack[-1].clone unless @stack.empty?
   end
   
+  def reverse
+    @stack.reverse!
+  end
   
   def swap
     @stack[-1],@stack[-2] = @stack[-2],@stack[-1] if @stack.length > 1
