@@ -40,6 +40,17 @@ class Bundle < Item
     end
   end
   
+  def swap
+    if @contents.length > 1
+      new_contents = @contents.clone
+      new_contents[-1],new_contents[-2] = @contents[-2].clone,@contents[-1].clone
+      Bundle.new(*new_contents)
+    else
+      self
+    end
+    
+  end
+  
   def reverse
     Bundle.new(*@contents.clone.reverse)
   end
