@@ -6,6 +6,7 @@ class Item
   attr_reader :needs
   attr_reader :messages
   
+  
   def initialize(value="")
     @value = value
     @needs = []
