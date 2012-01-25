@@ -48,5 +48,14 @@ describe "finicky bugs found" do
         puts "#{d.stack.inspect} << #{d.queue.inspect} << #{d.script.inspect}<br />\n"
       end
     end.should_not raise_error
+    
+    
+    d = DuckInterpreter.new("0 pop x x x T be do >> be known -9 -3 x empty x copy < ¬ x swap known unshift ungreedy x -0 unshift ∨ F zap reverse x x F F 1 greedy 4 known x T x + T x x -9 -4 8 inc x -4 T x -9 reverse -4 x x swap 6 x shatter -1 quote x 9 5 -9 x neg x know? 3 -7 F greedy -4 F swap greedy F x -4 0 [] -1 x 9 -7 -4 x / copy swap x shatter x F ( unshift ) x T x F copy x F x F copy []",{"x" => Int.new(8)})
+    lambda do
+      until d.script == ""
+        d.step
+        puts "#{d.stack.inspect} << #{d.queue.inspect} << #{d.script.inspect}<br />\n"
+      end
+    end.should_not raise_error
   end
 end

@@ -81,8 +81,7 @@ class Bundle < Item
   end
   
   # keep at end of class definition!
-  @private_messages = [:value, :needs, :messages, :grab, :recognize_message?, :can_use?, :to_s, :contents]
-  @recognized_messages = (self.instance_methods - Object.instance_methods - @private_messages)
+  @recognized_messages = Item.recognized_messages + [:count, :[], :empty, :reverse, :copy, :swap, :pop, :shift, :>>, :<<, :+, :shatter]
 end
 
 
@@ -103,6 +102,5 @@ class Bundler < Closure
   end
   
   # keep at end of class definition!
-  @private_messages = [:value, :needs, :messages, :grab, :recognize_message?, :can_use?, :to_s, :string_version, :string_version=, :template_string, :contents, :contents=]
-  @recognized_messages = (self.instance_methods - Object.instance_methods - @private_messages)
+  @recognized_messages = Closure.recognized_messages + ["(".intern]
 end

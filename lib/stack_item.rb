@@ -2,6 +2,7 @@
 class Item
   class << self; attr_accessor :recognized_messages end
   
+  
   attr_reader :value
   attr_reader :needs
   attr_reader :messages
@@ -48,6 +49,5 @@ class Item
   end
   
   # keep at end of class definition!
-  @private_messages = [:value, :needs, :messages, :grab, :recognize_message?, :can_use?, :to_s,:string_version, :string_version=, :template_string]
-  @recognized_messages = (self.instance_methods - Object.instance_methods - @private_messages)
+  @recognized_messages = [:know?, :if, :known, :be]
 end
