@@ -46,5 +46,6 @@ class Closure < Item
   end
   
   # keep at end of class definition!
-  @recognized_messages = (self.instance_methods - Object.instance_methods)
+  @private_messages = [:value, :needs, :messages, :grab, :recognize_message?, :can_use?, :to_s, :closure,:closure=, :string_version, :string_version=, :contents, :contents=, :template_string]
+  @recognized_messages = (self.instance_methods - Object.instance_methods - @private_messages)
 end

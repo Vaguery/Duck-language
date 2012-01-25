@@ -6,6 +6,10 @@ describe "Message object" do
       Message.new("foo").should be_a_kind_of(Closure)
     end
     
+    it "should work if the message happens to be a Symbol rather than a String" do
+      Message.new(:foo).value.should == Message.new("foo").value
+    end
+    
     it "should record the initialization string as its #needs item" do
       Message.new("foo").needs.should == ["foo"]
     end

@@ -31,7 +31,8 @@ class Number < Item
   end
   
   # keep at end of class definition!
-  @recognized_messages = (self.instance_methods - Object.instance_methods)
+  @private_messages = [:value, :needs, :messages, :grab, :recognize_message?, :can_use?, :to_s]
+  @recognized_messages = (self.instance_methods - Object.instance_methods - @private_messages)
 end
 
 
@@ -77,5 +78,6 @@ class Int < Number
   end
   
   # keep at end of class definition!
-  @recognized_messages = (self.instance_methods - Object.instance_methods)
+  @private_messages = [:value, :needs, :messages, :grab, :recognize_message?, :can_use?, :to_s, :closure]
+  @recognized_messages = (self.instance_methods - Object.instance_methods - @private_messages)
 end

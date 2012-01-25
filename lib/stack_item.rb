@@ -31,6 +31,10 @@ class Item
     self
   end
   
+  def known
+    Bundle.new(* self.class.recognized_messages.collect {|msg| Message.new(msg)})
+  end
+  
   def if
     Closure.new(Proc.new{|bool| bool.value ? self : Message.new("noop")},["¬"],"#{self.value} IF ?")
   end
@@ -43,5 +47,6 @@ class Item
   end
   
   # keep at end of class definition!
-  @recognized_messages = (self.instance_methods - Object.instance_methods)
+  @private_messages = [:value, :needs, :messages, :grab, :recognize_message?, :can_use?, :to_s,:string_version, :string_version=, :template_string]
+  @recognized_messages = (self.instance_methods - Object.instance_methods - @private_messages)
 end

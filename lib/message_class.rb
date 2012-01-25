@@ -12,15 +12,17 @@ class Message < Closure
     ":#{@value}"
   end
   
-  def do
-    self
-  end
-  
   def grab(object)
     can_use?(object) ?
       @closure.curry[object] :
       self
   end
+  
+  
+  def do
+    self
+  end
+  
   
   def eql
     Closure.new(Proc.new {|arg1| Bool.new(arg1.value == self.value)},["do"],"? == #{self.value}")
@@ -28,5 +30,6 @@ class Message < Closure
   
   
   # keep at end of class definition!
-  @recognized_messages = (self.instance_methods - Object.instance_methods)
+  @private_messages = [:value, :needs, :messages, :grab, :recognize_message?, :can_use?, :to_s, :closure, :closure=, :string_version, :string_version=, :contents, :contents=, :template_string]
+  @recognized_messages = (self.instance_methods - Object.instance_methods - @private_messages)
 end

@@ -62,6 +62,16 @@ class Bundle < Item
     Bundle.new
   end
   
+  def []
+    Closure.new(
+      Proc.new do |idx| 
+        index = idx.value.to_i
+        how_many = self.contents.length
+        which = how_many == 0 ? 0 : index % how_many
+        self.contents[which].clone unless how_many == 0
+      end, ["inc"], "#{self.to_s}[?]")
+  end
+  
   def count
     Int.new(@contents.length)
   end
@@ -71,7 +81,8 @@ class Bundle < Item
   end
   
   # keep at end of class definition!
-  @recognized_messages = (self.instance_methods - Object.instance_methods)
+  @private_messages = [:value, :needs, :messages, :grab, :recognize_message?, :can_use?, :to_s, :contents]
+  @recognized_messages = (self.instance_methods - Object.instance_methods - @private_messages)
 end
 
 
@@ -92,5 +103,6 @@ class Bundler < Closure
   end
   
   # keep at end of class definition!
-  @recognized_messages = (self.instance_methods - Object.instance_methods)
+  @private_messages = [:value, :needs, :messages, :grab, :recognize_message?, :can_use?, :to_s, :string_version, :string_version=, :template_string, :contents, :contents=]
+  @recognized_messages = (self.instance_methods - Object.instance_methods - @private_messages)
 end

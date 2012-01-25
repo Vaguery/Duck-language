@@ -44,7 +44,7 @@ class DuckInterpreter
       end
       self
     rescue Exception
-      puts "ERROR when running #{@old_script} at #{@script}"
+      puts "ERROR when running \"#{@old_script}\" at \"#{@script}\""
       raise
     end
   end
@@ -183,6 +183,17 @@ class DuckInterpreter
   
   def copy
     @stack.push @stack[-1].clone unless @stack.empty?
+  end
+  
+  def []
+    @queue.unshift Closure.new(
+      Proc.new do |idx| 
+        index = idx.value.to_i
+        how_many = @stack.length
+        which = how_many == 0 ? 0 : index % how_many
+        @stack.delete_at(which)
+      end, ["inc"], "stack[?]")
+    
   end
   
   def reverse
