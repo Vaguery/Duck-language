@@ -63,6 +63,8 @@ class DuckInterpreter
       Bundler.new()
     when /^[-+]?[0-9]+$/
       Int.new(string.to_i)
+    when /^[-+]?[0-9]*\.?[0-9]+$/
+      Decimal.new(string.to_f)
     when 'true','T'
       Bool.new(true)
     when 'false','F'
