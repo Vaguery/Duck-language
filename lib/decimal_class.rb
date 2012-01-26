@@ -1,15 +1,15 @@
 #encoding: utf-8
 class Decimal < Number
-  # def +
-  #   needs = ["neg"]
-  #   Closure.new(Proc.new {|summand| Decimal.new(self.value + summand.value)},needs,"#{self.value} + ?")
-  # end
-  # 
-  # def -
-  #   needs = ["neg"]
-  #   Closure.new(Proc.new {|arg1| Int.new(arg1.value - self.value)},needs,"? - #{self.value}")
-  # end
-  # 
+  def +
+    needs = ["neg"]
+    Closure.new(Proc.new {|summand| Decimal.new(self.value + summand.value)},needs,"#{self.value} + ?")
+  end
+  
+  def -
+    needs = ["neg"]
+    Closure.new(Proc.new {|arg1| Decimal.new(arg1.value - self.value)},needs,"? - #{self.value}")
+  end
+  
   # def *
   #   needs = ["neg"]
   #   Closure.new(Proc.new {|multiplier| Int.new(self.value * multiplier.value)},needs,"#{self.value} * ?")
@@ -41,5 +41,5 @@ class Decimal < Number
   end
   
   # keep at end of class definition!
-  @recognized_messages = Number.recognized_messages + []
+  @recognized_messages = Number.recognized_messages + [:+, :-]
 end

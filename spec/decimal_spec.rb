@@ -19,6 +19,11 @@ describe "Decimal stack item" do
       d.stack[0].should_not be_a_kind_of(Decimal)
       d.stack[0].should be_a_kind_of(Message)
     end
+    
+    it "should work for decimal-terminated numbers with no fractions" do
+      d = DuckInterpreter.new("-1231.").run
+      d.stack[0].should be_a_kind_of(Decimal)
+    end
   end
   
   
