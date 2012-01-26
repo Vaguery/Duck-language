@@ -72,6 +72,7 @@ class Bundle < Item
       end, ["inc"], "#{self.to_s}[?]")
   end
   
+  
   def count
     Int.new(@contents.length)
   end
