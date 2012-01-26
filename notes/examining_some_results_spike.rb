@@ -123,7 +123,7 @@ def performance_over_IO_pairs(script,training_data)
       script,
       {"x" => key.each.collect{|i| Int.new(key[i].to_i)} } ).run
 
-    where = d.topmost_respondent("neg")
+    where = d.topmost_respondent("inc")
     where.nil? ? 1000000 : (val-d.stack[where].value).abs
   end
 end
@@ -140,4 +140,6 @@ end
 
 
 
-puts performance_over_IO_pairs("-7 ≥ ungreedy empty 9 F unshift F x * T x quote 2 -7 if T T quote * -8 -2 2 / x ungreedy F ≥ * 7 F be 8 ¬ F dec do ( F * 3 0 6 >> F T -18 know? F shift pop x swap if ∧ depth",training_data).inspect
+puts performance_space(population,training_data).inspect
+
+

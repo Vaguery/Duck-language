@@ -26,14 +26,15 @@ def random_script(length)
   template.join(" ")
 end
 
-@all_functions = ["+","-","*","/","neg","¬","∧","∨","depth","inc","dec","eql","<",">","≤","≥","be","pop","swap",  "if", "greedy?", "greedy", "ungreedy", "do", "know?", "shatter", "copy", "(", ")", "<<", ">>", "pop", "shift", "unshift", "reverse", "empty", "zap", "quote", "[]", "known"]
-@biased_literals = ['T','F','k','k','k','x','x','x']*5
+@all_functions = ["+","-","*","/","neg","¬","∧","∨","depth","inc","dec","eql","<",">","≤","≥","be","pop","swap",  "if", "greedy?", "greedy", "ungreedy", "do", "know?", "shatter", "copy", "(", ")", "<<", ">>", "pop", "shift", "unshift", "reverse", "empty", "zap", "quote", "[]", "known", "trunc"]
+@biased_literals = ['T','F','k','k','k','f','f','f','x','x','x']*5
 
 
 def random_tokens(length,tokens=@all_functions+@biased_literals)
   length.times.collect do |t|
     t = tokens.sample
     t = (rand(20)-10).to_s if t == 'k'
+    t = ((rand()*20-10.0).round(3)).to_s if t == 'f'
     t
   end
 end

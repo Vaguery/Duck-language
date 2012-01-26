@@ -35,27 +35,48 @@ class Number < Item
 end
 
 
+
 class Int < Number
-  def +
-    needs = ["neg"]
-    Closure.new(Proc.new {|summand| Int.new(self.value + summand.value)},needs,"#{self.value} + ?")
+  def type_cast_result(arg, operator)
+    arg.class == Decimal ?
+      Decimal.new(arg.value.send(operator,self.value)) :
+      Int.new(arg.value.send(operator,self.value))
   end
+  
+  
+  def +
+    Closure.new(
+      Proc.new {|summand| type_cast_result(summand, :+)},
+      ["neg"],
+      "#{self.value} + ?")
+  end
+  
   
   def -
-    needs = ["neg"]
-    Closure.new(Proc.new {|arg1| Int.new(arg1.value - self.value)},needs,"? - #{self.value}")
+    Closure.new(
+      Proc.new {|arg1| type_cast_result(arg1, :-)},
+      ["neg"],
+      "? - #{self.value}")
   end
+  
   
   def *
-    needs = ["neg"]
-    Closure.new(Proc.new {|multiplier| Int.new(self.value * multiplier.value)},needs,"#{self.value} * ?")
+    Closure.new(
+      Proc.new {|multiplier| type_cast_result(multiplier, :*)},
+      ["neg"],
+      "#{self.value} * ?")
   end
   
+  
   def /
-    needs = ["neg"]
-    self.value != 0 ? 
-      Closure.new(Proc.new {|numerator| Int.new(numerator.value / self.value)},needs,"? / #{self.value}") :
-      Closure.new(Proc.new {|numerator| Int.new(@@divzero_result)},needs,"DIV0")
+    if self.value != 0.0
+      Closure.new(
+        Proc.new {|numerator| type_cast_result(numerator, :/)},
+        ["neg"],
+        "? / #{self.value}")
+    else
+      Closure.new(Proc.new {|numerator| Int.new(@@divzero_result)},["neg"],"DIV0")
+    end
   end
   
   def inc

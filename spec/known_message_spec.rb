@@ -45,7 +45,7 @@ describe "finicky bugs found" do
     lambda do
       until d.script == ""
         d.step
-        puts "#{d.stack.inspect} << #{d.queue.inspect} << #{d.script.inspect}<br />\n"
+        # puts "#{d.stack.inspect} << #{d.queue.inspect} << #{d.script.inspect}<br />\n"
       end
     end.should_not raise_error
     
@@ -54,7 +54,7 @@ describe "finicky bugs found" do
     lambda do
       until d.script == ""
         d.step
-        puts "#{d.stack.inspect} << #{d.queue.inspect} << #{d.script.inspect}<br />\n"
+        # puts "#{d.stack.inspect} << #{d.queue.inspect} << #{d.script.inspect}<br />\n"
       end
     end.should_not raise_error
   end

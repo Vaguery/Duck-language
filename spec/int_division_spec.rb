@@ -55,6 +55,7 @@ describe "division" do
     
     it "should produce the value specified in Number.divzero_result when you try to divide by 0" do
       d = DuckInterpreter.new("/ 0 60")
+      Number.divzero_result=0 # default
       d.run.stack[-1].value.should == 0
       
       d2 = DuckInterpreter.new("/ 0 60")
@@ -63,21 +64,32 @@ describe "division" do
     end
   end
   
-  describe "delayed multiplication" do
+  describe "type casting" do
+    it "should return an Int if both arguments are Ints" do
+      DuckInterpreter.new("60 12 /").run.stack[-1].should be_a_kind_of(Int)
+    end
+    
+    it "should return a Decimal if either argument is a Decimal" do
+      DuckInterpreter.new("60.0 12 /").run.stack[-1].should be_a_kind_of(Decimal)
+    end
+  end
+  
+  
+  describe "delayed division" do
     it "should work over complex sequences" do
-      ducky = DuckInterpreter.new("1 2 * 3 4 * *")
+      ducky = DuckInterpreter.new("56 28 / 7 2 /")
       ducky.run
-      ducky.stack[-1].value.should == 24
+      ducky.stack[-1].value.should == 3
     end
     
     it "should produce a number when all args and methods are accounted for" do
-      "11 -22 * 33 *".split.permutation do |p|
+      "66 -22 / 1 /".split.permutation do |p|
         DuckInterpreter.new(p.join(" ")).run.stack[-1].should be_a_kind_of(Int)
       end
     end
     
     it "should produce some closures when there aren't enough args" do
-      "21 * -3 * *".split.permutation do |p|
+      "21 / -3 / /".split.permutation do |p|
         [Int,Closure,Message].should include DuckInterpreter.new(p.join(" ")).run.stack[-1].class
       end
     end

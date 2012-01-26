@@ -53,6 +53,18 @@ describe "addition" do
     end
   end
   
+  
+  describe "type casting" do
+    it "should return an Int if both arguments are Ints" do
+      DuckInterpreter.new("-11 -22 +").run.stack[-1].should be_a_kind_of(Int)
+    end
+    
+    it "should return a Decimal if either argument is a Decimal" do
+      DuckInterpreter.new("0.2 -22 +").run.stack[-1].should be_a_kind_of(Decimal)
+    end
+  end
+  
+  
   describe "delayed addition" do
     it "should work over complex sequences" do
       ducky = DuckInterpreter.new("1 2 + 3 4 + +")
