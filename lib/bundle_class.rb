@@ -72,6 +72,20 @@ class Bundle < Item
       end, ["inc"], "#{self.to_s}[?]")
   end
   
+  def []=
+    Closure.new(
+      Proc.new do |idx,item|
+        index = idx.value.to_i
+        how_many = self.contents.length
+        which = how_many == 0 ? 0 : index % how_many
+        new_contents = self.contents.clone
+        new_contents[which] = item
+        Bundle.new(*new_contents)
+      end,
+      ["inc","be"],
+      "(item ? of #{self.inspect})"
+    )
+  end
   
   def count
     Int.new(@contents.length)
@@ -82,7 +96,7 @@ class Bundle < Item
   end
   
   # keep at end of class definition!
-  @recognized_messages = Item.recognized_messages + [:count, :[], :empty, :reverse, :copy, :swap, :pop, :shift, :>>, :<<, :+, :shatter]
+  @recognized_messages = Item.recognized_messages + [:count, :[], :empty, :reverse, :copy, :swap, :pop, :shift, :>>, :<<, :+, :shatter, :[]=]
 end
 
 

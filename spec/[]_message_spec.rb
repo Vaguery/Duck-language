@@ -80,7 +80,11 @@ describe "the :[] message for the Stack" do
     d.stack.inspect.should == "[1, 3, 4, 2]"
   end
   
-  it "should work when the Stack is empty" do
-    
+  it "should not fail when the Stack is empty" do
+    d = DuckInterpreter.new("3") # the number will get used up
+    d.run
+    d.script = "[]"
+    d.run
+    d.stack.inspect.should == "[]"
   end
 end
