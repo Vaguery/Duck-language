@@ -11,7 +11,11 @@ class Item
   def initialize(value="")
     @value = value
     @needs = []
-  end  
+  end
+  
+  def deep_copy
+    self.clone
+  end
   
   def grab(object)
     self

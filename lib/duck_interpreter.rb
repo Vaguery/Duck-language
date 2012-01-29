@@ -116,7 +116,7 @@ class DuckInterpreter
     if arg_for = @stack.rindex {|item| item.can_use?(@staged_item)}
       place_intermediate_result @stack[arg_for].grab(@staged_item)
       @stack.delete_at(arg_for)
-      @queue.unshift @staged_item.clone unless @staged_item.nil?
+      @queue.unshift @staged_item.deep_copy unless @staged_item.nil?
       @staged_item = nil
     end
   end
@@ -184,7 +184,7 @@ class DuckInterpreter
   end
   
   def copy
-    @stack.push @stack[-1].clone unless @stack.empty?
+    @stack.push @stack[-1].deep_copy unless @stack.empty?
   end
   
   def []

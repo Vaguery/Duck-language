@@ -11,6 +11,11 @@ class Bundle < Item
     @contents.clone
   end
   
+  def deep_copy
+    new_contents = @contents.collect {|i| i.deep_copy}
+    Bundle.new(*new_contents)
+  end
+  
   def +
     Closure.new(Proc.new {|other_bundle| Bundle.new(*(other_bundle.contents + @contents))},
       ["count"],"#{self.to_s}+(?)")
@@ -68,7 +73,7 @@ class Bundle < Item
         index = idx.value.to_i
         how_many = self.contents.length
         which = how_many == 0 ? 0 : index % how_many
-        self.contents[which].clone unless how_many == 0
+        self.contents[which].deep_copy unless how_many == 0
       end, ["inc"], "#{self.to_s}[?]")
   end
   
@@ -78,9 +83,9 @@ class Bundle < Item
         index = idx.value.to_i
         how_many = self.contents.length
         which = how_many == 0 ? 0 : index % how_many
-        new_contents = self.contents.clone
-        new_contents[which] = item
-        Bundle.new(*new_contents)
+        new_bundle = self.deep_copy
+        new_bundle.contents[which] = item.deep_copy
+        new_bundle
       end,
       ["inc","be"],
       "(item ? of #{self.inspect})"
@@ -106,9 +111,15 @@ class Bundler < Closure
   def initialize(item_array=[])
     @contents = item_array
     @closure = Proc.new {|item| item.value == "(".intern ?
-      Bundle.new(*@contents.clone) : Bundler.new(@contents.unshift(item).clone)}
+      Bundle.new(*@contents) : Bundler.new(@contents.unshift(item.deep_copy).clone)}
     @needs = ["be"]
   end
+  
+  def deep_copy
+    new_contents = @contents.collect {|i| i.deep_copy}
+    Bundler.new(new_contents)
+  end
+  
   
   define_method( "(".intern ) {Bundle.new(*@contents.clone)}
   
