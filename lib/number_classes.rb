@@ -98,5 +98,5 @@ class Int < Number
   end
   
   # keep at end of class definition!
-  @recognized_messages = Number.recognized_messages + [:-, :*, :+, :/, :inc, :dec, :copies]
+  @recognized_messages = Number.recognized_messages + [:-, :*, :+, :/, :inc, :dec] # commented out :copies
 end

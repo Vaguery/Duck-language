@@ -3,7 +3,7 @@ class Bundle < Item
   attr_accessor :contents
   
   def initialize(*items)
-    @contents = items.clone
+    @contents = items
     @needs = []
   end
   
@@ -111,7 +111,7 @@ class Bundler < Closure
   def initialize(item_array=[])
     @contents = item_array
     @closure = Proc.new {|item| item.value == "(".intern ?
-      Bundle.new(*@contents) : Bundler.new(@contents.unshift(item.deep_copy).clone)}
+      Bundle.new(*@contents) : Bundler.new(@contents.unshift(item.deep_copy))}
     @needs = ["be"]
   end
   

@@ -142,7 +142,7 @@ end
 
 # puts performance_space(population,training_data).inspect
 
-DuckInterpreter.new("x  T * ∨ ≤ -5 3 reverse -9.672 << 6.572 zap unshift F x -0.809 + F x known ≥ 2 x pop -8 5 trunc x x dec x < 0.001 >> x -7 -2 ungreedy x x x trunc x ) ≤ zap ) []= pop T x -6.37 -0.367 -5 0 -1.071 x 1.701 if shatter x ∧ x inc []= ungreedy inc T 3 T x -1 ≥ trunc F x x neg ∨ 7 F x 1 x neg -9 unshift -4 6 x zap -6 [] 9 x know? pop reverse x reverse F -2 x + T T T x ≥ F x -5 x -5.835 ∨ + < ¬ ( x -9 T do greedy? copy F -5 pop T pop x if quote copy F -1 [] unshift ∧ T x pop x F x known x known quote shatter if x unshift -7 F quote T >> quote 1 ( 1.564 x -6 -2 reverse greedy dec -7 -8.292 T x swap -4 greedy? x be [] -9 greedy? F -8.569 depth T copy ) F ≥ if << ∧ if neg 7 - < 7.645 F -4.694", {"x" => [Int.new(12),Int.new(13)]}).cartoon_trace
+DuckInterpreter.new(">> x 1.379 depth T -6.819 -4 pop x known < T 8 neg - x T x x -4.156 []= T F * pop if ungreedy 8.593 []= 5.353 << F >> 1.184 neg x 8 7.707 swap F swap x x -2 ungreedy x 6 x x -5", {"x" => Int.new(12)}).cartoon_trace
 
 # 1000.times do |i|
 #   begin
