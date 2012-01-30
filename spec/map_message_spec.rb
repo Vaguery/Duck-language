@@ -28,4 +28,14 @@ describe "the :give message for Bundles" do
     d = DuckInterpreter.new("( 1 2 3 4 ) * map 2 give").run
     d.stack.inspect.should == "[(2, 4, 6, 8)]"
   end
+  
+  it "should work for empty Bundles" do
+    d = DuckInterpreter.new("( ) - map").run
+    d.stack.inspect.should == "[()]"
+  end
+  
+  it "should work when the result of a message is an Array of items" do
+    d = DuckInterpreter.new("( 0.62 ) map trunc").run
+    d.stack.inspect.should == "[(0, 0.62)]"
+  end
 end

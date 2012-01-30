@@ -19,6 +19,13 @@ describe "various bad behaviors that cropped up during stress-testing" do
     
     lambda{ d.run }.should_not raise_error
   end
+  
+  
+  it "should be able to deal with Bad Script 4" do
+    d = DuckInterpreter.new("-5.957 known zap neg T ¬ -3.836 x / give x x x -9.557 3 -5 F -1.88 be ( depth 7 F zap x neg trunc -8.82 x T 6.336 shift -7.108 neg neg -2.772 pop -5 T + F 2.861 greedy x shift be x 6 x x",{"x" => Int.new(8)})
+    
+    lambda{ d.run }.should_not raise_error
+  end
 end
 
 

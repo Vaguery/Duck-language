@@ -142,7 +142,7 @@ end
 
 # puts performance_space(population,training_data).inspect
 
-DuckInterpreter.new(">> x 1.379 depth T -6.819 -4 pop x known < T 8 neg - x T x x -4.156 []= T F * pop if ungreedy 8.593 []= 5.353 << F >> 1.184 neg x 8 7.707 swap F swap x x -2 ungreedy x 6 x x -5", {"x" => Int.new(12)}).cartoon_trace
+DuckInterpreter.new("-5.957 known zap neg T ¬ -3.836 x / give x x x -9.557 3 -5 F -1.88 be ( depth 7 F zap x neg trunc -8.82 x T 6.336 shift -7.108 neg neg -2.772 pop -5 T + F 2.861 greedy x shift be x 6 x x", {"x" => Int.new(12)}).cartoon_trace
 
 # 1000.times do |i|
 #   begin
