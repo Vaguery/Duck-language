@@ -95,7 +95,8 @@ class Bundle < Item
   def give
     Closure.new(
       Proc.new do |item|
-        new_contents = @contents.collect {|i| i.grab(item.deep_copy)}.flatten
+        results = @contents.collect {|i| i.grab(item.deep_copy)}.flatten
+        new_contents = results.reject {|i| i.nil?}
         Bundle.new(*new_contents)
       end,
       ["be"],
@@ -106,7 +107,8 @@ class Bundle < Item
   def map
     Closure.new(
       Proc.new do |item|
-        new_contents = @contents.collect {|i| item.grab(i.deep_copy)}.flatten
+        results = @contents.collect {|i| item.grab(i.deep_copy)}.flatten
+        new_contents = results.reject {|i| i.nil?}
         Bundle.new(*new_contents)
       end,
       ["be"],

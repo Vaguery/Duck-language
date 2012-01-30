@@ -38,4 +38,10 @@ describe "the :give message for Bundles" do
     d = DuckInterpreter.new("( 0.62 ) map trunc").run
     d.stack.inspect.should == "[(0, 0.62)]"
   end
+  
+  it "should work when the result of a message is Nil" do
+    d = DuckInterpreter.new("( - ) zap map").run
+    d.stack.inspect.should == "[()]"
+  end
+  
 end

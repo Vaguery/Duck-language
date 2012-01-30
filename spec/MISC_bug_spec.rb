@@ -26,6 +26,13 @@ describe "various bad behaviors that cropped up during stress-testing" do
     
     lambda{ d.run }.should_not raise_error
   end
+  
+  
+  it "should be able to deal with Bad Script 4" do
+    d = DuckInterpreter.new("eql empty x ( -3.777 - < << give 4.214 known ≥ / T eql < x -6.333 []= copy be 5 << if zap ∧ 2.496 pop x know? -3 dec T F x depth F empty F greedy unshift x -7 ∧ greedy? -8 -6 x greedy copy",{"x" => Int.new(8)})
+    
+    lambda{ d.run }.should_not raise_error
+  end
 end
 
 
