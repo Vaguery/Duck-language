@@ -92,6 +92,28 @@ class Bundle < Item
     )
   end
   
+  def give
+    Closure.new(
+      Proc.new do |item|
+        new_contents = @contents.collect {|i| i.grab(item.deep_copy)}
+        Bundle.new(*new_contents)
+      end,
+      ["be"],
+      "give(#{self.inspect}, ?)"
+    )
+  end
+  
+  def map
+    Closure.new(
+      Proc.new do |item|
+        new_contents = @contents.collect {|i| item.grab(i.deep_copy)}
+        Bundle.new(*new_contents)
+      end,
+      ["be"],
+      "#grab({self.inspect}, ?)"
+    )
+  end
+  
   def count
     Int.new(@contents.length)
   end
@@ -101,7 +123,7 @@ class Bundle < Item
   end
   
   # keep at end of class definition!
-  @recognized_messages = Item.recognized_messages + [:count, :[], :empty, :reverse, :copy, :swap, :pop, :shift, :>>, :<<, :+, :shatter, :[]=]
+  @recognized_messages = Item.recognized_messages + [:count, :[], :empty, :reverse, :copy, :swap, :pop, :shift, :>>, :<<, :+, :shatter, :[]=, :give, :map]
 end
 
 
