@@ -142,7 +142,7 @@ end
 
 # puts performance_space(population,training_data).inspect
 
-DuckInterpreter.new("x F pop ungreedy 0 x 4.025 T ) 9 x 4.436 swap copy T x trunc eql 0.626 swap 7 swap x []= 3.687 x -3.38 -10 -4 greedy ∨ x greedy ( x quote ) map F shatter eql x + ¬ []= inc known [] depth x trunc x 3.700 -2 ∧ 1.578 x T map map eql unshift 5.036 -7.378 - 9 know? do reverse x", {"x" => Int.new(12)}).cartoon_trace
+DuckInterpreter.new("ungreedy ) x trunc eql 0.626 swap 7 swap x []= 3.687 x -3.38 -10 -4 greedy ∨ x greedy ( x quote ) map F shatter eql x + ¬ []= inc known [] depth x trunc x 3.700 -2 ∧ 1.578 x T map map eql unshift 5.036 -7.378 - 9 know? do reverse x", {"x" => Int.new(12)}).cartoon_trace
 
 # 1000.times do |i|
 #   begin

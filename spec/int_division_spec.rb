@@ -49,18 +49,13 @@ describe "division" do
       DuckInterpreter.new("/ -12 60").run.stack[-1].value.should == -5
     end
     
-    it "should not fail for division by 0" do
+    it "should not raise an error for division by 0" do
       lambda { DuckInterpreter.new("/ 0 60").run }.should_not raise_error
     end
     
-    it "should produce the value specified in Number.divzero_result when you try to divide by 0" do
+    it "should produce an Error object when you try to divide by 0 (and consume the numerator)" do
       d = DuckInterpreter.new("/ 0 60")
-      Number.divzero_result=0 # default
-      d.run.stack[-1].value.should == 0
-      
-      d2 = DuckInterpreter.new("/ 0 60")
-      Number.divzero_result=21213
-      d2.run.stack[-1].value.should == 21213
+      d.run.stack.inspect.should == "[err:DIV0]"
     end
   end
   
@@ -82,9 +77,9 @@ describe "division" do
       ducky.stack[-1].value.should == 3
     end
     
-    it "should produce a number when all args and methods are accounted for" do
-      "66 -22 / 1 /".split.permutation do |p|
-        DuckInterpreter.new(p.join(" ")).run.stack[-1].should be_a_kind_of(Int)
+    it "should produce a result when all args and methods are accounted for" do
+      "66 -22 / 3 /".split.permutation do |p|
+        [Int,Error].should include DuckInterpreter.new(p.join(" ")).run.stack[-1].class
       end
     end
     

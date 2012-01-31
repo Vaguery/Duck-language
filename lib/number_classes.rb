@@ -1,10 +1,5 @@
 #encoding: utf-8
 class Number < Item
-  @@divzero_result = 0
-  
-  def self.divzero_result=(new_value)
-    @@divzero_result=new_value
-  end
   
   def neg
     self.class.new(-@value)
@@ -75,7 +70,7 @@ class Int < Number
         ["neg"],
         "? / #{self.value}")
     else
-      Closure.new(Proc.new {|numerator| Int.new(@@divzero_result)},["neg"],"DIV0")
+      Closure.new(Proc.new {|numerator| Error.new("DIV0")},["neg"],"? / #{self.value}")
     end
   end
   

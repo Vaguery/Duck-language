@@ -15,6 +15,7 @@ class DuckInterpreter
       counter += 1
       puts "\n\n#{counter}"
       puts "greedy: #{@greedy_flag}"
+      puts "characters: #{@stack.to_s.length} : #{@queue.to_s.length} : #{@script.length}"
       # puts "stack contains: #{item_tree(@stack)}"
       # puts "queue contains: #{item_tree(@queue)}"
       cartoon_of_state

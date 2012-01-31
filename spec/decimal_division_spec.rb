@@ -38,13 +38,9 @@ describe "division" do
       lambda { DuckInterpreter.new("/ 0.0 60.0").run }.should_not raise_error
     end
     
-    it "should produce the value specified in Number.divzero_result when you try to divide by 0" do
+    it "should produce an Error object when you try to divide by 0" do
       d = DuckInterpreter.new("/ 0.0 60.0")
-      d.run.stack[-1].value.should == 0
-      
-      d2 = DuckInterpreter.new("/ 0.0 60.0")
-      Number.divzero_result=21213
-      d2.run.stack[-1].value.should == 21213
+      d.run.stack.inspect.should == "[err:DIV0]"
     end
   end
   

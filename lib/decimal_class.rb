@@ -19,7 +19,7 @@ class Decimal < Number
     needs = ["neg"]
     self.value != 0 ? 
       Closure.new(Proc.new {|numerator| Decimal.new(numerator.value / self.value)},needs,"? / #{self.value}") :
-      Closure.new(Proc.new {|numerator| Decimal.new(@@divzero_result)},needs,"DIV0")
+      Closure.new(Proc.new {|numerator| Error.new("DIV0")},needs,"? / #{self.value}")
   end
   
   def trunc
