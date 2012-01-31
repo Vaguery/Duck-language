@@ -15,8 +15,8 @@ class DuckInterpreter
       counter += 1
       puts "\n\n#{counter}"
       puts "greedy: #{@greedy_flag}"
-      puts "stack contains: #{item_tree(@stack)}"
-      puts "queue contains: #{item_tree(@queue)}"
+      # puts "stack contains: #{item_tree(@stack)}"
+      # puts "queue contains: #{item_tree(@queue)}"
       cartoon_of_state
     end
   end
@@ -45,7 +45,7 @@ def random_script(length)
   template.join(" ")
 end
 
-@all_functions = ["+","-","*","/","neg","¬","∧","∨","depth","inc","dec","eql","<",">","≤","≥","be","pop","swap",  "if", "greedy?", "greedy", "ungreedy", "do", "know?", "shatter", "copy", "(", ")", "<<", ">>", "pop", "shift", "unshift", "reverse", "empty", "zap", "quote", "[]", "known", "trunc", "[]=", "give"]
+@all_functions = ["+","-","*","/","neg","¬","∧","∨","depth","inc","dec","eql","<",">","≤","≥","be","pop","swap",  "if", "greedy?", "greedy", "ungreedy", "do", "know?", "shatter", "copy", "(", ")", "<<", ">>", "pop", "shift", "unshift", "reverse", "empty", "zap", "quote", "[]", "known", "trunc", "[]=", "give", "map"]
 @biased_literals = ['T','F','k','k','k','f','f','f','x','x','x']*5
 
 

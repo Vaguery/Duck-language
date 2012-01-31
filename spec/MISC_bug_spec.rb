@@ -1,5 +1,6 @@
 #encoding: utf-8
 require_relative './spec_helper'
+require 'timeout'
 
 describe "various bad behaviors that cropped up during stress-testing" do
   it "should be able to deal with Bad Script 1" do
@@ -33,6 +34,14 @@ describe "various bad behaviors that cropped up during stress-testing" do
     
     lambda{ d.run }.should_not raise_error
   end
+  
+  it "should be able to deal with Very Slow Bad Script 5" do
+    d = DuckInterpreter.new("x F pop ungreedy 0 x 4.025 T ) 9 x 4.436 swap copy T x trunc eql 0.626 swap 7 swap x []= 3.687 x -3.38 -10 -4 greedy ∨ x greedy ( x quote ) map F shatter eql x + ¬ []= inc known [] depth x trunc x 3.700 -2 ∧ 1.578 x T map map eql unshift 5.036 -7.378 - 9 know? do reverse x", {"x" => Int.new(12)})
+    lambda { 
+      Timeout::timeout(3) do |t|
+        d.run
+      end
+    }.should_not raise_error
+  end
 end
-
 

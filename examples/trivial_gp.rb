@@ -93,7 +93,7 @@ SIMPLE_TOKENS = ["+","-","*","/","inc","dec","if"]+['k','k','k','x','x','x']*2  
 NUMBERLESS_TOKENS = ["+","-","*","/","inc","dec"]+['x']*4  # EXERCISE (one hand tied)
 ALL_TOKENS = @all_functions+@biased_literals
 
-@experiment_tokens = SIMPLE_TOKENS
+@experiment_tokens = ALL_TOKENS
 
 # EXERCISE (time and materials)
 pop_size = 200
