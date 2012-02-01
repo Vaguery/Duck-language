@@ -70,6 +70,7 @@ class Bundle < Item
     Bundle.new
   end
   
+  
   def []
     Closure.new(
       Proc.new do |idx| 
@@ -79,6 +80,7 @@ class Bundle < Item
         self.contents[which].deep_copy unless how_many == 0
       end, ["inc"], "#{self.to_s}[?]")
   end
+  
   
   def []=
     Closure.new(
@@ -94,6 +96,7 @@ class Bundle < Item
       "(item ? of #{self.inspect})"
     )
   end
+  
   
   def give
     Closure.new(
@@ -146,6 +149,28 @@ class Bundle < Item
   end
   
   
+  def ∪
+    Closure.new(
+      Proc.new do |other_bundle|
+        aggregated = other_bundle.contents + @contents
+        Bundle.new(*(aggregated.uniq {|element| element.inspect}))
+      end,
+      ["count"],
+      "#{self.inspect} ∪ ?"
+    )
+  end
+  
+  def ∩
+    Closure.new(
+      Proc.new do |other_bundle|
+        overlappers = other_bundle.contents.collect {|item| item.inspect}
+        Bundle.new(*(@contents.select {|element| overlappers.include? element.inspect}))
+      end,
+      ["count"],
+      "#{self.inspect} ∩ ?"
+    )
+  end
+  
   
   def count
     Int.new(@contents.length)
@@ -156,7 +181,7 @@ class Bundle < Item
   end
   
   # keep at end of class definition!
-  @recognized_messages = Item.recognized_messages + [:count, :[], :empty, :reverse, :copy, :swap, :pop, :shift, :>>, :<<, :+, :shatter, :[]=, :give, :map, :useful, :users]
+  @recognized_messages = Item.recognized_messages + [:count, :[], :empty, :reverse, :copy, :swap, :pop, :shift, :>>, :<<, :+, :shatter, :[]=, :give, :map, :useful, :users, :∪, :∩]
 end
 
 
@@ -174,7 +199,6 @@ class Bundler < Closure
     new_contents = @contents.collect {|i| i.deep_copy}
     Bundler.new(new_contents)
   end
-  
   
   define_method( "(".intern ) {Bundle.new(*@contents.clone)}
   

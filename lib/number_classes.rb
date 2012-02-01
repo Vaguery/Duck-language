@@ -94,11 +94,17 @@ class Int < Number
       "#{i} of ?")
   end
   
+  def bundle
+    @value.to_i < 1 ?
+    Bundle.new :
+    Collector.new(@value.to_i,[])
+  end
+  
   
   def to_s
     "#{@value}"
   end
   
   # keep at end of class definition!
-  @recognized_messages = Number.recognized_messages + [:-, :*, :+, :/, :inc, :dec, :copies]
+  @recognized_messages = Number.recognized_messages + [:-, :*, :+, :/, :inc, :dec, :copies, :bundle]
 end
