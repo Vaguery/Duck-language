@@ -112,7 +112,7 @@ class Bundle < Item
   def map
     Closure.new(
       Proc.new do |item|
-        results = @contents.collect {|i| item.grab(i.deep_copy)}.flatten
+        results = @contents.collect {|i| item.deep_copy.grab(i.deep_copy)}.flatten
         new_contents = results.reject {|i| i.nil?}
         size = new_contents.inject("") {|rep,i| rep+(i.to_s)}.length
         size < @@result_size_limit ? Bundle.new(*new_contents) : Error.new("OVERSIZE")

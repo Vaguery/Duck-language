@@ -44,4 +44,9 @@ describe "the :give message for Bundles" do
     d.stack.inspect.should == "[()]"
   end
   
+  it "should work with Bundlers" do
+    d = DuckInterpreter.new("( 1 2 3 ) quote ) map").run
+    d.stack.inspect.should == "[(λ( (1, ?) ), λ( (2, ?) ), λ( (3, ?) ))]"
+    
+  end
 end
