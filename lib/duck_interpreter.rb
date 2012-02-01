@@ -1,6 +1,8 @@
 #encoding:utf-8
+require 'timeout'
+
 class DuckInterpreter
-  class << self; attr_accessor :recognized_messages end
+  class << self; attr_accessor :recognized_messages end  
   
   attr_accessor :old_script,:old_bindings
   attr_accessor :script
@@ -9,7 +11,6 @@ class DuckInterpreter
   attr_accessor :staged_item
   attr_accessor :bindings
   attr_accessor :greedy_flag
-  
   
   def initialize(script="",bindings={})
     @script = script.strip

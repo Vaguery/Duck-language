@@ -84,7 +84,14 @@ class Int < Number
   
   def copies
     i = self.value
-    Closure.new(Proc.new {|item| i.times.collect {|i| item.clone}},["be"],"#{i} of ?")
+    Closure.new(
+      Proc.new do |item|
+        item.to_s.length * i <= @@result_size_limit ?
+        i.times.collect {|i| item.clone} :
+        Error.new("OVERSIZED RESULT")
+      end,
+      ["be"],
+      "#{i} of ?")
   end
   
   
@@ -93,5 +100,5 @@ class Int < Number
   end
   
   # keep at end of class definition!
-  @recognized_messages = Number.recognized_messages + [:-, :*, :+, :/, :inc, :dec] # commented out :copies
+  @recognized_messages = Number.recognized_messages + [:-, :*, :+, :/, :inc, :dec, :copies]
 end

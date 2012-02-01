@@ -2,6 +2,7 @@
 class Item
   class << self; attr_accessor :recognized_messages end
   
+  @@result_size_limit = 5000
   
   attr_reader :value
   attr_reader :needs

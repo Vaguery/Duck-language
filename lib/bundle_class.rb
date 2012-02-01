@@ -1,4 +1,7 @@
 #encoding:utf-8
+require 'timeout'
+
+
 class Bundle < Item
   attr_accessor :contents
   
@@ -104,17 +107,22 @@ class Bundle < Item
     )
   end
   
+  
+  
   def map
     Closure.new(
       Proc.new do |item|
         results = @contents.collect {|i| item.grab(i.deep_copy)}.flatten
         new_contents = results.reject {|i| i.nil?}
-        Bundle.new(*new_contents)
+        size = new_contents.inject("") {|rep,i| rep+(i.to_s)}.length
+        size < @@result_size_limit ? Bundle.new(*new_contents) : Error.new("OVERSIZE")
       end,
       ["be"],
       "#grab({self.inspect}, ?)"
     )
   end
+  
+  
   
   def count
     Int.new(@contents.length)
