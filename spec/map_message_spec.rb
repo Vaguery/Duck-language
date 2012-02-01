@@ -1,7 +1,7 @@
 #encoding: utf-8
 require_relative './spec_helper'
 
-describe "the :give message for Bundles" do
+describe "the :map message for Bundles" do
   it "should be something Bundles recognize" do
     Bundle.new.should respond_to(:map)
   end

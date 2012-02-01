@@ -108,7 +108,6 @@ class Bundle < Item
   end
   
   
-  
   def map
     Closure.new(
       Proc.new do |item|
@@ -123,6 +122,30 @@ class Bundle < Item
   end
   
   
+  def useful
+    Closure.new(
+      Proc.new do |item|
+        results = @contents.group_by {|element| item.can_use?(element) ? "useful" : "unuseful"}
+        [Bundle.new(*results["useful"]), Bundle.new(*results["unuseful"])]
+      end,
+      ["be"],
+      "#useful({self.inspect}, ?)"
+    )
+  end
+  
+  
+  def users
+    Closure.new(
+      Proc.new do |item|
+        results = @contents.group_by {|element| element.can_use?(item) ? "users" : "nonusers"}
+        [Bundle.new(*results["users"]), Bundle.new(*results["nonusers"])]
+      end,
+      ["be"],
+      "#users({self.inspect}, ?)"
+    )
+  end
+  
+  
   
   def count
     Int.new(@contents.length)
@@ -133,7 +156,7 @@ class Bundle < Item
   end
   
   # keep at end of class definition!
-  @recognized_messages = Item.recognized_messages + [:count, :[], :empty, :reverse, :copy, :swap, :pop, :shift, :>>, :<<, :+, :shatter, :[]=, :give, :map]
+  @recognized_messages = Item.recognized_messages + [:count, :[], :empty, :reverse, :copy, :swap, :pop, :shift, :>>, :<<, :+, :shatter, :[]=, :give, :map, :useful, :users]
 end
 
 
