@@ -171,6 +171,15 @@ class Bundle < Item
     )
   end
   
+  def flatten
+    new_contents = @contents.inject([]) do |arr,item|
+      item.kind_of?(Bundle) ?
+      arr + item.contents :
+      arr << item
+    end
+    Bundle.new(*new_contents)
+  end
+  
   
   def count
     Int.new(@contents.length)
@@ -181,7 +190,7 @@ class Bundle < Item
   end
   
   # keep at end of class definition!
-  @recognized_messages = Item.recognized_messages + [:count, :[], :empty, :reverse, :copy, :swap, :pop, :shift, :>>, :<<, :+, :shatter, :[]=, :give, :map, :useful, :users, :∪, :∩]
+  @recognized_messages = Item.recognized_messages + [:count, :[], :empty, :reverse, :copy, :swap, :pop, :shift, :>>, :<<, :+, :shatter, :[]=, :give, :map, :useful, :users, :∪, :∩, :flatten]
 end
 
 
