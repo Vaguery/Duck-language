@@ -100,11 +100,18 @@ class Int < Number
     Collector.new(@value.to_i,[])
   end
   
+  def to_decimal
+    Decimal.new(@value.to_f)
+  end
+  
+  def to_bool
+    Bool.new(@value.to_i >= 0)
+  end
   
   def to_s
     "#{@value}"
   end
   
   # keep at end of class definition!
-  @recognized_messages = Number.recognized_messages + [:-, :*, :+, :/, :inc, :dec, :copies, :bundle]
+  @recognized_messages = Number.recognized_messages + [:-, :*, :+, :/, :inc, :dec, :copies, :bundle, :to_bool, :to_decimal]
 end

@@ -142,7 +142,7 @@ end
 
 # puts performance_space(population,training_data).inspect
 
-DuckInterpreter.new("3 bundle a b c d", {"x" => Int.new(12)}).cartoon_trace
+DuckInterpreter.new( "-9 1 T T depth copy T 7 7 7.281 shatter 4.16 -7.91 F swap x x x T T known reverse 1.517 -8 zap F -8 unshift -5 6.806 2 if zap copy ≤ eql 8 3 -4 empty T pop F T / T F x pop ≥ *", {"x" => Bundle.new(Int.new(1), Int.new(8))}).cartoon_trace
 
 # 1000.times do |i|
 #   begin

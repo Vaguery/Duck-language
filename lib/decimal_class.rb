@@ -26,11 +26,19 @@ class Decimal < Number
     [Int.new(self.value.to_i), Decimal.new(self.value-self.value.to_i)]
   end
   
+  def to_int
+    Int.new(self.value.to_i)
+  end
+  
+  def to_bool
+    Bool.new(@value.to_i >= 0.0)
+  end
+  
   
   def to_s
     "#{@value}"
   end
   
   # keep at end of class definition!
-  @recognized_messages = Number.recognized_messages + [:+, :-, :*, :/, :trunc]
+  @recognized_messages = Number.recognized_messages + [:+, :-, :*, :/, :trunc, :to_int, :to_bool]
 end

@@ -120,7 +120,7 @@ class Bundle < Item
         size < @@result_size_limit ? Bundle.new(*new_contents) : Error.new("OVERSIZE")
       end,
       ["be"],
-      "#grab({self.inspect}, ?)"
+      "map(#{self.inspect}, ?)"
     )
   end
   
