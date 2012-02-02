@@ -195,6 +195,20 @@ class Bundle < Item
     )
   end
   
+  def rewrap_by
+    Closure.new(
+      Proc.new do |size|
+        slice_size = size.value.to_i
+        slice_size = @contents.length if slice_size < 1
+        @contents.empty? ?
+        self :
+        @contents.each_slice(slice_size).collect {|chunk| Bundle.new(*chunk)}
+      end,
+      ["inc"],
+      "rewrap#{self.inspect} by ?"
+    )
+  end
+  
   
   def count
     Int.new(@contents.length)
@@ -205,7 +219,7 @@ class Bundle < Item
   end
   
   # keep at end of class definition!
-  @recognized_messages = Item.recognized_messages + [:count, :[], :empty, :reverse, :copy, :swap, :pop, :shift, :>>, :<<, :+, :shatter, :[]=, :give, :map, :useful, :users, :∪, :∩, :flatten, :snap]
+  @recognized_messages = Item.recognized_messages + [:count, :[], :empty, :reverse, :copy, :swap, :pop, :shift, :>>, :<<, :+, :shatter, :[]=, :give, :map, :useful, :users, :∪, :∩, :flatten, :snap, :rewrap_by]
 end
 
 
