@@ -180,6 +180,21 @@ class Bundle < Item
     Bundle.new(*new_contents)
   end
   
+  def snap
+    Closure.new(
+      Proc.new do |location|
+        if @contents.length > 0
+          where = location.value.to_i % @contents.length
+          [Bundle.new(*@contents[0...where]),Bundle.new(*@contents[where..-1])]
+        else
+          self
+        end
+      end,
+      ["inc"],
+      "snap#{self.inspect} at ?"
+    )
+  end
+  
   
   def count
     Int.new(@contents.length)
@@ -190,7 +205,7 @@ class Bundle < Item
   end
   
   # keep at end of class definition!
-  @recognized_messages = Item.recognized_messages + [:count, :[], :empty, :reverse, :copy, :swap, :pop, :shift, :>>, :<<, :+, :shatter, :[]=, :give, :map, :useful, :users, :∪, :∩, :flatten]
+  @recognized_messages = Item.recognized_messages + [:count, :[], :empty, :reverse, :copy, :swap, :pop, :shift, :>>, :<<, :+, :shatter, :[]=, :give, :map, :useful, :users, :∪, :∩, :flatten, :snap]
 end
 
 
