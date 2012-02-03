@@ -13,7 +13,7 @@ It's built to be easily extensible for domain modeling, and also non-brittle for
 * uses _duck-typing_ to map arguments to function calls, not static type matching
 * uses [greedy] partial application to produce closures when objects respond to messages
 
-### planned features (under active development)
+### planned features (under [active development] (http://www.pivotaltracker.com/projects/448409))
 
 * local variable bindings
 * various modes of forking and recursion
