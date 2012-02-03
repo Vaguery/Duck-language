@@ -160,6 +160,7 @@ class Bundle < Item
     )
   end
   
+  
   def ∩
     Closure.new(
       Proc.new do |other_bundle|
@@ -170,6 +171,12 @@ class Bundle < Item
       "#{self.inspect} ∩ ?"
     )
   end
+  
+  
+  def rotate
+    Bundle.new(*@contents.rotate(1))
+  end
+  
   
   def flatten
     new_contents = @contents.inject([]) do |arr,item|
@@ -219,7 +226,7 @@ class Bundle < Item
   end
   
   # keep at end of class definition!
-  @recognized_messages = Item.recognized_messages + [:count, :[], :empty, :reverse, :copy, :swap, :pop, :shift, :>>, :<<, :+, :shatter, :[]=, :give, :map, :useful, :users, :∪, :∩, :flatten, :snap, :rewrap_by]
+  @recognized_messages = Item.recognized_messages + [:count, :[], :empty, :reverse, :copy, :swap, :pop, :shift, :>>, :<<, :+, :shatter, :[]=, :give, :map, :useful, :users, :∪, :∩, :flatten, :snap, :rewrap_by, :rotate]
 end
 
 
