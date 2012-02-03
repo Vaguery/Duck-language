@@ -11,6 +11,7 @@ class Closure < Item
     string ||= template_string
     @string_version = string
     @value = self.to_s
+    @returned_items_responses = []
   end
   
   
