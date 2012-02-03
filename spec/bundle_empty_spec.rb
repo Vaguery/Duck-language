@@ -1,6 +1,6 @@
 require_relative './spec_helper'
 
-describe "shatter message" do
+describe "empty message" do
   before(:each) do
     @d = DuckInterpreter.new("empty")
   end
