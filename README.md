@@ -27,29 +27,29 @@ If the staged object is not consumed as an argument by another item on the stack
 For example, `"3 2 1 - +"` contains five tokens. The first three represent integers, and they are parsed, queued, staged and pushed onto the stack in the order they appear. The token `-` is not recognized as a literal, so it is used to create a Message object, which lacks (and therefore "wants") a *target* that responds to the message `-`. When the Message object is staged, it's first allowed to examine the stacked integers; the topmost `1` literal responds to `-`, so it is consumed by the staged Message, which is replaced with a Closure object representing the partial application `?-1`, which "wants" something that responds to the message `neg` (implying it's a number of some sort). The newly-staged Closure is allowed to check the stack for arguments, and it finds the `2` literal this time, which it consumes to produce a new Int literal `1` (2 minus 1). This "wants" nothing on the stack, and isn't "wanted" by the remaining `1` literal, so it is pushed to the top.
 
     running "3 2 1 - +":
-    (stack) <<< (staged) <<< (queue)  <<< (script)         (notes)
-    []      <<<          <<<   []     <<<  "3 2 1 - +"
-    []      <<<          <<<   [3]    <<<  "2 1 - +"
-    []      <<<    3     <<<   []     <<<  "2 1 - +"
-    [3]     <<<          <<<   []     <<<  "2 1 - +"
-    [3]     <<<          <<<   [2]    <<<  "1 - +"
-    [3]     <<<    2     <<<   []     <<<  "1 - +"
-    [3,2]   <<<          <<<   []     <<<  "1 - +"
-    [3,2]   <<<          <<<   [1]    <<<  "- +"
-    [3,2]   <<<    1     <<<   []     <<<  "- +"
-    [3,2,1] <<<          <<<   []     <<<  "- +"
-    [3,2,1] <<<          <<<   [:-]   <<<  "+"
-    [3,2,1] <<<    :-    <<<   []     <<<  "+"
-    [3,2]   <<<    ?-1   <<<   []     <<<  "+"             '?-1' wants an object that responds to :neg
-    [3]     <<<    2-1   <<<   []     <<<  "+"             ... like any Number would
-    [3]     <<<    1     <<<   []     <<<  "+"
-    [3,1]   <<<          <<<   []     <<<  "+"
-    [3,1]   <<<          <<<   [:+]   <<<  ""
-    [3,1]   <<<    :+    <<<   []     <<<  ""
-    [3]     <<<    ?+1   <<<   []     <<<  ""              '?+1' wants an object that responds to :neg
-    []      <<<    3+1   <<<   []     <<<  ""
-    []      <<<    4     <<<   []     <<<  ""
-    [4]     <<<          <<<   []     <<<  ""
+    (stack) <<< (staged)  <<< (queue)  <<< (script)         (notes)
+    []      <<<           <<<   []     <<<  "3 2 1 - +"
+    []      <<<           <<<   [3]    <<<  "2 1 - +"
+    []      <<<    3      <<<   []     <<<  "2 1 - +"
+    [3]     <<<           <<<   []     <<<  "2 1 - +"
+    [3]     <<<           <<<   [2]    <<<  "1 - +"
+    [3]     <<<    2      <<<   []     <<<  "1 - +"
+    [3,2]   <<<           <<<   []     <<<  "1 - +"
+    [3,2]   <<<           <<<   [1]    <<<  "- +"
+    [3,2]   <<<    1      <<<   []     <<<  "- +"
+    [3,2,1] <<<           <<<   []     <<<  "- +"
+    [3,2,1] <<<           <<<   [:-]   <<<  "+"
+    [3,2,1] <<<    :-     <<<   []     <<<  "+"
+    [3,2]   <<<    λ(?-1) <<<   []     <<<  "+"             'λ(?-1)' wants an object that responds to :neg
+    [3]     <<<    2-1    <<<   []     <<<  "+"             ... like any Number would
+    [3]     <<<    1      <<<   []     <<<  "+"
+    [3,1]   <<<           <<<   []     <<<  "+"
+    [3,1]   <<<           <<<   [:+]   <<<  ""
+    [3,1]   <<<    :+     <<<   []     <<<  ""
+    [3]     <<<    λ(?+1) <<<   []     <<<  ""              'λ(?+1)' wants an object that responds to :neg
+    []      <<<    3+1    <<<   []     <<<  ""
+    []      <<<    4      <<<   []     <<<  ""
+    [4]     <<<           <<<   []     <<<  ""
     
 
 Similarly, the `+` Message first consumes the top `1` literal to produce a Closure representing `?+1`, and then consumes the other `1` to produce a new literal with value `2`. That's the only thing on the stack when we're done running this script.
@@ -59,9 +59,38 @@ This seems a very convoluted way to approach simple arithmetic, doesn't it? But 
 One more, to demonstrate the flexibility:
 
     running "( 2 1 ) 3 + map":
-    (stack) <<< (staged) <<< (queue)  <<< (script)                (notes)
-    []      <<<          <<<   []     <<<  "( 2 1 ) 3 + map"
-    (we'll save that for later)
+    (stack)          <<< (staged)         <<< (queue) <<< (script)             (notes)
+    []               <<<                  <<< []      <<<  "( 2 1 ) 3 + map"
+    []               <<<                  <<< [:(]    <<<  "2 1 ) 3 + map"
+    []               <<<    :(            <<< []      <<<  "2 1 ) 3 + map"     only a Bundler object responds to :(
+    [:(]             <<<                  <<< []      <<<  "2 1 ) 3 + map"     ... so it ends up on the stack as a Message
+    [:(]             <<<                  <<< [2]     <<<  "1 ) 3 + map"
+    [:(]             <<<   2              <<< []      <<<  "1 ) 3 + map"
+    [:(,2]           <<<                  <<< []      <<<  "1 ) 3 + map"
+    [:(,2]           <<<                  <<< [1]     <<<  ") 3 + map"
+    [:(,2]           <<<   1              <<< []      <<<  ") 3 + map"
+    [:(,2,1]         <<<                  <<< []      <<<  ") 3 + map"
+    [:(,2,1]         <<<                  <<< [λ(?)]  <<<  "3 + map"           the token ')' is interpreted as a Bundler object
+    [:(,2,1]         <<<  λ(?)            <<< []      <<<  "3 + map"           Bundlers want arguments that respond to :be
+    [:(,2]           <<<  λ(1,?)          <<< []      <<<  "3 + map"           ... and everything does!
+    [:(]             <<<  λ(2,1,?)        <<< []      <<<  "3 + map"           ... but the :( message transforms the Bundler
+    []               <<<  (2,1)           <<< []      <<<  "3 + map"           ... into a Bundle
+    [(2,1)]          <<<                  <<< []      <<<  "3 + map"
+    [(2,1)]          <<<                  <<< [3]     <<<  "+ map"
+    [(2,1)]          <<<   3              <<< []      <<<  "+ map"
+    [(2,1), 3]       <<<                  <<< []      <<<  "+ map"
+    [(2,1), 3]       <<<                  <<< [:+]    <<<  "map"               Now the :+ message is recognized by both Numbers
+    [(2,1), 3]       <<<  :+              <<< []      <<<  "map"               ... and Bundles
+    [(2,1)]          <<<  λ(?+3)          <<< []      <<<  "map"               ... but the 3 is on top. The resulting Closure 
+    [(2,1), λ(?+3)]  <<<                  <<< []      <<<  "map"               ...wants an argument that responds to :neg. Nope!
+    [(2,1), λ(?+3)]  <<<                  <<< [:map]  <<<  ""
+    [(2,1), λ(?+3)]  <<<  :map            <<< []      <<<  ""                  The :map message is recognized by a Bundle
+    [λ(?+3)]         <<<  λ(map(2,1),?)   <<< []      <<<  ""                  ...and the result looks for ANYTHING
+    []               <<<  map(2,1,λ(?+3)) <<< []      <<<  ""                  ...which is "handed" each Bundle item in turn
+    []               <<<  (2+3,1+3)       <<< []      <<<  ""                  ... (whether it wants it or not)
+    []               <<<  (5,4)           <<< []      <<<  ""
+    [(5,4)]          <<<                  <<< []      <<<  ""                  and we're done
+        
 
 ### The "result" of running a Duck script
 
