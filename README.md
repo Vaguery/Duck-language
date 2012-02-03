@@ -8,9 +8,21 @@ It's built to be easily extensible for domain modeling, and also non-brittle for
 * boolean operators
 * stack-based, similar to Forth and Push
 * concatenative, like XY
-* simple collection structures ("Bundles")
+* arbitrary collection structures ("Bundles")
+* map/reduce and other list-based functional operations
 * uses _duck-typing_ to map arguments to function calls, not static type matching
 * uses [greedy] partial application to produce closures when objects respond to messages
+
+### planned features (under active development)
+
+* local variable bindings
+* various modes of forking and recursion
+* string handling
+* higher-order functions
+* ranges and enumerators
+* lazy evaluation
+* direct programmatic manipulation of script text and queue items
+* inline (and emergent) class definitions
 
 ### Executing scripts
 
