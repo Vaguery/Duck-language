@@ -211,6 +211,10 @@ class DuckInterpreter
     @queue.unshift @stack.delete_at(0) unless @stack.empty?
   end
   
+  def rotate
+    @stack = @stack.rotate(1)
+  end
+  
   def noop
     # black hole
   end
