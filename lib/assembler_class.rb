@@ -59,6 +59,12 @@ class Assembler < List
     end
   end
   
+  
+  def to_s
+    (@contents.inject("[") {|s,i| s+i.to_s+", "}).chomp(", ") + "]"
+  end
+  
+  
   # special Assembler behaviors that differ from List:
   # :<< (push)
   # :+ (append-with-assembly)

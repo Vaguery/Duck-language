@@ -96,7 +96,7 @@ describe "the Assembler item" do
       numbers = (0..10).collect {|i| Int.new(i*i)}
       d.stack.push(Assembler.new(*numbers))
       d.run
-      d.stack.inspect.should == "[(100, 81, 64, 49, 36, 25, 16, 9, 4, 1, 0)]"
+      d.stack.inspect.should == "[[100, 81, 64, 49, 36, 25, 16, 9, 4, 1, 0]]"
       d.stack[0].should be_a_kind_of(Assembler)
     end
     
@@ -105,7 +105,7 @@ describe "the Assembler item" do
       numbers = (0..10).collect {|i| Int.new(i*i)}
       d.stack.push(Assembler.new(*numbers))
       d.run
-      d.stack.inspect.should == "[(0, 1, 4, 9, 16, 25, 36, 49, 64, 81, 100, 100)]"
+      d.stack.inspect.should == "[[0, 1, 4, 9, 16, 25, 36, 49, 64, 81, 100, 100]]"
       d.stack[0].should be_a_kind_of(Assembler)
     end
     
@@ -114,7 +114,7 @@ describe "the Assembler item" do
       numbers = (0..10).collect {|i| Int.new(i*i)}
       d.stack.push(Assembler.new(*numbers))
       d.run
-      d.stack.inspect.should == "[(0, 1, 4, 9, 16, 25, 36, 49, 64, 100, 81)]"
+      d.stack.inspect.should == "[[0, 1, 4, 9, 16, 25, 36, 49, 64, 100, 81]]"
       d.stack[0].should be_a_kind_of(Assembler)
     end
     
@@ -123,7 +123,7 @@ describe "the Assembler item" do
       numbers = (0..10).collect {|i| Int.new(i*i)}
       d.stack.push(Assembler.new(*numbers))
       d.run
-      d.stack.inspect.should == "[(0, 1, 4, 9, 16, 25, 36, 49, 64, 81), 100]"
+      d.stack.inspect.should == "[[0, 1, 4, 9, 16, 25, 36, 49, 64, 81], 100]"
       d.stack[0].should be_a_kind_of(Assembler)
     end
     
@@ -132,7 +132,7 @@ describe "the Assembler item" do
       numbers = (0..10).collect {|i| Int.new(i*i)}
       d.stack.push(Assembler.new(*numbers))
       d.run
-      d.stack.inspect.should == "[(1, 4, 9, 16, 25, 36, 49, 64, 81, 100), 0]"
+      d.stack.inspect.should == "[[1, 4, 9, 16, 25, 36, 49, 64, 81, 100], 0]"
       d.stack[0].should be_a_kind_of(Assembler)
     end
     
@@ -141,7 +141,7 @@ describe "the Assembler item" do
       numbers = (0..10).collect {|i| Int.new(i*i)}
       d.stack.push(Assembler.new(*numbers))
       d.run
-      d.stack.inspect.should == "[(F, 0, 1, 4, 9, 16, 25, 36, 49, 64, 81, 100)]"
+      d.stack.inspect.should == "[[F, 0, 1, 4, 9, 16, 25, 36, 49, 64, 81, 100]]"
       d.stack[0].should be_a_kind_of(Assembler)
     end
     
@@ -158,7 +158,7 @@ describe "the Assembler item" do
       numbers = (0..10).collect {|i| Int.new(i*i)}
       d.stack.push(Assembler.new(*numbers))
       d.run
-      d.stack.inspect.should == "[(0, 1, 4, 9, F, 25, 36, 49, 64, 81, 100)]"
+      d.stack.inspect.should == "[[0, 1, 4, 9, F, 25, 36, 49, 64, 81, 100]]"
       d.stack[0].should be_a_kind_of(Assembler)
     end
     
@@ -167,7 +167,7 @@ describe "the Assembler item" do
       items = [Bool.new(false), Int.new(2), Int.new(4)]
       d.stack.push(Assembler.new(*items))
       d.run
-      d.stack.inspect.should == "[(2, 4), (F)]"
+      d.stack.inspect.should == "[[2, 4], [F]]"
       d.stack[0].should be_a_kind_of(Assembler)
       d.stack[1].should be_a_kind_of(Assembler)
     end
@@ -177,7 +177,7 @@ describe "the Assembler item" do
       items = [Message.new("+"), Message.new("inc"), Message.new("empty")]
       d.stack.push(Assembler.new(*items))
       d.run
-      d.stack.inspect.should == "[(:+), (:inc, :empty)]"
+      d.stack.inspect.should == "[[:+], [:inc, :empty]]"
       d.stack[0].should be_a_kind_of(Assembler)
       d.stack[1].should be_a_kind_of(Assembler)
     end
@@ -189,7 +189,7 @@ describe "the Assembler item" do
       d.stack.push(Assembler.new(*list1))
       d.stack.push(Assembler.new(*list2))
       d.run
-      d.stack.inspect.should == "[(F, 2, 4, T, 4.0)]"
+      d.stack.inspect.should == "[[F, 2, 4, T, 4.0]]"
       d.stack[0].should be_a_kind_of(Assembler)
     end
     
@@ -200,7 +200,7 @@ describe "the Assembler item" do
       d.stack.push(Assembler.new(*list1))
       d.stack.push(Assembler.new(*list2))
       d.run
-      d.stack.inspect.should == "[(2)]"
+      d.stack.inspect.should == "[[2]]"
       d.stack[0].should be_a_kind_of(Assembler)
     end
     
@@ -211,7 +211,7 @@ describe "the Assembler item" do
       tree = subtree_1 + [Assembler.new(*subtree_2+[List.new(*subtree_1)])] + [List.new(*subtree_1)]
       d.stack.push(Assembler.new(*tree))
       d.run
-      d.stack.inspect.should == "[(F, 2, 4, T, 2, 4.0, (F, 2, 4), F, 2, 4)]"
+      d.stack.inspect.should == "[[F, 2, 4, T, 2, 4.0, (F, 2, 4), F, 2, 4]]"
       d.stack[0].should be_a_kind_of(Assembler)
     end
     
@@ -220,7 +220,7 @@ describe "the Assembler item" do
       numbers = (0..10).collect {|i| Int.new(i*i)}
       d.stack.push(Assembler.new(*numbers))
       d.run
-      d.stack.inspect.should == "[(0, 1, 4), (9, 16, 25, 36, 49, 64, 81, 100)]"
+      d.stack.inspect.should == "[[0, 1, 4], [9, 16, 25, 36, 49, 64, 81, 100]]"
       d.stack[0].should be_a_kind_of(Assembler)
       d.stack[1].should be_a_kind_of(Assembler)
     end
@@ -230,7 +230,7 @@ describe "the Assembler item" do
       numbers = (0..10).collect {|i| Int.new(i*i)}
       d.stack.push(Assembler.new(*numbers))
       d.run
-      d.stack.inspect.should == "[(0, 1, 4), (9, 16, 25), (36, 49, 64), (81, 100)]"
+      d.stack.inspect.should == "[[0, 1, 4], [9, 16, 25], [36, 49, 64], [81, 100]]"
       d.stack.each {|i| i.should be_a_kind_of(Assembler)}      
     end
     
@@ -239,7 +239,7 @@ describe "the Assembler item" do
       numbers = (0..10).collect {|i| Int.new(i*i)}
       d.stack.push(Assembler.new(*numbers))
       d.run
-      d.stack.inspect.should == "[(1, 4, 9, 16, 25, 36, 49, 64, 81, 100, 0)]"
+      d.stack.inspect.should == "[[1, 4, 9, 16, 25, 36, 49, 64, 81, 100, 0]]"
       d.stack.each {|i| i.should be_a_kind_of(Assembler)}      
     end
   end
@@ -258,7 +258,7 @@ describe "the Assembler item" do
     it "should look like an Array" do
       @s.<<(Int.new(7))
       @s.<<(Int.new(3))
-      @s.contents.inspect.should == "[7, 3]"
+      @s.inspect.should == "[7, 3]"
     end
   end
 end
