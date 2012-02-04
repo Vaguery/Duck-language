@@ -28,7 +28,7 @@ class DuckInterpreter
   
   def item_tree(array)
     id_tree = array.inject("(") do |tree,item|
-      if [Bundle,Bundler].include? item.class
+      if [Bundle,Connector].include? item.class
         subtree = "#{item.class}[#{item.object_id}]:#{item_tree(item.contents)}, "
       else
         subtree = "#{item.class}[#{item.object_id}], "

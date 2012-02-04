@@ -32,23 +32,23 @@ describe "Bundle objects" do
   end
 end
   
-describe "Bundler closures" do
+describe "Connector closures" do
   describe "initialization" do
     it "should create an empty contents array with no args" do
-      Bundler.new.contents.should == []
+      Connector.new.contents.should == []
     end
   end
   
   
-  it "should create a new Bundler closure when the interpreter sees a free-standing close paren" do
+  it "should create a new Connector closure when the interpreter sees a free-standing close paren" do
     d = DuckInterpreter.new(")").run
-    d.stack[-1].should be_a_kind_of(Bundler)
+    d.stack[-1].should be_a_kind_of(Connector)
     d.stack[-1].should be_a_kind_of(Closure)
   end
   
   
   it "should want to acquire anything" do
-    Bundler.new.needs.should == ["be"]
+    Connector.new.needs.should == ["be"]
   end
   
   it "should collect anything it can into a nascent Bundle" do

@@ -5,7 +5,7 @@ class Parser < Closure
   def self.recognize(string)
     case string
     when /^\)$/
-      Bundler.new()
+      Connector.new()
     when /^[-+]?[0-9]+$/
       Int.new(string.to_i)
     when /^[-+]?[0-9]+\.[0-9]*$/
