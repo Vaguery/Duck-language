@@ -244,6 +244,12 @@ describe "the Assembler item" do
     end
   end
   
+  describe "special behaviors" do
+    it "should act differently from a List when responding to :+"
+    it "should act differently from a List when responding to :give"
+    it "should act differently from a List when responding to :map"
+  end
+  
   describe "visualization" do
     before(:each) do
       @s = Assembler.new
