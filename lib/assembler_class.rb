@@ -4,15 +4,17 @@ class Assembler < List
   attr_accessor :buffer
   
   
-  def initialize
-    @contents = []
+  def initialize(*items)
+    @contents = items
     @buffer = []
+    @needs = []
   end
   
   
-  def push(item)
+  def <<(item)
     item.class != Array ? @buffer.push(item) : @buffer += item
     process_buffer
+    self
   end
   
   
@@ -58,5 +60,5 @@ class Assembler < List
   end
   
   # keep at end of class definition!
-  @recognized_messages = List.recognized_messages + [:push]
+  @recognized_messages = List.recognized_messages + [:<<]
 end

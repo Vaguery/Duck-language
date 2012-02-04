@@ -16,7 +16,7 @@ class List < Item
   
   def deep_copy
     new_contents = @contents.collect {|i| i.deep_copy}
-    List.new(*new_contents)
+    self.class.new(*new_contents)
   end
   
   def +
