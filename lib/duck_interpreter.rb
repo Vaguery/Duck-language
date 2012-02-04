@@ -71,7 +71,7 @@ class DuckInterpreter
     when 'false','F'
       Bool.new(false)
     else
-      Message.new(string)
+      Message.new(string) unless string.strip==""
     end
   end
   
