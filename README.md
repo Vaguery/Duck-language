@@ -8,7 +8,7 @@ It's built to be easily extensible for domain modeling, and also non-brittle for
 * boolean operators
 * stack-based, similar to Forth and Push
 * concatenative, like XY
-* arbitrary collection structures ("Bundles")
+* passive collection structures (lists), and also more dynamic self-organizing collections (assemblers)
 * map/reduce and other list-based functional operations
 * uses _duck-typing_ to map arguments to function calls, not static type matching
 * uses [greedy] partial application to produce closures when objects respond to messages
@@ -86,19 +86,19 @@ One more, to demonstrate the flexibility:
     [:(,2,1]         <<<  λ(?)            <<< []      <<<  "3 + map"           Connectors want arguments that respond to :be
     [:(,2]           <<<  λ(1,?)          <<< []      <<<  "3 + map"           ... and everything does!
     [:(]             <<<  λ(2,1,?)        <<< []      <<<  "3 + map"           ... but the :( message transforms the Connector
-    []               <<<  (2,1)           <<< []      <<<  "3 + map"           ... into a Bundle
+    []               <<<  (2,1)           <<< []      <<<  "3 + map"           ... into a List
     [(2,1)]          <<<                  <<< []      <<<  "3 + map"
     [(2,1)]          <<<                  <<< [3]     <<<  "+ map"
     [(2,1)]          <<<   3              <<< []      <<<  "+ map"
     [(2,1), 3]       <<<                  <<< []      <<<  "+ map"
     [(2,1), 3]       <<<                  <<< [:+]    <<<  "map"               Now the :+ message is recognized by both Numbers
-    [(2,1), 3]       <<<  :+              <<< []      <<<  "map"               ... and Bundles
+    [(2,1), 3]       <<<  :+              <<< []      <<<  "map"               ... and Lists
     [(2,1)]          <<<  λ(?+3)          <<< []      <<<  "map"               ... but the 3 is on top. The resulting Closure 
     [(2,1), λ(?+3)]  <<<                  <<< []      <<<  "map"               ...wants an argument that responds to :neg. Nope!
     [(2,1), λ(?+3)]  <<<                  <<< [:map]  <<<  ""
-    [(2,1), λ(?+3)]  <<<  :map            <<< []      <<<  ""                  The :map message is recognized by a Bundle
+    [(2,1), λ(?+3)]  <<<  :map            <<< []      <<<  ""                  The :map message is recognized by a List
     [λ(?+3)]         <<<  λ(map(2,1),?)   <<< []      <<<  ""                  ...and the result looks for ANYTHING
-    []               <<<  map(2,1,λ(?+3)) <<< []      <<<  ""                  ...which is "handed" each Bundle item in turn
+    []               <<<  map(2,1,λ(?+3)) <<< []      <<<  ""                  ...which is "handed" each List item in turn
     []               <<<  (2+3,1+3)       <<< []      <<<  ""                  ... (whether it wants it or not)
     []               <<<  (5,4)           <<< []      <<<  ""
     [(5,4)]          <<<                  <<< []      <<<  ""                  and we're done

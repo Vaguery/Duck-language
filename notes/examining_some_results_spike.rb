@@ -142,7 +142,7 @@ end
 
 # puts performance_space(population,training_data).inspect
 
-DuckInterpreter.new( "( 2 1 ) 3 + map", {"x" => Bundle.new(Int.new(1), Int.new(8), Int.new(8))}).cartoon_trace
+DuckInterpreter.new( "( 2 1 ) 3 + map", {"x" => List.new(Int.new(1), Int.new(8), Int.new(8))}).cartoon_trace
 
 # 1000.times do |i|
 #   begin

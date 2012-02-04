@@ -1,16 +1,16 @@
 #encoding:utf-8
 require_relative './spec_helper'
 
-describe "Bundle objects" do
+describe "List objects" do
   describe "contents" do
     it "should have an Array of contents" do
-      b = Bundle.new(Int.new(1),Int.new(2))
+      b = List.new(Int.new(1),Int.new(2))
       b.contents.should be_a_kind_of(Array)
       (b.contents.collect {|i| i.value}).should == [1,2]
     end
     
     it "should accept a splatted array" do
-      b = Bundle.new(*[Int.new(1),Int.new(2)])
+      b = List.new(*[Int.new(1),Int.new(2)])
       b.contents.should be_a_kind_of(Array)
       (b.contents.collect {|i| i.value}).should == [1,2]
     end
@@ -18,7 +18,7 @@ describe "Bundle objects" do
   
   describe "working as a variable binding" do
     it "should put itself onto the stack correctly" do
-      b = Bundle.new(*[Int.new(1),Int.new(2)])
+      b = List.new(*[Int.new(1),Int.new(2)])
       d = DuckInterpreter.new("x x x", {"x" => b})
       d.run.stack.inspect.should == "[(1, 2), (1, 2), (1, 2)]"
     end
@@ -27,7 +27,7 @@ describe "Bundle objects" do
   
   describe "needs" do
     it "should have no @needs" do
-      Bundle.new.needs.should == []
+      List.new.needs.should == []
     end
   end
 end
@@ -51,7 +51,7 @@ describe "Connector closures" do
     Connector.new.needs.should == ["be"]
   end
   
-  it "should collect anything it can into a nascent Bundle" do
+  it "should collect anything it can into a nascent List" do
     d = DuckInterpreter.new("1 2 3 4 5 )").run
     d.stack[-1].inspect.should == "λ( (1, 2, 3, 4, 5, ?) )"
   end
@@ -71,7 +71,7 @@ describe "Connector closures" do
     d.stack.inspect.should == "[(1, 2, (:foo), 3)]"
   end
   
-  it "should produce a bundle even for human-illegible order, like ') 1 2 ('" do
+  it "should produce a List even for human-illegible order, like ') 1 2 ('" do
     d = DuckInterpreter.new(') 1 2 (').run
     d.stack.inspect.should == "[(2, 1)]"
   end
@@ -85,8 +85,8 @@ end
 
 describe "visualization" do
   it "should list the contents" do
-    Bundle.new(Int.new(1),Int.new(2)).to_s.should == "(1, 2)"
-    Bundle.new.to_s.should == "()"
-    Bundle.new(Bundle.new(Bundle.new(Int.new(1)),Int.new(2)),Int.new(2)).to_s.should == "(((1), 2), 2)"
+    List.new(Int.new(1),Int.new(2)).to_s.should == "(1, 2)"
+    List.new.to_s.should == "()"
+    List.new(List.new(List.new(Int.new(1)),Int.new(2)),Int.new(2)).to_s.should == "(((1), 2), 2)"
   end
 end

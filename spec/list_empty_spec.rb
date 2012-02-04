@@ -5,8 +5,8 @@ describe "empty message" do
     @d = DuckInterpreter.new("empty")
   end
   
-  it "should be recognized by Bundle items" do
-    Bundle.new.should respond_to(:empty)
+  it "should be recognized by List items" do
+    List.new.should respond_to(:empty)
   end
   
   it "should queue the item's contents" do
@@ -14,8 +14,8 @@ describe "empty message" do
     @d.stack.inspect.should == "[()]"
   end
   
-  it "should work for an empty Bundle" do
-    s = Bundle.new
+  it "should work for an empty List" do
+    s = List.new
     s.empty.contents.should == []
   end
 end

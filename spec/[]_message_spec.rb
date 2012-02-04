@@ -1,16 +1,16 @@
 require_relative './spec_helper'
 
-describe "the :[] message for Bundles" do
-  it "should be something Bundles recognize" do
-    Bundle.new.should respond_to(:[])
+describe "the :[] message for Lists" do
+  it "should be something Lists recognize" do
+    List.new.should respond_to(:[])
   end
   
   it "should produce a closure, looking for a number that responds to ++" do
-    Bundle.new.[].should be_a_kind_of(Closure)
-    Bundle.new.[].needs.should == ["inc"]
+    List.new.[].should be_a_kind_of(Closure)
+    List.new.[].needs.should == ["inc"]
   end
   
-  it "should return the nth element of the Bundle" do
+  it "should return the nth element of the List" do
     d = DuckInterpreter.new("( 1 2 3 4 ) [] 2").run
     d.stack.inspect.should == "[3]"
   end
@@ -25,14 +25,14 @@ describe "the :[] message for Bundles" do
     d.stack.inspect.should == "[3]"
   end
   
-  it "should work with an empty Bundle" do
+  it "should work with an empty List" do
     d = DuckInterpreter.new("( ) [] 1").run
     d.stack.inspect.should == "[]"
   end
   
-  it "should not return the same object as the Bundle contained" do
+  it "should not return the same object as the List contained" do
     d = DuckInterpreter.new("( 1 2 3 4 )").run
-    d.stack[0].should be_a_kind_of(Bundle)
+    d.stack[0].should be_a_kind_of(List)
     old_three_id = d.stack[0].contents[2].object_id
     d.script = "[] 2"
     d.run
@@ -70,7 +70,7 @@ describe "the :[] message for the Stack" do
   end
     
   
-  it "should return the same object as the Stack originally contained (unlike Bundle#[])" do
+  it "should return the same object as the Stack originally contained (unlike List#[])" do
     d = DuckInterpreter.new("1 2 3 4 1").run
     old2 = d.stack[1].object_id
     d.script = "[]"

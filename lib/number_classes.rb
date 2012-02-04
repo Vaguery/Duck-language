@@ -96,7 +96,7 @@ class Int < Number
   
   def bundle
     @value.to_i < 1 ?
-    Bundle.new :
+    List.new :
     Collector.new(@value.to_i,[])
   end
   

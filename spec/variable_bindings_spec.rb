@@ -84,8 +84,8 @@ describe "initialization" do
         ducky.stack.inspect.should == "[3]"
       end
       
-      it "should handle Bundle inputs" do
-        ducky = DuckInterpreter.new("x x x shatter 3",{"x" => Bundle.new(*[Int.new(8)])})
+      it "should handle List inputs" do
+        ducky = DuckInterpreter.new("x x x shatter 3",{"x" => List.new(*[Int.new(8)])})
         ducky.run
         ducky.stack.inspect.should == "[(8), (8), 8, 3]" 
       end

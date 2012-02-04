@@ -6,7 +6,7 @@ class Connector < Closure
   def initialize(item_array=[])
     @contents = item_array
     @closure = Proc.new {|item| item.value == "(".intern ?
-      Bundle.new(*@contents) : Connector.new(@contents.unshift(item.deep_copy))}
+      List.new(*@contents) : Connector.new(@contents.unshift(item.deep_copy))}
     @needs = ["be"]
   end
   
@@ -15,7 +15,7 @@ class Connector < Closure
     Connector.new(new_contents)
   end
   
-  define_method( "(".intern ) {Bundle.new(*@contents.clone)}
+  define_method( "(".intern ) {List.new(*@contents.clone)}
   
   def to_s
     "λ( " + (@contents.inject("(") {|s,i| s+i.to_s+", "}).chomp(", ") + ", ?) )"

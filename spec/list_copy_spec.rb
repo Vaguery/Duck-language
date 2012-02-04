@@ -1,9 +1,9 @@
 #encoding: utf-8
 require_relative './spec_helper'
 
-describe "the :copy message for Bundles" do
-  it "should be something a Bundle recognizes" do
-    Bundle.new.should respond_to(:copy)
+describe "the :copy message for Lists" do
+  it "should be something a List recognizes" do
+    List.new.should respond_to(:copy)
   end
   
   it "should produce the expected output" do
@@ -11,17 +11,17 @@ describe "the :copy message for Bundles" do
     d.stack.inspect.should == "[(1, 2, 3, 4, 4)]"
   end
   
-  it "should do nothing to Bundles with one element" do
+  it "should do nothing to Lists with one element" do
     d = DuckInterpreter.new("( 3 ) copy").run
     d.stack.inspect.should == "[(3, 3)]"
   end
   
-  it "should work with empty Bundles" do
+  it "should work with empty Lists" do
     d = DuckInterpreter.new("( ) copy").run
     d.stack.inspect.should == "[()]"
   end
   
-  it "should work with nested bundles" do
+  it "should work with nested Lists" do
     d = DuckInterpreter.new("( ( 1 ) 2 ( 3 ( 4 ) ) ) copy").run
     d.stack.inspect.should == "[((1), 2, (3, (4)), (3, (4)))]"
   end

@@ -10,12 +10,12 @@ describe "the :bundle message" do
     Int.new(3).bundle.needs.should == ["be"]
   end
   
-  it "should produce a Bundle when it's done gathering items" do
+  it "should produce a List when it's done gathering items" do
     d = DuckInterpreter.new("3 bundle a b c d").run
     d.stack.inspect.should == "[(:a, :b, :c), :d]"
   end
   
-  it "should produce an empty Bundle if the integer is negative or 0" do
+  it "should produce an empty List if the integer is negative or 0" do
     d = DuckInterpreter.new("-3 bundle foo 0 bundle bar").run
     d.stack.inspect.should == "[(), :foo, (), :bar]"
   end

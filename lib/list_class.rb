@@ -2,7 +2,7 @@
 require 'timeout'
 
 
-class Bundle < Item
+class List < Item
   attr_accessor :contents
   
   def initialize(*items)
@@ -16,27 +16,27 @@ class Bundle < Item
   
   def deep_copy
     new_contents = @contents.collect {|i| i.deep_copy}
-    Bundle.new(*new_contents)
+    List.new(*new_contents)
   end
   
   def +
-    Closure.new(Proc.new {|other_bundle| Bundle.new(*(other_bundle.contents + @contents))},
+    Closure.new(Proc.new {|other_list| List.new(*(other_list.contents + @contents))},
       ["count"],"#{self.to_s}+(?)")
   end
   
   def << #push
-    Closure.new(Proc.new {|item| Bundle.new(*(@contents.clone<<item.clone))},
+    Closure.new(Proc.new {|item| List.new(*(@contents.clone<<item.clone))},
       ["be"],"#{self.to_s} << ?")
   end
   
   def >> #unshift
-    Closure.new(Proc.new {|item| Bundle.new(*(@contents.clone.unshift(item.clone)))},
+    Closure.new(Proc.new {|item| List.new(*(@contents.clone.unshift(item.clone)))},
       ["be"],"? >> #{self.to_s}")
   end
   
   def shift # release the first item
     @contents.empty? ? self :
-      [Bundle.new(*@contents[1..-1].clone),@contents[0].clone]
+      [List.new(*@contents[1..-1].clone),@contents[0].clone]
   end
   
   def pop # release the last item
@@ -44,7 +44,7 @@ class Bundle < Item
       self
     else
       item = @contents.pop
-      return [Bundle.new(*@contents),item]
+      return [List.new(*@contents),item]
     end
   end
   
@@ -52,22 +52,22 @@ class Bundle < Item
     if @contents.length > 1
       new_contents = @contents.clone
       new_contents[-1],new_contents[-2] = @contents[-2].clone,@contents[-1].clone
-      Bundle.new(*new_contents)
+      List.new(*new_contents)
     else
       self
     end
   end
   
   def copy
-    @contents.empty? ? self : Bundle.new(*(@contents.clone << @contents[-1].clone))
+    @contents.empty? ? self : List.new(*(@contents.clone << @contents[-1].clone))
   end
   
   def reverse
-    Bundle.new(*@contents.clone.reverse)
+    List.new(*@contents.clone.reverse)
   end
   
   def empty
-    Bundle.new
+    List.new
   end
   
   
@@ -88,9 +88,9 @@ class Bundle < Item
         index = idx.value.to_i
         how_many = self.contents.length
         which = how_many == 0 ? 0 : index % how_many
-        new_bundle = self.deep_copy
-        new_bundle.contents[which] = item.deep_copy
-        new_bundle
+        new_list = self.deep_copy
+        new_list.contents[which] = item.deep_copy
+        new_list
       end,
       ["inc","be"],
       "(item ? of #{self.inspect})"
@@ -103,7 +103,7 @@ class Bundle < Item
       Proc.new do |item|
         results = @contents.collect {|i| i.grab(item.deep_copy)}.flatten
         new_contents = results.reject {|i| i.nil?}
-        Bundle.new(*new_contents)
+        List.new(*new_contents)
       end,
       ["be"],
       "give(#{self.inspect}, ?)"
@@ -117,7 +117,7 @@ class Bundle < Item
         results = @contents.collect {|i| item.deep_copy.grab(i.deep_copy)}.flatten
         new_contents = results.reject {|i| i.nil?}
         size = new_contents.inject("") {|rep,i| rep+(i.to_s)}.length
-        size < @@result_size_limit ? Bundle.new(*new_contents) : Error.new("OVERSIZE")
+        size < @@result_size_limit ? List.new(*new_contents) : Error.new("OVERSIZE")
       end,
       ["be"],
       "map(#{self.inspect}, ?)"
@@ -129,7 +129,7 @@ class Bundle < Item
     Closure.new(
       Proc.new do |item|
         results = @contents.group_by {|element| item.can_use?(element) ? "useful" : "unuseful"}
-        [Bundle.new(*results["useful"]), Bundle.new(*results["unuseful"])]
+        [List.new(*results["useful"]), List.new(*results["unuseful"])]
       end,
       ["be"],
       "#useful({self.inspect}, ?)"
@@ -141,7 +141,7 @@ class Bundle < Item
     Closure.new(
       Proc.new do |item|
         results = @contents.group_by {|element| element.can_use?(item) ? "users" : "nonusers"}
-        [Bundle.new(*results["users"]), Bundle.new(*results["nonusers"])]
+        [List.new(*results["users"]), List.new(*results["nonusers"])]
       end,
       ["be"],
       "#users({self.inspect}, ?)"
@@ -151,9 +151,9 @@ class Bundle < Item
   
   def ∪
     Closure.new(
-      Proc.new do |other_bundle|
-        aggregated = other_bundle.contents + @contents
-        Bundle.new(*(aggregated.uniq {|element| element.inspect}))
+      Proc.new do |other_list|
+        aggregated = other_list.contents + @contents
+        List.new(*(aggregated.uniq {|element| element.inspect}))
       end,
       ["count"],
       "#{self.inspect} ∪ ?"
@@ -163,9 +163,9 @@ class Bundle < Item
   
   def ∩
     Closure.new(
-      Proc.new do |other_bundle|
-        overlappers = other_bundle.contents.collect {|item| item.inspect}
-        Bundle.new(*(@contents.select {|element| overlappers.include? element.inspect}))
+      Proc.new do |other_list|
+        overlappers = other_list.contents.collect {|item| item.inspect}
+        List.new(*(@contents.select {|element| overlappers.include? element.inspect}))
       end,
       ["count"],
       "#{self.inspect} ∩ ?"
@@ -174,17 +174,17 @@ class Bundle < Item
   
   
   def rotate
-    Bundle.new(*@contents.rotate(1))
+    List.new(*@contents.rotate(1))
   end
   
   
   def flatten
     new_contents = @contents.inject([]) do |arr,item|
-      item.kind_of?(Bundle) ?
+      item.kind_of?(List) ?
       arr + item.contents :
       arr << item
     end
-    Bundle.new(*new_contents)
+    List.new(*new_contents)
   end
   
   def snap
@@ -192,7 +192,7 @@ class Bundle < Item
       Proc.new do |location|
         if @contents.length > 0
           where = location.value.to_i % @contents.length
-          [Bundle.new(*@contents[0...where]),Bundle.new(*@contents[where..-1])]
+          [List.new(*@contents[0...where]),List.new(*@contents[where..-1])]
         else
           self
         end
@@ -209,7 +209,7 @@ class Bundle < Item
         slice_size = @contents.length if slice_size < 1
         @contents.empty? ?
         self :
-        @contents.each_slice(slice_size).collect {|chunk| Bundle.new(*chunk)}
+        @contents.each_slice(slice_size).collect {|chunk| List.new(*chunk)}
       end,
       ["inc"],
       "rewrap#{self.inspect} by ?"

@@ -1,16 +1,16 @@
 require_relative './spec_helper'
 
-describe "the :snap message for Bundles" do
-  it "should be recognized by Bundles" do
-    Bundle.new.should respond_to(:rewrap_by)
+describe "the :snap message for Lists" do
+  it "should be recognized by Lists" do
+    List.new.should respond_to(:rewrap_by)
   end
   
   it "should produce a Closure looking for an Int as a result" do
-    Bundle.new.rewrap_by.should be_a_kind_of(Closure)
-    Bundle.new.rewrap_by.needs.should == ["inc"]
+    List.new.rewrap_by.should be_a_kind_of(Closure)
+    List.new.rewrap_by.needs.should == ["inc"]
   end
   
-  it "should break the Bundle into several new Bundles, of a size indicated by the Int" do
+  it "should break the List into several new Lists, of a size indicated by the Int" do
     d = DuckInterpreter.new("( 1 2 3 4 5 ) 2 rewrap_by").run
     d.stack.inspect.should == "[(1, 2), (3, 4), (5)]"
   end
@@ -28,7 +28,7 @@ describe "the :snap message for Bundles" do
     d.stack.inspect.should == "[(1, 2, 3, 4, 5)]"
   end
   
-  it "should work with empty bundles" do
+  it "should work with empty Lists" do
     d = DuckInterpreter.new("( ) 5 rewrap_by").run
     d.stack.inspect.should == "[()]"
   end

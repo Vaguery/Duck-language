@@ -1,16 +1,16 @@
 require_relative './spec_helper'
 
-describe "the :snap message for Bundles" do
-  it "should be recognized by Bundles" do
-    Bundle.new.should respond_to(:snap)
+describe "the :snap message for Lists" do
+  it "should be recognized by Lists" do
+    List.new.should respond_to(:snap)
   end
   
   it "should produce a Closure looking for an Int as a result" do
-    Bundle.new.snap.should be_a_kind_of(Closure)
-    Bundle.new.snap.needs.should == ["inc"]
+    List.new.snap.should be_a_kind_of(Closure)
+    List.new.snap.needs.should == ["inc"]
   end
   
-  it "should break the Bundle into two parts, at the location indicated by the Int" do
+  it "should break the List into two parts, at the location indicated by the Int" do
     d = DuckInterpreter.new("( 1 2 3 4 5 ) 2 snap").run
     d.stack.inspect.should == "[(1, 2), (3, 4, 5)]"
     
@@ -36,7 +36,7 @@ describe "the :snap message for Bundles" do
     d.stack.inspect.should == "[(), (1, 2, 3, 4, 5)]"
   end
   
-  it "should work with empty bundles" do
+  it "should work with empty Lists" do
     d = DuckInterpreter.new("( ) 5 snap").run
     d.stack.inspect.should == "[()]"
   end

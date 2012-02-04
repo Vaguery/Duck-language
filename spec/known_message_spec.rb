@@ -6,8 +6,8 @@ describe "the :messages message for Stack Items" do
     Item.new.should respond_to(:known)
   end
   
-  it "should produce a Bundle" do
-    Item.new.known.should be_a_kind_of(Bundle)
+  it "should produce a List" do
+    Item.new.known.should be_a_kind_of(List)
   end
   
   it "should contain Messages" do
@@ -25,7 +25,7 @@ describe "the :messages message for Stack Items" do
   
   it "should work for other subclasses of Item as expected" do
     Int.new.known.contents.length.should == Int.recognized_messages.length
-    Bundle.new.known.contents.length.should == Bundle.recognized_messages.length
+    List.new.known.contents.length.should == List.recognized_messages.length
     Closure.new(Proc.new {},[]).known.contents.length.should == Closure.recognized_messages.length
   end
 end
