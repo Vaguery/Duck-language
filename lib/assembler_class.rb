@@ -59,6 +59,15 @@ class Assembler < List
     end
   end
   
+  # special Assembler behaviors that differ from List:
+  # :<< (push)
+  # :+ (append-with-assembly)
+  # :give
+  # :map
+  
+  
+  # Lists do these [:count, :[], :empty, :reverse, :copy, :swap, :pop, :shift, :>>, :shatter, :[]=, :useful, :users, :∪, :∩, :flatten, :snap, :rewrap_by, :rotate]
+  
   # keep at end of class definition!
   @recognized_messages = List.recognized_messages + [:<<]
 end

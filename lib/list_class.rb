@@ -30,13 +30,13 @@ class List < Item
   end
   
   def >> #unshift
-    Closure.new(Proc.new {|item| List.new(*(@contents.clone.unshift(item.clone)))},
+    Closure.new(Proc.new {|item| self.class.new(*(@contents.clone.unshift(item.deep_copy)))},
       ["be"],"? >> #{self.to_s}")
   end
   
   def shift # release the first item
     @contents.empty? ? self :
-      [List.new(*@contents[1..-1].clone),@contents[0].clone]
+      [self.class.new(*@contents[1..-1].clone),@contents[0].clone]
   end
   
   def pop # release the last item
@@ -44,7 +44,7 @@ class List < Item
       self
     else
       item = @contents.pop
-      return [List.new(*@contents),item]
+      return [self.class.new(*@contents),item]
     end
   end
   
@@ -52,22 +52,22 @@ class List < Item
     if @contents.length > 1
       new_contents = @contents.clone
       new_contents[-1],new_contents[-2] = @contents[-2].clone,@contents[-1].clone
-      List.new(*new_contents)
+      self.class.new(*new_contents)
     else
       self
     end
   end
   
   def copy
-    @contents.empty? ? self : List.new(*(@contents.clone << @contents[-1].clone))
+    @contents.empty? ? self : self.class.new(*(@contents.clone << @contents[-1].clone))
   end
   
   def reverse
-    List.new(*@contents.clone.reverse)
+    self.class.new(*@contents.clone.reverse)
   end
   
   def empty
-    List.new
+    self.class.new
   end
   
   
@@ -129,7 +129,7 @@ class List < Item
     Closure.new(
       Proc.new do |item|
         results = @contents.group_by {|element| item.can_use?(element) ? "useful" : "unuseful"}
-        [List.new(*results["useful"]), List.new(*results["unuseful"])]
+        [self.class.new(*results["useful"]), self.class.new(*results["unuseful"])]
       end,
       ["be"],
       "#useful({self.inspect}, ?)"
@@ -141,7 +141,7 @@ class List < Item
     Closure.new(
       Proc.new do |item|
         results = @contents.group_by {|element| element.can_use?(item) ? "users" : "nonusers"}
-        [List.new(*results["users"]), List.new(*results["nonusers"])]
+        [self.class.new(*results["users"]), self.class.new(*results["nonusers"])]
       end,
       ["be"],
       "#users({self.inspect}, ?)"
@@ -153,7 +153,7 @@ class List < Item
     Closure.new(
       Proc.new do |other_list|
         aggregated = other_list.contents + @contents
-        List.new(*(aggregated.uniq {|element| element.inspect}))
+        self.class.new(*(aggregated.uniq {|element| element.inspect}))
       end,
       ["count"],
       "#{self.inspect} ∪ ?"
@@ -165,7 +165,7 @@ class List < Item
     Closure.new(
       Proc.new do |other_list|
         overlappers = other_list.contents.collect {|item| item.inspect}
-        List.new(*(@contents.select {|element| overlappers.include? element.inspect}))
+        self.class.new(*(@contents.select {|element| overlappers.include? element.inspect}))
       end,
       ["count"],
       "#{self.inspect} ∩ ?"
@@ -174,7 +174,7 @@ class List < Item
   
   
   def rotate
-    List.new(*@contents.rotate(1))
+    self.class.new(*@contents.rotate(1))
   end
   
   
@@ -184,7 +184,7 @@ class List < Item
       arr + item.contents :
       arr << item
     end
-    List.new(*new_contents)
+    self.class.new(*new_contents)
   end
   
   def snap
@@ -192,7 +192,7 @@ class List < Item
       Proc.new do |location|
         if @contents.length > 0
           where = location.value.to_i % @contents.length
-          [List.new(*@contents[0...where]),List.new(*@contents[where..-1])]
+          [self.class.new(*@contents[0...where]),self.class.new(*@contents[where..-1])]
         else
           self
         end
@@ -209,7 +209,7 @@ class List < Item
         slice_size = @contents.length if slice_size < 1
         @contents.empty? ?
         self :
-        @contents.each_slice(slice_size).collect {|chunk| List.new(*chunk)}
+        @contents.each_slice(slice_size).collect {|chunk| self.class.new(*chunk)}
       end,
       ["inc"],
       "rewrap#{self.inspect} by ?"

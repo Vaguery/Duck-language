@@ -72,6 +72,178 @@ describe "the Assembler item" do
     end
   end
   
+  describe "inherited methods" do
+    it "should respond to :count correctly" do
+      Assembler.new.count.should be_a_kind_of(Int)
+      Assembler.new(*[Int.new(1)]*12).count.value.should == 12
+    end
+    
+    it "should respond to :[] correctly" do
+      d = DuckInterpreter.new("3 []")
+      numbers = (0..10).collect {|i| Int.new(i*i)}
+      d.stack.push(Assembler.new(*numbers))
+      d.run
+      d.stack.inspect.should == "[9]"
+    end
+    
+    it "should respond to :empty correctly" do
+      Assembler.new(*[Int.new(1)]*12).empty.contents.length.should == 0
+      Assembler.new(*[Int.new(1)]*12).empty.should be_a_kind_of(Assembler)
+    end
+    
+    it "should respond to :reverse correctly" do
+      d = DuckInterpreter.new("reverse")
+      numbers = (0..10).collect {|i| Int.new(i*i)}
+      d.stack.push(Assembler.new(*numbers))
+      d.run
+      d.stack.inspect.should == "[(100, 81, 64, 49, 36, 25, 16, 9, 4, 1, 0)]"
+      d.stack[0].should be_a_kind_of(Assembler)
+    end
+    
+    it "should respond to :copy correctly" do
+      d = DuckInterpreter.new("copy")
+      numbers = (0..10).collect {|i| Int.new(i*i)}
+      d.stack.push(Assembler.new(*numbers))
+      d.run
+      d.stack.inspect.should == "[(0, 1, 4, 9, 16, 25, 36, 49, 64, 81, 100, 100)]"
+      d.stack[0].should be_a_kind_of(Assembler)
+    end
+    
+    it "should respond to :swap correctly" do
+      d = DuckInterpreter.new("swap")
+      numbers = (0..10).collect {|i| Int.new(i*i)}
+      d.stack.push(Assembler.new(*numbers))
+      d.run
+      d.stack.inspect.should == "[(0, 1, 4, 9, 16, 25, 36, 49, 64, 100, 81)]"
+      d.stack[0].should be_a_kind_of(Assembler)
+    end
+    
+    it "should respond to :pop correctly" do
+      d = DuckInterpreter.new("pop")
+      numbers = (0..10).collect {|i| Int.new(i*i)}
+      d.stack.push(Assembler.new(*numbers))
+      d.run
+      d.stack.inspect.should == "[(0, 1, 4, 9, 16, 25, 36, 49, 64, 81), 100]"
+      d.stack[0].should be_a_kind_of(Assembler)
+    end
+    
+    it "should respond to :shift correctly" do
+      d = DuckInterpreter.new("shift")
+      numbers = (0..10).collect {|i| Int.new(i*i)}
+      d.stack.push(Assembler.new(*numbers))
+      d.run
+      d.stack.inspect.should == "[(1, 4, 9, 16, 25, 36, 49, 64, 81, 100), 0]"
+      d.stack[0].should be_a_kind_of(Assembler)
+    end
+    
+    it "should respond to :>> correctly" do
+      d = DuckInterpreter.new("F >>")
+      numbers = (0..10).collect {|i| Int.new(i*i)}
+      d.stack.push(Assembler.new(*numbers))
+      d.run
+      d.stack.inspect.should == "[(F, 0, 1, 4, 9, 16, 25, 36, 49, 64, 81, 100)]"
+      d.stack[0].should be_a_kind_of(Assembler)
+    end
+    
+    it "should respond to :shatter correctly" do
+      d = DuckInterpreter.new("shatter")
+      numbers = (0..10).collect {|i| Int.new(i*i)}
+      d.stack.push(Assembler.new(*numbers))
+      d.run
+      d.stack.inspect.should == "[0, 1, 4, 9, 16, 25, 36, 49, 64, 81, 100]"
+    end
+    
+    it "should respond to :[]= correctly" do
+      d = DuckInterpreter.new("4 F []=")
+      numbers = (0..10).collect {|i| Int.new(i*i)}
+      d.stack.push(Assembler.new(*numbers))
+      d.run
+      d.stack.inspect.should == "[(0, 1, 4, 9, F, 25, 36, 49, 64, 81, 100)]"
+      d.stack[0].should be_a_kind_of(Assembler)
+    end
+    
+    it "should respond to :useful correctly" do
+      d = DuckInterpreter.new("* useful")
+      items = [Bool.new(false), Int.new(2), Int.new(4)]
+      d.stack.push(Assembler.new(*items))
+      d.run
+      d.stack.inspect.should == "[(2, 4), (F)]"
+      d.stack[0].should be_a_kind_of(Assembler)
+      d.stack[1].should be_a_kind_of(Assembler)
+    end
+    
+    it "should respond to :users correctly" do
+      d = DuckInterpreter.new("3.1 users")
+      items = [Message.new("+"), Message.new("inc"), Message.new("empty")]
+      d.stack.push(Assembler.new(*items))
+      d.run
+      d.stack.inspect.should == "[(:+), (:inc, :empty)]"
+      d.stack[0].should be_a_kind_of(Assembler)
+      d.stack[1].should be_a_kind_of(Assembler)
+    end
+    
+    it "should respond to :∪ correctly" do
+      d = DuckInterpreter.new("∪")
+      list1 = [Bool.new(false), Int.new(2), Int.new(4)]
+      list2 = [Bool.new(true), Int.new(2), Decimal.new(4.0)]
+      d.stack.push(Assembler.new(*list1))
+      d.stack.push(Assembler.new(*list2))
+      d.run
+      d.stack.inspect.should == "[(F, 2, 4, T, 4.0)]"
+      d.stack[0].should be_a_kind_of(Assembler)
+    end
+    
+    it "should respond to :∩ correctly" do
+      d = DuckInterpreter.new("∩")
+      list1 = [Bool.new(false), Int.new(2), Int.new(4)]
+      list2 = [Bool.new(true), Int.new(2), Decimal.new(4.0)]
+      d.stack.push(Assembler.new(*list1))
+      d.stack.push(Assembler.new(*list2))
+      d.run
+      d.stack.inspect.should == "[(2)]"
+      d.stack[0].should be_a_kind_of(Assembler)
+    end
+    
+    it "should respond to :flatten correctly" do
+      d = DuckInterpreter.new("flatten")
+      subtree_1 = [Bool.new(false), Int.new(2), Int.new(4)]
+      subtree_2 = [Bool.new(true), Int.new(2), Decimal.new(4.0)]
+      tree = subtree_1 + [Assembler.new(*subtree_2+[List.new(*subtree_1)])] + [List.new(*subtree_1)]
+      d.stack.push(Assembler.new(*tree))
+      d.run
+      d.stack.inspect.should == "[(F, 2, 4, T, 2, 4.0, (F, 2, 4), F, 2, 4)]"
+      d.stack[0].should be_a_kind_of(Assembler)
+    end
+    
+    it "should respond to :snap correctly" do
+      d = DuckInterpreter.new("3 snap")
+      numbers = (0..10).collect {|i| Int.new(i*i)}
+      d.stack.push(Assembler.new(*numbers))
+      d.run
+      d.stack.inspect.should == "[(0, 1, 4), (9, 16, 25, 36, 49, 64, 81, 100)]"
+      d.stack[0].should be_a_kind_of(Assembler)
+      d.stack[1].should be_a_kind_of(Assembler)
+    end
+    
+    it "should respond to :rewrap_by correctly" do
+      d = DuckInterpreter.new("3 rewrap_by")
+      numbers = (0..10).collect {|i| Int.new(i*i)}
+      d.stack.push(Assembler.new(*numbers))
+      d.run
+      d.stack.inspect.should == "[(0, 1, 4), (9, 16, 25), (36, 49, 64), (81, 100)]"
+      d.stack.each {|i| i.should be_a_kind_of(Assembler)}      
+    end
+    
+    it "should respond to :rotate correctly" do
+      d = DuckInterpreter.new("rotate")
+      numbers = (0..10).collect {|i| Int.new(i*i)}
+      d.stack.push(Assembler.new(*numbers))
+      d.run
+      d.stack.inspect.should == "[(1, 4, 9, 16, 25, 36, 49, 64, 81, 100, 0)]"
+      d.stack.each {|i| i.should be_a_kind_of(Assembler)}      
+    end
+  end
+  
   describe "visualization" do
     before(:each) do
       @s = Assembler.new
