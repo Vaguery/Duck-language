@@ -11,7 +11,7 @@ class Assembler < List
   end
   
   
-  def <<(item)
+  def push(item)
     item.class != Array ? @buffer.push(item) : @buffer += item
     process_buffer
     self
@@ -45,6 +45,7 @@ class Assembler < List
       staged_item = @buffer.delete_at(0)
       next_arg = index_of_next_useful_argument_for(staged_item)
       if next_arg.nil?
+        # self.be_consumed(staged_item) if staged_item.can_use?(self)
         wanted_by = index_of_next_item_that_wants(staged_item)
         if wanted_by.nil?
           @contents.push staged_item
@@ -66,14 +67,14 @@ class Assembler < List
   
   
   # special Assembler behaviors that differ from List:
-  # :<< (push)
+  # :push
   # :+ (append-with-assembly)
   # :give
   # :map
   
   
-  # Lists do these [:count, :[], :empty, :reverse, :copy, :swap, :pop, :shift, :>>, :shatter, :[]=, :useful, :users, :∪, :∩, :flatten, :snap, :rewrap_by, :rotate]
+  # Lists do these [:count, :[], :empty, :reverse, :copy, :swap, :pop, :shift, :unshift, :shatter, :[]=, :useful, :users, :∪, :∩, :flatten, :snap, :rewrap_by, :rotate]
   
   # keep at end of class definition!
-  @recognized_messages = List.recognized_messages + [:<<]
+  @recognized_messages = List.recognized_messages + [:push]
 end

@@ -24,14 +24,14 @@ class List < Item
       ["count"],"#{self.to_s}+(?)")
   end
   
-  def << #push
+  def push
     Closure.new(Proc.new {|item| List.new(*(@contents.clone<<item.clone))},
-      ["be"],"#{self.to_s} << ?")
+      ["be"],"#{self.to_s}.push(?)")
   end
   
-  def >> #unshift
+  def unshift 
     Closure.new(Proc.new {|item| self.class.new(*(@contents.clone.unshift(item.deep_copy)))},
-      ["be"],"? >> #{self.to_s}")
+      ["be"],"#{self.to_s}.unshift(?)")
   end
   
   def shift # release the first item
@@ -226,5 +226,5 @@ class List < Item
   end
   
   # keep at end of class definition!
-  @recognized_messages = Item.recognized_messages + [:count, :[], :empty, :reverse, :copy, :swap, :pop, :shift, :>>, :<<, :+, :shatter, :[]=, :give, :map, :useful, :users, :∪, :∩, :flatten, :snap, :rewrap_by, :rotate]
+  @recognized_messages = Item.recognized_messages + [:count, :[], :empty, :reverse, :copy, :swap, :pop, :shift, :unshift, :push, :+, :shatter, :[]=, :give, :map, :useful, :users, :∪, :∩, :flatten, :snap, :rewrap_by, :rotate]
 end
