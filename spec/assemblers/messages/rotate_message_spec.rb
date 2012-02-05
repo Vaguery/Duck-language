@@ -6,7 +6,7 @@ describe "Assembler" do
     it "should respond to :rotate like a List does" do
       d = DuckInterpreter.new("rotate")
       numbers = (0..10).collect {|i| Int.new(i*i)}
-      d.stack.push(Assembler.new(*numbers))
+      d.stack.push(Assembler.new(numbers))
       d.run
       d.stack.inspect.should == "[[1, 4, 9, 16, 25, 36, 49, 64, 81, 100, 0 ::]]"
       d.stack.each {|i| i.should be_a_kind_of(Assembler)}      

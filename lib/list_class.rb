@@ -5,8 +5,8 @@ require 'timeout'
 class List < Item
   attr_accessor :contents
   
-  def initialize(*items)
-    @contents = items
+  def initialize(contents=[])
+    @contents = contents
     @needs = []
   end
   
@@ -16,27 +16,27 @@ class List < Item
   
   def deep_copy
     new_contents = @contents.collect {|i| i.deep_copy}
-    self.class.new(*new_contents)
+    self.class.new(new_contents)
   end
   
   def +
-    Closure.new(Proc.new {|other_list| List.new(*(other_list.contents + @contents))},
+    Closure.new(Proc.new {|other_list| List.new(other_list.contents + @contents)},
       ["count"],"#{self.to_s}+(?)")
   end
   
   def push
-    Closure.new(Proc.new {|item| List.new(*(@contents.clone<<item.clone))},
+    Closure.new(Proc.new {|item| List.new(@contents.clone<<item.clone)},
       ["be"],"#{self.to_s}.push(?)")
   end
   
   def unshift 
-    Closure.new(Proc.new {|item| self.class.new(*(@contents.clone.unshift(item.deep_copy)))},
+    Closure.new(Proc.new {|item| self.class.new(@contents.clone.unshift(item.deep_copy))},
       ["be"],"#{self.to_s}.unshift(?)")
   end
   
   def shift # release the first item
     @contents.empty? ? self :
-      [self.class.new(*@contents[1..-1].clone),@contents[0].clone]
+      [self.class.new(@contents[1..-1].clone),@contents[0].clone]
   end
   
   def pop # release the last item
@@ -44,7 +44,7 @@ class List < Item
       self
     else
       item = @contents.pop
-      return [self.class.new(*@contents),item]
+      return [self.class.new(@contents),item]
     end
   end
   
@@ -52,18 +52,18 @@ class List < Item
     if @contents.length > 1
       new_contents = @contents.clone
       new_contents[-1],new_contents[-2] = @contents[-2].clone,@contents[-1].clone
-      self.class.new(*new_contents)
+      self.class.new(new_contents)
     else
       self
     end
   end
   
   def copy
-    @contents.empty? ? self : self.class.new(*(@contents.clone << @contents[-1].clone))
+    @contents.empty? ? self : self.class.new((@contents.clone << @contents[-1].clone))
   end
   
   def reverse
-    self.class.new(*@contents.clone.reverse)
+    self.class.new(@contents.clone.reverse)
   end
   
   def empty
@@ -103,7 +103,7 @@ class List < Item
       Proc.new do |item|
         results = @contents.collect {|i| i.grab(item.deep_copy)}.flatten
         new_contents = results.reject {|i| i.nil?}
-        List.new(*new_contents)
+        List.new(new_contents)
       end,
       ["be"],
       "give(#{self.inspect}, ?)"
@@ -117,7 +117,7 @@ class List < Item
         results = @contents.collect {|i| item.deep_copy.grab(i.deep_copy)}.flatten
         new_contents = results.reject {|i| i.nil?}
         size = new_contents.inject("") {|rep,i| rep+(i.to_s)}.length
-        size < @@result_size_limit ? List.new(*new_contents) : Error.new("OVERSIZE")
+        size < @@result_size_limit ? List.new(new_contents) : Error.new("OVERSIZE")
       end,
       ["be"],
       "map(#{self.inspect}, ?)"
@@ -129,7 +129,7 @@ class List < Item
     Closure.new(
       Proc.new do |item|
         results = @contents.group_by {|element| item.can_use?(element) ? "useful" : "unuseful"}
-        [self.class.new(*results["useful"]), self.class.new(*results["unuseful"])]
+        [self.class.new(results["useful"]||[]), self.class.new(results["unuseful"]||[])]
       end,
       ["be"],
       "#useful({self.inspect}, ?)"
@@ -141,7 +141,7 @@ class List < Item
     Closure.new(
       Proc.new do |item|
         results = @contents.group_by {|element| element.can_use?(item) ? "users" : "nonusers"}
-        [self.class.new(*results["users"]), self.class.new(*results["nonusers"])]
+        [List.new(results["users"]||[]), List.new(results["nonusers"]||[])]
       end,
       ["be"],
       "#users({self.inspect}, ?)"
@@ -153,7 +153,7 @@ class List < Item
     Closure.new(
       Proc.new do |other_list|
         aggregated = other_list.contents + @contents
-        self.class.new(*(aggregated.uniq {|element| element.inspect}))
+        self.class.new(aggregated.uniq {|element| element.inspect})
       end,
       ["count"],
       "#{self.inspect} ∪ ?"
@@ -165,7 +165,7 @@ class List < Item
     Closure.new(
       Proc.new do |other_list|
         overlappers = other_list.contents.collect {|item| item.inspect}
-        self.class.new(*(@contents.select {|element| overlappers.include? element.inspect}))
+        self.class.new(@contents.select {|element| overlappers.include? element.inspect})
       end,
       ["count"],
       "#{self.inspect} ∩ ?"
@@ -174,7 +174,7 @@ class List < Item
   
   
   def rotate
-    self.class.new(*@contents.rotate(1))
+    self.class.new(@contents.rotate(1))
   end
   
   
@@ -184,7 +184,7 @@ class List < Item
       arr + item.contents :
       arr << item
     end
-    self.class.new(*new_contents)
+    self.class.new(new_contents)
   end
   
   def snap
@@ -192,7 +192,7 @@ class List < Item
       Proc.new do |location|
         if @contents.length > 0
           where = location.value.to_i % @contents.length
-          [self.class.new(*@contents[0...where]),self.class.new(*@contents[where..-1])]
+          [self.class.new(@contents[0...where]),self.class.new(@contents[where..-1])]
         else
           self
         end
@@ -209,7 +209,7 @@ class List < Item
         slice_size = @contents.length if slice_size < 1
         @contents.empty? ?
         self :
-        @contents.each_slice(slice_size).collect {|chunk| self.class.new(*chunk)}
+        @contents.each_slice(slice_size).collect {|chunk| self.class.new(chunk)}
       end,
       ["inc"],
       "rewrap#{self.inspect} by ?"

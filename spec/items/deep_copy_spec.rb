@@ -30,7 +30,7 @@ describe "Stack Item deep copy method" do
   end
   
   it "should clone all the contents items of a List" do
-    i = List.new(Int.new(8), Int.new(9))
+    i = List.new([Int.new(8), Int.new(9)])
     j = i.deep_copy
     i.object_id.should_not == j.object_id
     i.contents.each_with_index do |item,idx|
@@ -39,7 +39,7 @@ describe "Stack Item deep copy method" do
   end
   
   it "should work recursively to get nested Lists" do
-    i = List.new(Int.new(8), Int.new(9), List.new(Int.new(8), Int.new(9)))
+    i = List.new([Int.new(8), Int.new(9), List.new([Int.new(8), Int.new(9)])])
     j = i.deep_copy
     i.object_id.should_not == j.object_id
     i.contents.each_with_index do |item,idx|

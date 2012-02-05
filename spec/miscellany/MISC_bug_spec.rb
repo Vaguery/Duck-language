@@ -10,7 +10,7 @@ describe "various bad behaviors that cropped up during stress-testing" do
   end
   
   it "should be able to deal with Bad Script 2" do
-    d = DuckInterpreter.new("inc < F -9 F 4 pop push 4 F x x x push push T -9 do greedy ∨ inc 4 greedy 3 -6 be unshift x -3 x -10 greedy x ) if ≤ ) 8 F ∨ -2 neg > swap x ) x x x T T ) -9 ¬ T -1 ∧ -4 ungreedy x ) know? neg at T -9 do greedy ∨ inc 4 greedy 3 -6 be unshift x -3 x -10 greedy x ) if ≤ ) 8 F ∨ -2 neg > swap x ) x x x T T ) -9 ¬ T -1 ∧ -4 ungreedy x ) know? neg",{"x" => List.new(*[Int.new(8)])})
+    d = DuckInterpreter.new("inc < F -9 F 4 pop push 4 F x x x push push T -9 do greedy ∨ inc 4 greedy 3 -6 be unshift x -3 x -10 greedy x ) if ≤ ) 8 F ∨ -2 neg > swap x ) x x x T T ) -9 ¬ T -1 ∧ -4 ungreedy x ) know? neg at T -9 do greedy ∨ inc 4 greedy 3 -6 be unshift x -3 x -10 greedy x ) if ≤ ) 8 F ∨ -2 neg > swap x ) x x x T T ) -9 ¬ T -1 ∧ -4 ungreedy x ) know? neg",{"x" => List.new([Int.new(8)])})
     
     lambda{ d.run }.should_not raise_error
   end

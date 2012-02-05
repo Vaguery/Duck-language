@@ -8,9 +8,9 @@ class Collector < Closure
     @closure = Proc.new do |item|
       case 
       when @contents.length + 1 > @target
-        [List.new(*@contents),item]
+        [List.new(@contents),item]
       when @contents.length + 1 == @target
-        List.new(*(@contents << item))
+        List.new((@contents << item))
       else
         Collector.new(@target,(@contents << item))
       end

@@ -4,9 +4,9 @@ class Assembler < List
   attr_accessor :buffer
   
   
-  def initialize(*items)
-    @contents = items
-    @buffer = []
+  def initialize(contents = [], buffer = [])
+    @contents = contents
+    @buffer = buffer
     @needs = []
   end
   
@@ -14,7 +14,7 @@ class Assembler < List
   def deep_copy
     new_contents = @contents.collect {|i| i.deep_copy}
     new_buffer = @buffer.collect {|i| i.deep_copy}
-    result = self.class.new(*new_contents)
+    result = self.class.new(new_contents)
     result.buffer = new_buffer
     result
   end
@@ -70,19 +70,37 @@ class Assembler < List
   end
   
   
+  def to_s
+    rep = (@contents.inject("[") {|s,i| s+i.to_s+", "}).chomp(", ")
+    rep += @contents.empty? ? "::" : " ::"
+    rep += (@buffer.inject(" ") {|s,i| s+i.to_s+", "}).chomp(", ") unless @buffer.empty?
+    rep += "]"
+  end
+  
+  
+  #################
+  #
+  #  DUCK MESSAGES
+  #
+  #################
+  
   def +
     Closure.new(
       Proc.new do |arg|
         new_contents = @contents + arg.contents
         new_buffer = @buffer
         new_buffer += arg.buffer if arg.respond_to?(:buffer) # in case it's a List
-        result = Assembler.new(*new_contents)
+        result = Assembler.new(new_contents)
         result.buffer = new_buffer
         result
       end,
       ["count"],
       "#{self.value} + ?"
     )
+  end
+  
+  def count
+    Int.new(@contents.length + @buffer.length)
   end
   
   def []=
@@ -104,12 +122,36 @@ class Assembler < List
   end
   
   
-  
-  def to_s
-    rep = (@contents.inject("[") {|s,i| s+i.to_s+", "}).chomp(", ") + " ::"
-    rep += (@buffer.inject(" ") {|s,i| s+i.to_s+", "}).chomp(", ") unless @buffer.empty?
-    rep += "]"
+  def []
+    Closure.new(
+      Proc.new do |idx| 
+        index = idx.value.to_i
+        how_many = @contents.length + @buffer.length
+        which = how_many == 0 ? 0 : index % how_many
+        unless how_many == 0
+          if which < @contents.length
+            self.contents[which].deep_copy
+          else
+            self.buffer[which-@contents.length].deep_copy
+          end
+        end
+      end, ["inc"], "#{self.to_s}[?]")
   end
+  
+  def flatten
+    new_contents = @contents.inject([]) do |arr,item|
+      case item
+      when item.kind_of?(List)
+        arr + item.contents
+      when item.kind_of?(Assembler)
+        arr + item.contents + item.buffer
+      else
+        arr << item
+      end
+    end
+    Assembler.new(new_contents, @buffer)
+  end
+  
   
   
   # special Assembler behaviors that differ from List:

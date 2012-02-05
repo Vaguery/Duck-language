@@ -24,7 +24,7 @@ describe "List" do
     end
 
     it "should leave interior Lists intact" do
-      s2 = List.new(List.new(Int.new(1),Bool.new(false)),Int.new(2))
+      s2 = List.new([List.new([Int.new(1),Bool.new(false)]),Int.new(2)])
       @d.stack.push s2
       @d.run
       @d.stack.inspect.should == "[(1, F), 2]"
@@ -42,7 +42,7 @@ describe "List" do
     end
 
     it "should work with bound variables" do
-      @d.reset("x x x shatter", {"x" => List.new(*[Int.new(3),Int.new(4)])}).run
+      @d.reset("x x x shatter", {"x" => List.new([Int.new(3),Int.new(4)])}).run
       @d.stack.inspect.should == "[(3, 4), (3, 4), 3, 4]"
     end
   end

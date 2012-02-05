@@ -39,7 +39,7 @@ class Item
   end
   
   def known
-    List.new(* self.class.recognized_messages.collect {|msg| Message.new(msg)})
+    List.new(self.class.recognized_messages.collect {|msg| Message.new(msg)})
   end
   
   def if

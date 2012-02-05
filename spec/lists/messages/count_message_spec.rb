@@ -8,7 +8,7 @@ describe "List" do
 
     it "should produce an Int containing the List's [root] length" do
       d = DuckInterpreter.new("count")
-      d.stack.push List.new(List.new(Int.new(1),Int.new(2)))
+      d.stack.push List.new([List.new([Int.new(1),Int.new(2)])])
       d.run
       d.stack.inspect.should == "[1]"
     end

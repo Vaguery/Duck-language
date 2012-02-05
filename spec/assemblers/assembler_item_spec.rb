@@ -19,6 +19,8 @@ describe "the Assembler item" do
       @s.buffer.push(Int.new(11))
       @s.buffer.push(Message.new("foo"))
       @s.inspect.should == "[7, 3 :: 11, :foo]"
+      
+      Assembler.new.inspect.should == "[::]"
     end
   end
 end

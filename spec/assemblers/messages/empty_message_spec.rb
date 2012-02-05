@@ -4,10 +4,14 @@ require_relative '../../spec_helper'
 describe "Assembler" do
   describe ":empty" do
     it "should respond to :empty like a List does" do
-      Assembler.new(*[Int.new(1)]*12).empty.contents.length.should == 0
-      Assembler.new(*[Int.new(1)]*12).empty.should be_a_kind_of(Assembler)
+      Assembler.new([Int.new(1)]*12).empty.contents.length.should == 0
+      Assembler.new([Int.new(1)]*12).empty.should be_a_kind_of(Assembler)
     end
     
-    it "should also empty the buffer"
+    it "should also empty the buffer" do
+      with_buffer = Assembler.new([Int.new(1)]*12)
+      with_buffer.buffer.push(Bool.new(false))
+      with_buffer.empty.inspect.should == "[::]"
+    end
   end
 end

@@ -85,7 +85,7 @@ describe "initialization" do
       end
       
       it "should handle List inputs" do
-        ducky = DuckInterpreter.new("x x x shatter 3",{"x" => List.new(*[Int.new(8)])})
+        ducky = DuckInterpreter.new("x x x shatter 3",{"x" => List.new([Int.new(8)])})
         ducky.run
         ducky.stack.inspect.should == "[(8), (8), 8, 3]" 
       end
