@@ -1,6 +1,6 @@
 require_relative '../spec_helper'
 
-describe "Boolean stack item" do
+describe "Bool items" do
   describe "initialization" do
     it "should be parsed from 'true' or 'false', 'T' or 'F'" do
       DuckInterpreter.new("true").parse.queue[-1].should be_a_kind_of(Bool)
