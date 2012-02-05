@@ -25,24 +25,4 @@ describe "GREEDY interpreter flag" do
       ungreedy.stack.inspect.should == "[6]"
     end
   end
-  
-  describe "Duck script access" do
-    it "should be readable in a script via the :greedy? message" do
-      d = DuckInterpreter.new("greedy?").run
-      d.stack.inspect.should == "[T]"
-    end
-    
-    it "should be set to true by the :greedy message" do
-      d = DuckInterpreter.new("greedy")
-      d.greedy_flag = false
-      d.run
-      d.greedy_flag.should == true
-    end
-    
-    it "should be set to false by the :ungreedy message" do
-      d = DuckInterpreter.new("ungreedy")
-      d.run
-      d.greedy_flag.should == false
-    end
-  end
 end
