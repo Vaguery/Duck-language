@@ -140,7 +140,7 @@ But the Closure `λ(? + 2)` might *still* `grab` either a Decimal (to produce a 
 
 I feel type-casting design decisions are better left as a matter for domain modelers. In the core Duck class definitions, I've tried to avoid including any but the most obvious type-casting events: in the outcome of common arithmetic operations, or the in the consistency of results from Message/String/Script and List/Stack manipulations.
 
-The Duck classes are provided as *self-contained abstractions*. As a matter of convention, "slop" at the edges of these strict categories, such a might happen if one type-cast a Bool to act like an Int, should be avoided. Instead, focus on a careful choice of *message responses*, and of explicit type-conversion messages like `:to_bool`, `:to_int` and `:to_decimal` already included.
+The Duck classes are provided as *self-contained abstractions*. As a matter of convention, "slop" at the edges of these strict categories—such as might happen if one type-cast a Bool to act like an Int—should be avoided. Instead, focus on a careful choice of *message responses*, and of explicit type-conversion messages like `:to_bool`, `:to_int` and `:to_decimal` already included.
 
 ### Core Duck classes (rapidly changing!)
 
