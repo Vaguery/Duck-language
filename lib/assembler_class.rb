@@ -62,7 +62,9 @@ class Assembler < List
   
   
   def to_s
-    (@contents.inject("[") {|s,i| s+i.to_s+", "}).chomp(", ") + "]"
+    rep = (@contents.inject("[") {|s,i| s+i.to_s+", "}).chomp(", ") + " ::"
+    rep += (@buffer.inject(" ") {|s,i| s+i.to_s+", "}).chomp(", ") unless @buffer.empty?
+    rep += "]"
   end
   
   

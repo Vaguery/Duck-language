@@ -11,10 +11,14 @@ describe "the Assembler item" do
       @s = Assembler.new
     end
     
-    it "should look like an Array" do
+    it "should be displayed in square brackets, with a double colon separating the buffer" do
       @s.push(Int.new(7))
       @s.push(Int.new(3))
-      @s.inspect.should == "[7, 3]"
+      @s.inspect.should == "[7, 3 ::]"
+      
+      @s.buffer.push(Int.new(11))
+      @s.buffer.push(Message.new("foo"))
+      @s.inspect.should == "[7, 3 :: 11, :foo]"
     end
   end
 end

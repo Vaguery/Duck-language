@@ -8,7 +8,7 @@ describe "Assembler" do
       items = [Bool.new(false), Int.new(2), Int.new(4)]
       d.stack.push(Assembler.new(*items))
       d.run
-      d.stack.inspect.should == "[[2, 4], [F]]"
+      d.stack.inspect.should == "[[2, 4 ::], [F ::]]"
       d.stack[0].should be_a_kind_of(List)
       d.stack[1].should be_a_kind_of(List)
     end

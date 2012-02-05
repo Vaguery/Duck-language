@@ -10,7 +10,7 @@ describe "Assembler" do
       d.stack.push(Assembler.new(*list1))
       d.stack.push(Assembler.new(*list2))
       d.run
-      d.stack.inspect.should == "[[F, 2, 4, T, 4.0]]"
+      d.stack.inspect.should == "[[F, 2, 4, T, 4.0 ::]]"
       d.stack[0].should be_a_kind_of(Assembler)
     end
     
