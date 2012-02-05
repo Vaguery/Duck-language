@@ -115,18 +115,18 @@ All Duck objects also maintain a list of their `needs`, in the form of messages 
 As we've seen above in the examples, whenever a new item is pushed onto a Stack, it is buffered and "staged" in an internal queue, and goes through a very particular sequence of *negotiations* with the other items already on the Stack.
 
 1. The Stack is searched *in top to bottom order* for an item that fills one of the staged item's `needs`.
-    * If one is found, then it is removed from the Stack immediately, the staged item `grab`s it, and the result of that curried function application is staged in place of the original item (and we GOTO 1)
+    * If one is found, then it is removed from the Stack immediately, the staged item `grabs` it, and the result of that curried function application is staged in place of the original item (and we GOTO 1)
 2. The Stack items are queried *in top to bottom order* for an item which `needs` the staged item.
-    * If one is found, it is removed from the Stack immediately, it `grab`s the staged item, and the result of that curried function application is staged in place of the original item (and we GOTO 1)
+    * If one is found, it is removed from the Stack immediately, it `grabs` the staged item, and the result of that curried function application is staged in place of the original item (and we GOTO 1)
 3. The staged item (whatever it is by now) is pushed onto the top of the Stack.
 
-A crucial process in Duck interpretation is `grab`bing arguments. Every Duck object is a function (though literals like Ints and Lists trivially return themselves). Any item (including a literal) can be made to `grab` any other: If the `grab`bed item is able to fulfill one of the `grab`ber's `needs`, it is consumed by partial application (currying), and a new object results; if a `grab`bed item cannot be used, *both are still destroyed* but the result is an identical copy of the `grab`ber.
+A crucial process in Duck interpretation is **grabbing** arguments. Every Duck object is a function (though literals like Ints and Lists trivially return themselves). Any item (including a literal) can be made to `grab` any other: If the grabbed item is able to fulfill one of the grabber's `needs`, it is consumed by partial application (currying), and a new object results; if a grabbed item cannot be used, *both are still destroyed* but the result is an identical copy of the grabber.
 
-So, as a reasonable convention: don't have items going around `grab`bing stuff somebody else might need.
+So, as a reasonable convention: don't have items going around grabbing stuff somebody else might need.
 
 #### Unusual `grab` results
 
-Some messages, like `:zap`, destroy the receiver. The "result" of a `:zap` Message `grab`bing a target item is *nothing at all* (`nil` in the Ruby implementation). A Stack will handle that outcome correctly.
+Some messages, like `:zap`, destroy the receiver. The "result" of a `:zap` Message grabbing a target item is *nothing at all* (`nil` in the Ruby implementation). A Stack will handle that outcome correctly.
 
 Other messages, like `:trunc` and `:shatter`, produce multiple items. These will be *unshifted* onto the bottom of the Stack's buffer, in the order returned. So for example if a List `(1, 2, F)` is `:shatter`ed, the resulting Int, Int and Bool items will be re-buffered immediately *in that order*, and placed before anything else that might still be buffered and waiting to be pushed onto that Stack. 
 
@@ -136,7 +136,7 @@ If it happens that a `:+` is lurking on the stack somewhere, more stuff will hap
 
 Occasionally partial function application isn't enough to fully determine the class of a result. For example, both Decimal and Int items respond to `:+`. In the case of the Decimal, the Closure `λ(? + 1.23)` will clearly "always" produce another Decimal, whether it encounters an Int or a Decimal as its argument.
 
-But the Closure `λ(? + 2)` might *still* `grab` either a Decimal (to produce a Decimal result), or an Int to produce an `Int` result.
+But the Closure `λ(? + 2)` might *still* `grab` either a Decimal (to produce a Decimal result), or an Int to produce an Int result.
 
 I feel type-casting design decisions are better left as a matter for domain modelers. In the core Duck class definitions, I've tried to avoid including any but the most obvious type-casting events: in the outcome of common arithmetic operations, or the in the consistency of results from Message/String/Script and List/Stack manipulations.
 
