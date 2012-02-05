@@ -104,6 +104,61 @@ One more, to demonstrate the flexibility:
     [(5,4)]          <<<                  <<< []      <<<  ""                  and we're done
         
 
+### Duck-typing in Duck
+
+Every Duck object (including the Interpreter itself, as it happens) maintains an explicit list of `recognized_messages` it can respond to. Every item responds to the `:be` and `know?` messages, only some respond to `:+`, very few respond to `:parse`, and (to date) none respond to `:foo`. The class hierarchy of stack items makes it relatively simple for domain modelers to include large chunks of functionality into specialized subclasses, but as a matter of convention *objects are provided no explicit information about other objects' class*.
+
+#### Object interaction: needing, recognizing, grabbing and using
+
+All Duck objects also maintain a list of their `needs`, in the form of messages they "wish" something would respond to. Messages and other Closures are typically the only items which populate this list (literal Int items don't really feel much pressure to perform tricks). Messages `need` items that respond to their own message, so for example a `:+` Message will have a `needs` list that includes `:+`; it "wants" to meet somebody who can fulfill its mission. Closures, which represent partially applied functions, often have more carefully-designed `needs`. The closure `λ(?+3)` for instance, which represents the function "some argument plus three", clearly wants a *number* of some sort but not a List or a Matrix or a Script, though it _doesn't care_ whether it ends up with an Int or a Decimal or a Rational. Thus, its `needs` list should specify a message "signature" that the argument will recognize *if it is the right class, and no other*. (As of this writing, `:neg` is a message that can differentiate Numbers from other items.)
+
+As we've seen above in the examples, whenever a new item is pushed onto a Stack, it is buffered and "staged" in an internal queue, and goes through a very particular sequence of *negotiations* with the other items already on the Stack.
+
+1. The Stack is searched *in top to bottom order* for an item that fills one of the staged item's `needs`.
+    * If one is found, then it is removed from the Stack immediately, the staged item `grab`s it, and the result of that curried function application is staged in place of the original item (and we GOTO 1)
+2. The Stack items are queried *in top to bottom order* for an item which `needs` the staged item.
+    * If one is found, it is removed from the Stack immediately, it `grab`s the staged item, and the result of that curried function application is staged in place of the original item (and we GOTO 1)
+3. The staged item (whatever it is by now) is pushed onto the top of the Stack.
+
+A crucial process in Duck interpretation is `grab`bing arguments. Every Duck object is a function (though literals like Ints and Lists trivially return themselves). Any item (including a literal) can be made to `grab` any other: If the `grab`bed item is able to fulfill one of the `grab`ber's `needs`, it is consumed by partial application (currying), and a new object results; if a `grab`bed item cannot be used, *both are still destroyed* but the result is an identical copy of the `grab`ber.
+
+So, as a reasonable convention: don't have items going around `grab`bing stuff somebody else might need.
+
+#### Unusual `grab` results
+
+Some messages, like `:zap`, destroy the receiver. The "result" of a `:zap` Message `grab`bing a target item is *nothing at all* (`nil` in the Ruby implementation). A Stack will handle that outcome correctly.
+
+Other messages, like `:trunc` and `:shatter`, produce multiple items. These will be *unshifted* onto the bottom of the Stack's buffer, in the order returned. So for example if a List `(1, 2, F)` is `:shatter`ed, the resulting Int, Int and Bool items will be re-buffered immediately *in that order*, and placed before anything else that might still be buffered and waiting to be pushed onto that Stack. 
+
+If it happens that a `:+` is lurking on the stack somewhere, more stuff will happen soon. So be it.
+
+#### Type-casting
+
+Occasionally partial function application isn't enough to fully determine the class of a result. For example, both Decimal and Int items respond to `:+`. In the case of the Decimal, the Closure `λ(? + 1.23)` will clearly "always" produce another Decimal, whether it encounters an Int or a Decimal as its argument.
+
+But the Closure `λ(? + 2)` might *still* `grab` either a Decimal (to produce a Decimal result), or an Int to produce an `Int` result.
+
+I feel type-casting design decisions are better left as a matter for domain modelers. In the core Duck class definitions, I've tried to avoid including any but the most obvious type-casting events: in the outcome of common arithmetic operations, or the in the consistency of results from Message/String/Script and List/Stack manipulations.
+
+The Duck classes are provided as *self-contained abstractions*. As a matter of convention, "slop" at the edges of these strict categories, such a might happen if one type-cast a Bool to act like an Int, should be avoided. Instead, focus on a careful choice of *message responses*, and of explicit type-conversion messages like `:to_bool`, `:to_int` and `:to_decimal` already included.
+
+### Core Duck classes (rapidly changing!)
+
+- Item
+    - Bool
+    - Error
+    - Number
+        - Int
+        - Decimal
+    - Closure
+        - Message
+        - Collector
+        - Connector
+        - Parser
+    - List
+        - Assembler
+    - Script
+
 ### The "result" of running a Duck script
 
 `DuckInterpreter#run` returns the entire Interpreter object, with all its contents. Determining which stack items, if any, to examine in order to evaluate how well a Duck script satisfies one's goal is a matter of domain modeling---not programming.
