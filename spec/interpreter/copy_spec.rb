@@ -1,8 +1,6 @@
 require_relative '../spec_helper'
 require 'timeout'
 
-# NOTE do NOT try to refactor :copy into a message recognized by the copy message itself!
-
 describe "the :copy message" do
   it "should be something the Interpreter recognizes" do
     DuckInterpreter.new.should respond_to(:copy)
