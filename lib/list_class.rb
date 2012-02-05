@@ -93,7 +93,7 @@ class List < Item
         new_list
       end,
       ["inc","be"],
-      "(item ? of #{self.inspect})"
+      "(#{self.inspect}[?] = ?)"
     )
   end
   

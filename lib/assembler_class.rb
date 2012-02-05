@@ -11,6 +11,15 @@ class Assembler < List
   end
   
   
+  def deep_copy
+    new_contents = @contents.collect {|i| i.deep_copy}
+    new_buffer = @buffer.collect {|i| i.deep_copy}
+    result = self.class.new(*new_contents)
+    result.buffer = new_buffer
+    result
+  end
+  
+  
   def push(item)
     item.class != Array ? @buffer.push(item) : @buffer += item
     process_buffer
@@ -59,6 +68,41 @@ class Assembler < List
       end
     end
   end
+  
+  
+  def +
+    Closure.new(
+      Proc.new do |arg|
+        new_contents = @contents + arg.contents
+        new_buffer = @buffer
+        new_buffer += arg.buffer if arg.respond_to?(:buffer) # in case it's a List
+        result = Assembler.new(*new_contents)
+        result.buffer = new_buffer
+        result
+      end,
+      ["count"],
+      "#{self.value} + ?"
+    )
+  end
+  
+  def []=
+    Closure.new(
+      Proc.new do |idx,item|
+        index = idx.value.to_i
+        how_many = @contents.length + @buffer.length
+        which = (how_many == 0) ? 0 : index % how_many
+        
+        new_assembler = self.deep_copy
+        which < @contents.length ?
+          new_assembler.contents[which] = item.deep_copy :
+          new_assembler.buffer[which-@contents.length] = item.deep_copy
+        new_assembler
+      end,
+      ["inc","be"],
+      "(#{self.inspect}[?] = ?)"
+    )
+  end
+  
   
   
   def to_s
