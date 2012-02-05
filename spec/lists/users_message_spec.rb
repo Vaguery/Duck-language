@@ -12,8 +12,8 @@ describe "the :users message for Lists" do
   end
   
   it "should produce two Lists, containing items that can use the external item, or not" do
-    d = DuckInterpreter.new("( - + / foo ) 3 users").run
-    d.stack.inspect.should == "[(:-, :+, :/), (:foo)]"
+    d = DuckInterpreter.new("( - + ÷ foo ) 3 users").run
+    d.stack.inspect.should == "[(:-, :+, :÷), (:foo)]"
   end
   
   it "should produce two Lists when the thing isn't useful" do

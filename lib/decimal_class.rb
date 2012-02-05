@@ -15,11 +15,11 @@ class Decimal < Number
     Closure.new(Proc.new {|multiplier| Decimal.new(self.value * multiplier.value)},needs,"#{self.value} * ?")
   end
   
-  def /
+  def ÷
     needs = ["neg"]
     self.value != 0 ? 
-      Closure.new(Proc.new {|numerator| Decimal.new(numerator.value / self.value)},needs,"? / #{self.value}") :
-      Closure.new(Proc.new {|numerator| Error.new("DIV0")},needs,"? / #{self.value}")
+      Closure.new(Proc.new {|numerator| Decimal.new(numerator.value / self.value)},needs,"? ÷ #{self.value}") :
+      Closure.new(Proc.new {|numerator| Error.new("DIV0")},needs,"? ÷ #{self.value}")
   end
   
   def trunc
@@ -40,5 +40,5 @@ class Decimal < Number
   end
   
   # keep at end of class definition!
-  @recognized_messages = Number.recognized_messages + [:+, :-, :*, :/, :trunc, :to_int, :to_bool]
+  @recognized_messages = Number.recognized_messages + [:+, :-, :*, :÷, :trunc, :to_int, :to_bool]
 end

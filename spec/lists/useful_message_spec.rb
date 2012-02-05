@@ -22,7 +22,7 @@ describe "the :useful message for Lists" do
   end
   
   it "should produce two Lists when all of them are useful" do
-    d = DuckInterpreter.new("( 1.1 2 33 ) / useful").run
+    d = DuckInterpreter.new("( 1.1 2 33 ) ÷ useful").run
     d.stack.inspect.should == "[(1.1, 2, 33), ()]"
   end
   
