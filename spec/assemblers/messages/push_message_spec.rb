@@ -67,18 +67,10 @@ describe "Assembler" do
       @s.contents.inspect.should == "[11]"
     end
 
-    it "should be able to handle items already present on the buffer"
-  end
-
-  describe "'being on its own stack'" do
-    it "should present itself as the 'bottom' item on its own stack, when processing is underway" do
-      pending
-      tenuous = Assembler.new
-      tenuous.contents.push(Int.new(3))
-      tenuous.contents.push(Int.new(4))
-      result = tenuous.push(Message.new("shatter"))
-      result.should be_a_kind_of(Array)
-      result.inspect.should == "[3, 4]"
+    it "should also process items already present on the buffer (first)" do
+      with_buffer = Assembler.new([Int.new(3)], [Bool.new(false)])
+      with_buffer.push(Decimal.new(12.34))
+      with_buffer.inspect.should == "[3, F, 12.34 ::]"
     end
   end
 end

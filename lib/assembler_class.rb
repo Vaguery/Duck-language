@@ -152,6 +152,54 @@ class Assembler < List
     Assembler.new(new_contents, @buffer)
   end
   
+  def ∩
+    Closure.new(
+      Proc.new do |arg|
+        other_contents = arg.contents.collect {|item| item.inspect}
+        other_buffer = arg.buffer.collect {|item| item.inspect} if arg.respond_to?(:buffer)
+        
+        Assembler.new(
+          @contents.select {|element| other_contents.include? element.inspect},
+          @buffer.select {|element| other_buffer.include? element.inspect})
+      end,
+      ["count"],
+      "#{self.inspect} ∩ ?"
+    )
+  end
+  
+  def useful
+    Closure.new(
+      Proc.new do |item|
+        results = (@contents+@buffer).group_by {|element| item.can_use?(element) ? "useful" : "unuseful"}
+        [List.new(results["useful"]||[]), List.new(results["unuseful"]||[])]
+      end,
+      ["be"],
+      "#useful({self.inspect}, ?)"
+    )
+  end
+  
+  
+  def users
+    Closure.new(
+      Proc.new do |item|
+        results = (@contents+@buffer).group_by {|element| element.can_use?(item) ? "users" : "nonusers"}
+        [List.new(results["users"]||[]), List.new(results["nonusers"]||[])]
+      end,
+      ["be"],
+      "#users({self.inspect}, ?)"
+    )
+  end
+  
+  def swap
+    if @contents.length > 1
+      new_contents = @contents.clone
+      new_contents[-1],new_contents[-2] = @contents[-2].clone,@contents[-1].clone
+      self.class.new(new_contents, @buffer)
+    else
+      self
+    end
+  end
+  
   
   
   # special Assembler behaviors that differ from List:

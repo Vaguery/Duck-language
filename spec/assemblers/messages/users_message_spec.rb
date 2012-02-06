@@ -13,6 +13,13 @@ describe "Assembler" do
       d.stack[1].should be_a_kind_of(List)
     end
     
-    it "should check the buffer as well"
+    it "should check the buffer as well" do
+      d = DuckInterpreter.new("3 users")
+      
+      with_buffer = Assembler.new([Message.new("foo")],[Message.new("inc")])
+      d.stack.push(with_buffer)
+      d.run
+      d.stack.inspect.should == "[(:inc), (:foo)]"
+    end
   end
 end
