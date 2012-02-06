@@ -20,6 +20,24 @@ class Assembler < List
   end
   
   
+  def step
+    staged_item = @buffer.delete_at(0)
+    next_arg = index_of_next_useful_argument_for(staged_item)
+    if next_arg.nil?
+      wanted_by = index_of_next_item_that_wants(staged_item)
+      if wanted_by.nil?
+        @contents.push staged_item
+      else
+        curried_result = @contents.delete_at(wanted_by).grab(staged_item)
+        rebuffer_intermediate_result(curried_result)
+      end
+    else
+      curried_result = staged_item.grab(@contents.delete_at(next_arg))
+      rebuffer_intermediate_result(curried_result)
+    end
+    self
+  end
+  
   def push(item)
     item.class != Array ? @buffer.push(item) : @buffer += item
     process_buffer
@@ -51,24 +69,14 @@ class Assembler < List
   
   def process_buffer
     until @buffer.empty?
-      staged_item = @buffer.delete_at(0)
-      next_arg = index_of_next_useful_argument_for(staged_item)
-      if next_arg.nil?
-        # self.be_consumed(staged_item) if staged_item.can_use?(self)
-        wanted_by = index_of_next_item_that_wants(staged_item)
-        if wanted_by.nil?
-          @contents.push staged_item
-        else
-          curried_result = @contents.delete_at(wanted_by).grab(staged_item)
-          rebuffer_intermediate_result(curried_result)
-        end
-      else
-        curried_result = staged_item.grab(@contents.delete_at(next_arg))
-        rebuffer_intermediate_result(curried_result)
-      end
+      self.step
     end
   end
   
+  def run
+    self.process_buffer
+    self
+  end
   
   def to_s
     rep = (@contents.inject("[") {|s,i| s+i.to_s+", "}).chomp(", ")
@@ -223,6 +231,18 @@ class Assembler < List
       [self.class.new(@contents[1..-1],@buffer),@contents[0].deep_copy]
   end
   
+  def ∪
+    Closure.new(
+      Proc.new do |other_list|
+        combined_contents = other_list.contents + @contents
+        combined_buffers = other_list.buffer + @buffer
+        self.class.new(combined_contents.uniq {|element| element.inspect},
+          combined_buffers.uniq {|element| element.inspect})
+      end,
+      ["count"],
+      "#{self.inspect} ∪ ?"
+    )
+  end
   
   
   # special Assembler behaviors that differ from List:
@@ -235,5 +255,5 @@ class Assembler < List
   # Lists do these [:count, :[], :empty, :reverse, :copy, :swap, :pop, :shift, :unshift, :shatter, :[]=, :useful, :users, :∪, :∩, :flatten, :snap, :rewrap_by, :rotate]
   
   # keep at end of class definition!
-  @recognized_messages = List.recognized_messages + [:push]
+  @recognized_messages = List.recognized_messages + [:push, :step, :run]
 end
