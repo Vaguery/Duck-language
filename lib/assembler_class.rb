@@ -200,6 +200,29 @@ class Assembler < List
     end
   end
   
+  def pop # release the last item
+    if @contents.empty?
+      self
+    else
+      item = @contents.pop
+      return [Assembler.new(@contents,@buffer),item]
+    end
+  end
+  
+  def unshift 
+    Closure.new(Proc.new {|item| Assembler.new(@contents.clone.unshift(item.deep_copy),@buffer)},
+      ["be"],"#{self.to_s}.unshift(?)")
+  end
+  
+  def reverse
+    self.class.new(@contents.reverse, @buffer)
+  end
+  
+  def shift # release the first item
+    @contents.empty? ? self :
+      [self.class.new(@contents[1..-1],@buffer),@contents[0].deep_copy]
+  end
+  
   
   
   # special Assembler behaviors that differ from List:

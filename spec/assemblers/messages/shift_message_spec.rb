@@ -12,6 +12,13 @@ describe "Assembler" do
       d.stack[0].should be_a_kind_of(Assembler)
     end
     
-    it "should leave the buffer untouched (and :halt processing)"
+    it "should leave the buffer untouched (and :halt processing)" do
+      d = DuckInterpreter.new("shift")
+      numbers = (5..10).collect {|i| Int.new(i*i)}
+      d.stack.push(Assembler.new(numbers, [Decimal.new(12.34)]))
+      d.run
+      d.stack.inspect.should == "[[36, 49, 64, 81, 100 :: 12.34], 25]"
+      d.stack[0].should be_a_kind_of(Assembler)
+    end
   end
 end

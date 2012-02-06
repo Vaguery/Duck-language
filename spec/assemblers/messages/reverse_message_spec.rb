@@ -12,6 +12,9 @@ describe "Assembler" do
       d.stack[0].should be_a_kind_of(Assembler)
     end
     
-    it "should maintain the buffer untouched (and :halt processing)"
+    it "should maintain the buffer untouched" do
+      with_buffer = Assembler.new((0..10).collect {|i| Int.new(i*i)}, [Bool.new(false)])
+      with_buffer.reverse.inspect.should == "[100, 81, 64, 49, 36, 25, 16, 9, 4, 1, 0 :: F]"
+    end
   end
 end

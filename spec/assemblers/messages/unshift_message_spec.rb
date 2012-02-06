@@ -12,6 +12,12 @@ describe "Assembler" do
       d.stack[0].should be_a_kind_of(Assembler)
     end
     
-    it "should leave the buffer untouched (and :halt processing)"
+    it "should leave the buffer untouched (and :halt processing)" do
+      d = DuckInterpreter.new("F unshift")
+      numbers = (0..10).collect {|i| Int.new(i*i)}
+      d.stack.push(Assembler.new(numbers, [Bool.new(true)]))
+      d.run
+      d.stack.inspect.should == "[[F, 0, 1, 4, 9, 16, 25, 36, 49, 64, 81, 100 :: T]]"
+    end
   end
 end
