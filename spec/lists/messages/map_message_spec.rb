@@ -53,5 +53,4 @@ describe "List" do
       d.stack.inspect.should == "[((1, :foo), (2, :foo), (3, :foo), (4, :foo))]"
     end
   end
-  
 end
