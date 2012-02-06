@@ -18,4 +18,15 @@ class Interpreter < Assembler
     rep += "]"
   end
   
+  def next_token
+    push(@script.next_token)
+  end
+  
+  def run
+    while @script.length > 0 || @buffer.length > 0
+      next_token if @buffer.empty?
+      process_buffer unless @buffer.empty?
+    end
+  end
+  
 end

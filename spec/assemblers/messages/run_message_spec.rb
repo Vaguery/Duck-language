@@ -16,5 +16,14 @@ describe "Assembler" do
       wb = Assembler.new([Message.new("*"), Message.new("+"),Int.new(1)], [Int.new(3), Int.new(4)])
       wb.run.inspect.should == "[16 ::]"
     end
+    
+    it "should change the @halted state of the Assembler to false" do
+      wb = Assembler.new
+      wb.halt
+      wb.halted.should == true
+      
+      wb.run
+      wb.halted.should == false
+    end
   end
 end

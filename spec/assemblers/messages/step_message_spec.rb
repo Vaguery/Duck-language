@@ -16,5 +16,15 @@ describe "Assembler" do
       wb = Assembler.new([Message.new("+"),Int.new(1)], [Int.new(3), Int.new(4)])
       wb.step.inspect.should == "[1 :: λ(3 + ?,[\"neg\"]), 4]"
     end
+    
+    it "should NOT change the @halted state of the Assembler to false" do
+      wb = Assembler.new([],[Message.new("foo")])
+      wb.halt
+      wb.halted.should == true
+      
+      wb.step
+      wb.inspect.should == "[:foo ::]"
+      wb.halted.should == true
+    end
   end
 end

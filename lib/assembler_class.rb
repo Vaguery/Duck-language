@@ -2,12 +2,14 @@
 class Assembler < List
   # superclass has @contents
   attr_accessor :buffer
+  attr_accessor :halted
   
   
   def initialize(contents = [], buffer = [])
     @contents = contents
     @buffer = buffer
     @needs = []
+    @halted = false
   end
   
   
@@ -16,6 +18,7 @@ class Assembler < List
     new_buffer = @buffer.collect {|i| i.deep_copy}
     result = self.class.new(new_contents)
     result.buffer = new_buffer
+    result.halted = @halted
     result
   end
   
@@ -40,7 +43,7 @@ class Assembler < List
   
   def push(item)
     item.class != Array ? @buffer.push(item) : @buffer += item
-    process_buffer
+    self.process_buffer
     self
   end
   
@@ -68,12 +71,13 @@ class Assembler < List
   
   
   def process_buffer
-    until @buffer.empty?
+    until @buffer.empty? || @halted
       self.step
     end
   end
   
   def run
+    @halted = false
     self.process_buffer
     self
   end
@@ -105,6 +109,10 @@ class Assembler < List
       ["count"],
       "#{self.value} + ?"
     )
+  end
+  
+  def halt
+    @halted = true
   end
   
   def count
@@ -326,5 +334,5 @@ class Assembler < List
   # Lists do these [:count, :[], :empty, :reverse, :copy, :swap, :pop, :shift, :unshift, :shatter, :[]=, :useful, :users, :∪, :∩, :flatten, :snap, :rewrap_by, :rotate]
   
   # keep at end of class definition!
-  @recognized_messages = List.recognized_messages + [:push, :step, :run]
+  @recognized_messages = List.recognized_messages + [:push, :step, :run, :halt]
 end

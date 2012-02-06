@@ -11,6 +11,40 @@ describe "the Script class" do
     Script.new("foo").value.should == "foo"
   end
   
+  describe ":next_word" do
+    it "should respond to :next_word by snipping off and returning its first word" do
+      s = Script.new("foo bar baz")
+      s.next_word.should == "foo"
+      s.inspect.should == "«bar baz»"
+    end
+    
+    it "should work when there is leading space" do
+      s = Script.new(" \t\t\n foo bar baz")
+      s.next_word.should == "foo"
+      s.inspect.should == "«bar baz»"
+    end
+    
+    it "should not fail when the script is empty" do
+      s = Script.new
+      s.next_word.should == ""
+      s.inspect.should == "«»"
+    end
+  end
+  
+  describe ":next_token" do
+    it "should snip off the next word and return a parsed Duck token" do
+      s = Script.new("foo 12.34 F")
+      s.next_token.should be_a_kind_of(Message)
+      s.inspect.should == "«12.34 F»"
+      s.next_token.should be_a_kind_of(Decimal)
+      s.inspect.should == "«F»"
+      s.next_token.should be_a_kind_of(Bool)
+      s.inspect.should == "«»"
+      s.next_token.should == nil
+      s.value.should == ""
+    end
+  end
+  
   it "should be represented on the Stack as being in guillemets" do
     d = DuckInterpreter.new("")
     d.queue.push Script.new("hi there")
