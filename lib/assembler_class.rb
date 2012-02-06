@@ -129,6 +129,10 @@ class Assembler < List
     )
   end
   
+  def rotate
+    self.class.new(@contents.rotate(1), @buffer)
+  end
+  
   
   def []
     Closure.new(
@@ -146,19 +150,37 @@ class Assembler < List
       end, ["inc"], "#{self.to_s}[?]")
   end
   
+  
+  def snap
+    Closure.new(
+      Proc.new do |location|
+        if @contents.length > 0
+          where = location.value.to_i % @contents.length
+          [self.class.new(@contents[0...where],[]),self.class.new(@contents[where..-1],@buffer)]
+        else
+          self
+        end
+      end,
+      ["inc"],
+      "snap#{self.inspect} at ?"
+    )
+  end
+  
   def flatten
     new_contents = @contents.inject([]) do |arr,item|
-      case item
-      when item.kind_of?(List)
-        arr + item.contents
+      case 
       when item.kind_of?(Assembler)
         arr + item.contents + item.buffer
+      when item.kind_of?(List)
+        arr + item.contents
       else
         arr << item
       end
     end
-    Assembler.new(new_contents, @buffer)
+    self.class.new(new_contents, @buffer)
   end
+  
+  
   
   def ∩
     Closure.new(

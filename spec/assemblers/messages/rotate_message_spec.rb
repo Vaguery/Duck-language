@@ -12,8 +12,10 @@ describe "Assembler" do
       d.stack.each {|i| i.should be_a_kind_of(Assembler)}      
     end
     
-    it "should NOT include the buffer in the rotation"
-    
-    it "should halt processing"
+    it "should NOT include the buffer in the rotation" do
+      numbers = (3..7).collect {|i| Int.new(i*i)}
+      wb = Assembler.new(numbers,[Decimal.new(12.34)])
+      wb.rotate.inspect.should == "[16, 25, 36, 49, 9 :: 12.34]"
+    end
   end
 end

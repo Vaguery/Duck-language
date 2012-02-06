@@ -13,8 +13,13 @@ describe "Assembler" do
       d.stack[1].should be_a_kind_of(Assembler)
     end
     
-    it "should include the buffer as part of the contents for counting, and share it out"
-    # [1 2 3 4 : 5 6], if snapped between 5 and 6 in buffer, would make:
-    # [1 2 3 4 : 5] and [ : 6], leaving 6 on the buffer of the second (empty) Assembler
+    it "should leave the entire buffer attached to the second part" do      
+      d = DuckInterpreter.new("3 snap")
+      numbers = (0..4).collect {|i| Int.new(i*i)}
+      wb = Assembler.new(numbers, [Bool.new(false),Bool.new(true)])
+      d.stack.push(wb)
+      d.run
+      d.stack.inspect.should == "[[0, 1, 4 ::], [9, 16 :: F, T]]"
+    end
   end
 end
