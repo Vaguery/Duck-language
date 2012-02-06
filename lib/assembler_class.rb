@@ -180,6 +180,24 @@ class Assembler < List
     self.class.new(new_contents, @buffer)
   end
   
+  def rewrap_by
+    Closure.new(
+      Proc.new do |size|
+        slice_size = size.value.to_i
+        slice_size = @contents.length if slice_size < 1
+        if @contents.empty?
+          result = self
+        else
+          result = @contents.each_slice(slice_size).collect {|chunk| self.class.new(chunk)}
+          result[-1].buffer = @buffer
+        end
+        result
+      end,
+      ["inc"],
+      "rewrap#{self.inspect} by ?"
+    )
+  end
+  
   
   
   def ∩
@@ -265,6 +283,37 @@ class Assembler < List
       "#{self.inspect} ∪ ?"
     )
   end
+  
+  
+  def map
+    Closure.new(
+      Proc.new do |item|
+        results = (@contents+@buffer).collect {|i| item.deep_copy.grab(i.deep_copy)}.flatten
+        new_contents = results.reject {|i| i.nil?}
+        size = new_contents.inject("") {|rep,i| rep+(i.to_s)}.length
+        size < @@result_size_limit ? List.new(new_contents) : Error.new("OVERSIZE")
+      end,
+      ["be"],
+      "map(#{self.inspect}, ?)"
+    )
+  end
+  
+  def give
+    Closure.new(
+      Proc.new do |item|
+        results = (@contents+@buffer).collect {|i| i.grab(item.deep_copy)}.flatten
+        new_contents = results.reject {|i| i.nil?}
+        List.new(new_contents)
+      end,
+      ["be"],
+      "give(#{self.inspect}, ?)"
+    )
+  end
+  
+  def shatter
+    @contents + @buffer
+  end
+  
   
   
   # special Assembler behaviors that differ from List:

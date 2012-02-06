@@ -12,6 +12,13 @@ describe "Assembler" do
       d.stack.each {|i| i.should be_a_kind_of(Assembler)}      
     end
     
-    it "should leave the buffer associated with the last result, and halt processing"
+    it "should leave the buffer associated with the last result, and halt processing" do
+      d = DuckInterpreter.new("3 rewrap_by")
+      numbers = (3..10).collect {|i| Int.new(i*i)}
+      d.stack.push(Assembler.new(numbers, [Bool.new(false)]))
+      d.run
+      d.stack.inspect.should == "[[9, 16, 25 ::], [36, 49, 64 ::], [81, 100 :: F]]" 
+      d.stack.each {|i| i.should be_a_kind_of(Assembler)}      
+    end
   end
 end

@@ -2,7 +2,7 @@
 class Collector < Closure
   attr_accessor :closure, :contents, :target
   
-  def initialize(target = 0,contents_array = [])
+  def initialize(target = INFINITY,contents_array = [])
     @contents = contents_array
     @target = target
     @closure = Proc.new do |item|

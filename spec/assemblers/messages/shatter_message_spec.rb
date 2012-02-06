@@ -11,6 +11,12 @@ describe "Assembler" do
       d.stack.inspect.should == "[0, 1, 4, 9, 16, 25, 36, 49, 64, 81, 100]"
     end
     
-    it "should release the buffered items as well"
+    it "should release the buffered items as well" do
+      d = DuckInterpreter.new("shatter")
+      numbers = (0..10).collect {|i| Int.new(i*i)}
+      d.stack.push(Assembler.new(numbers, [Bool.new(false), Decimal.new(12.34)]))
+      d.run
+      d.stack.inspect.should == "[0, 1, 4, 9, 16, 25, 36, 49, 64, 81, 100, F, 12.34]"
+    end
   end
 end
