@@ -18,11 +18,24 @@ class Message < Closure
       self
   end
   
+  #############
+  #
+  # PUBLIC DUCK METHODS
+  #
+  ###############
+  
   
   def do
     self
   end
   
+  def bind
+    Closure.new(
+      Proc.new {|new_value| Variable.new(@value, new_value)},
+      ["be"],
+      "#{@value}.bind(?)"
+    )
+  end
   
   def eql
     Closure.new(Proc.new {|arg1| Bool.new(arg1.value == self.value)},["do"],"? == #{self.value}")
@@ -30,5 +43,5 @@ class Message < Closure
   
   
   # keep at end of class definition!
-  @recognized_messages = Closure.recognized_messages + [:do, :eql]
+  @recognized_messages = Closure.recognized_messages + [:do, :eql, :bind]
 end
