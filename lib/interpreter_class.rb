@@ -27,6 +27,7 @@ class Interpreter < Assembler
       next_token if @buffer.empty?
       process_buffer unless @buffer.empty?
     end
+    self
   end
   
 end
