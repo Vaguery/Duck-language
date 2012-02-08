@@ -24,7 +24,7 @@ class List < Item
   end
   
   def push
-    Closure.new(["be"],"#{self.to_s}.push(?)") {|item| List.new(@contents.clone<<item.clone)}
+    Closure.new(["be"],"#{self.to_s}.push(?)") {|item| List.new(@contents.clone << item.deep_copy)}
   end
   
   def unshift 
@@ -58,7 +58,7 @@ class List < Item
   end
   
   def copy
-    @contents.empty? ? self : self.class.new((@contents.clone << @contents[-1].clone))
+    @contents.empty? ? self : self.class.new(@contents.clone << @contents[-1].clone)
   end
   
   def reverse

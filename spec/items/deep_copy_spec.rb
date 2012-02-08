@@ -47,8 +47,8 @@ describe "Stack Item deep copy method" do
     end
   end
   
-  it "should work for Connectors" do
-    i = Connector.new([Int.new(8), Int.new(9)])
+  it "should work for Pipes" do
+    i = Pipe.new([Int.new(8), Int.new(9)])
     j = i.deep_copy
     i.object_id.should_not == j.object_id
     i.contents.each_with_index do |item,idx|

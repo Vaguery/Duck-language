@@ -20,10 +20,10 @@ describe "Int" do
       d = DuckInterpreter.new("-3 bundle foo 0 bundle bar").run
       d.stack.inspect.should == "[(), :foo, (), :bar]"
     end
-
-    it "should complete even if no subsequent item appears" do
-      d = DuckInterpreter.new("2 bundle 3 4").run
-      d.stack.inspect.should == "[(3, 4)]"
+    
+    it "should be ready to grab more items when they appear" do
+      d = DuckInterpreter.new("12 bundle 3 4").run
+      d.stack.inspect.should == "[λ( (3, 4, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)]"
     end
   end
 end

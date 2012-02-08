@@ -24,9 +24,9 @@ describe "the Wrapper class" do
       d.inspect.should == "[|(?×Infinity), 1, 2, 3, 4, 5, 6, 7, 8, 9 :: :: «»]"
     end
     
-    it "it should stuff things into the list it finds, and wait for another" do
-      pending "this isn't working"
-      d = Interpreter.new("( 1 ) 1 2 3 4 5 6 7 8 9",[],[Wrapper.new])
+    it "it should stuff things into the list, then reappear" do
+      pending
+      d = Interpreter.new("( ) 1 2 3 4 5 6 7 8 9",[],[Wrapper.new])
       d.run
       d.inspect.should == "[|(?×Infinity), 1, 2, 3, 4, 5, 6, 7, 8, 9 :: :: «»]"
     end

@@ -45,7 +45,7 @@ describe "List" do
       d.stack.inspect.should == "[()]"
     end
     
-    it "should work with Connectors" do
+    it "should work with Pipes" do
       d = DuckInterpreter.new("( 1 2 3 4 )").run
       d.stack.push(Collector.new(2))
       d.script = "map foo give" # map the Collector to all items, then quickly give it the final "foo"

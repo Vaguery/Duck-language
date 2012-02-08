@@ -10,12 +10,16 @@ class Collector < Closure
       when @contents.length + 1 > @target
         [List.new(@contents),item]
       when @contents.length + 1 == @target
-        List.new((@contents << item))
+        List.new(@contents << item)
       else
         Collector.new(@target,(@contents << item))
       end
     end
     @needs = ["be"]
+  end
+  
+  def remaining
+    @target-@contents.length
   end
   
   def deep_copy
@@ -24,7 +28,7 @@ class Collector < Closure
   end
   
   def to_s
-    "λ( " + (@contents.inject("(") {|s,i| s+i.to_s+", "}).chomp(", ") + ", ?) )"
+    "λ( " + (@contents.inject("(") {|s,i| s+i.to_s+", "}).chomp(", ") + ", ?"*remaining + ")"
   end
   
   # keep at end of class definition!

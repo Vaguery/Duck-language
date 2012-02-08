@@ -61,7 +61,7 @@ class DuckInterpreter
   def recognize(string)
     case string
     when /^\)$/
-      Connector.new()
+      Pipe.new()
     when /^[-+]?[0-9]+$/
       Int.new(string.to_i)
     when /^[-+]?[0-9]+\.[0-9]*$/

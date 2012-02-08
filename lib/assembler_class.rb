@@ -41,6 +41,7 @@ class Assembler < List
     self
   end
   
+  
   def push(item)
     item.class != Array ? @buffer.push(item) : @buffer += item
     self.process_buffer
@@ -177,6 +178,7 @@ class Assembler < List
     self.class.new(new_contents, @buffer)
   end
   
+  
   def rewrap_by
     Closure.new(["inc"],"rewrap#{self.inspect} by ?") do |size|
       slice_size = size.value.to_i
@@ -190,7 +192,6 @@ class Assembler < List
       result
     end
   end
-  
   
   
   def ∩

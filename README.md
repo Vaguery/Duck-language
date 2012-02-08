@@ -74,7 +74,7 @@ One more, to demonstrate the flexibility:
     (stack)          <<< (staged)         <<< (queue) <<< (script)             (notes)
     []               <<<                  <<< []      <<<  "( 2 1 ) 3 + map"
     []               <<<                  <<< [:(]    <<<  "2 1 ) 3 + map"
-    []               <<<    :(            <<< []      <<<  "2 1 ) 3 + map"     only a Connector object responds to :(
+    []               <<<    :(            <<< []      <<<  "2 1 ) 3 + map"     only a Pipe object responds to :(
     [:(]             <<<                  <<< []      <<<  "2 1 ) 3 + map"     ... so it ends up on the stack as a Message
     [:(]             <<<                  <<< [2]     <<<  "1 ) 3 + map"
     [:(]             <<<   2              <<< []      <<<  "1 ) 3 + map"
@@ -82,10 +82,10 @@ One more, to demonstrate the flexibility:
     [:(,2]           <<<                  <<< [1]     <<<  ") 3 + map"
     [:(,2]           <<<   1              <<< []      <<<  ") 3 + map"
     [:(,2,1]         <<<                  <<< []      <<<  ") 3 + map"
-    [:(,2,1]         <<<                  <<< [λ(?)]  <<<  "3 + map"           the token ')' is interpreted as a Connector object
-    [:(,2,1]         <<<  λ(?)            <<< []      <<<  "3 + map"           Connectors want arguments that respond to :be
+    [:(,2,1]         <<<                  <<< [λ(?)]  <<<  "3 + map"           the token ')' is interpreted as a Pipe object
+    [:(,2,1]         <<<  λ(?)            <<< []      <<<  "3 + map"           Pipes want arguments that respond to :be
     [:(,2]           <<<  λ(1,?)          <<< []      <<<  "3 + map"           ... and everything does!
-    [:(]             <<<  λ(2,1,?)        <<< []      <<<  "3 + map"           ... but the :( message transforms the Connector
+    [:(]             <<<  λ(2,1,?)        <<< []      <<<  "3 + map"           ... but the :( message transforms the Pipe
     []               <<<  (2,1)           <<< []      <<<  "3 + map"           ... into a List
     [(2,1)]          <<<                  <<< []      <<<  "3 + map"
     [(2,1)]          <<<                  <<< [3]     <<<  "+ map"
@@ -146,18 +146,20 @@ The Duck classes are provided as *self-contained abstractions*. As a matter of c
 
 - Item
     - Bool
-    - Error
-    - Number
-        - Int
-        - Decimal
     - Closure
         - Message
         - Collector
-        - Connector
+        - Pipe
         - Parser
+    - Error
     - List
         - Assembler
+        - Interpreter
+    - Number
+        - Int
+        - Decimal
     - Script
+    - Variable
 
 ### The "result" of running a Duck script
 
