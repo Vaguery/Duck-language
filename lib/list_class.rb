@@ -81,10 +81,12 @@ class List < Item
   
   
   def []=
-    Closure.new(['inc', 'be'],":I AM A []= CLOSURE") do |index, new_item|
-      new_contents = @contents.clone
-      new_contents[index] = new_item
-      List.new(new_contents)
+    Closure.new(['inc', 'be'],"") do |index, new_item|
+      new_list = self.deep_copy
+      idx = index.value.to_i
+      which = (@contents.length == 0) ? 0 : (idx % @contents.length)
+      new_list.contents[which] = new_item.deep_copy
+      new_list
     end 
   end
   

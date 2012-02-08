@@ -40,8 +40,29 @@ describe "grabbing and consuming arguments" do
     it "should actually grab the thing" do
       negater = Closure.new(["inc"]) {|int| Int.new(-int.value.to_i)}
       negater.grab(Int.new(12)).inspect.should == "-12"
+      negater.grab(negater.grab(Int.new(12))).value.should == 12
     end
     
+    it "should work for closures requiring multiple arguments" do
+      add_three_er = Closure.new(["inc", "inc", "inc"]) do |i1, i2, i3|
+        Int.new(i1.value.to_i + i2.value.to_i + i3.value.to_i)
+      end
+      int_1 = Int.new(1)
+      int_2 = Int.new(10)
+      int_3 = Int.new(100)
+      
+      step_1 = add_three_er.grab(int_1)
+      step_1.to_s.should == "λ(f(_,_),[\"inc\", \"inc\"])"
+      
+      step_2 = step_1.grab(int_2)
+      step_2.inspect.should == 'λ(f(_),["inc"])'
+      
+      stacked =  add_three_er.closure.curry[int_1]
+      stacked = stacked.curry[int_2]
+      stacked = stacked.curry[int_3]
+      step_3 = step_2.grab(int_3)
+      step_3.class.should == Int
+    end
   end
 end
 
@@ -72,7 +93,7 @@ describe "string representation" do
   
   it "should default to saying something about the number of args in the Proc" do
     Closure.new(["bar"]) {|a| a}.to_s.should =~
-      /f\(\*\)/
+      /f\(_\)/
   end
   
   it "should be able to show something to indicate the method call" do

@@ -188,15 +188,6 @@ class DuckInterpreter
     @stack.push @stack[-1].deep_copy unless @stack.empty?
   end
   
-  def []
-    @queue.unshift Closure.new(["inc"], "stack[?]") do |idx| 
-      index = idx.value.to_i
-      how_many = @stack.length
-      which = how_many == 0 ? 0 : index % how_many
-      @stack.delete_at(which)
-    end
-  end
-  
   def reverse
     @stack.reverse!
   end

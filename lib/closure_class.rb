@@ -1,8 +1,8 @@
 #encoding: utf-8
 
 class Closure < Item
-  attr_reader :closure, :needs, :value
-  attr_accessor :string_version
+  attr_reader  :needs, :value
+  attr_accessor :closure,:string_version
   
   
   def initialize(needs=[], string = nil, &closure)
@@ -17,7 +17,7 @@ class Closure < Item
   
   def template_string
     unless @needs.empty?
-      "f(" + "*,"*(needs.length-1) + "*)"
+      "f(" + "_,"*(needs.length-1) + "_)"
     else
       "f()"
     end
@@ -25,11 +25,14 @@ class Closure < Item
   
   
   def grab(object)
-    if can_use?(object)
+    if self.can_use?(object)
       if @needs.length > 1
-        Closure.new(@needs.drop(1)) {@closure.curry[object]}
+        new_needs = @needs.drop(1)
+        result = Closure.new(new_needs)
+        result.closure = @closure.curry[object] # this is a Ruby syntax workaround I hate
+        result
       else
-        @closure
+        @closure.curry[object]
       end
     else
       self
