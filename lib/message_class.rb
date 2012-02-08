@@ -1,6 +1,5 @@
 
 class Message < Closure
-  
   def initialize(string)
     @closure = Proc.new {|receiver| receiver.__send__(string) }
     @needs = [string]
@@ -30,15 +29,11 @@ class Message < Closure
   end
   
   def bind
-    Closure.new(
-      Proc.new {|new_value| Variable.new(@value, new_value)},
-      ["be"],
-      "#{@value}.bind(?)"
-    )
+    Closure.new(["be"],"#{@value}.bind(?)") {|new_value| Variable.new(@value, new_value)}
   end
   
   def eql
-    Closure.new(Proc.new {|arg1| Bool.new(arg1.value == self.value)},["do"],"? == #{self.value}")
+    Closure.new(["do"],"? == #{self.value}") {|arg1| Bool.new(arg1.value == self.value)}
   end
   
   

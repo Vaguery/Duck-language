@@ -5,7 +5,7 @@ class Closure < Item
   attr_accessor :string_version
   
   
-  def initialize(closure,needs,string = nil)
+  def initialize(needs=[], string = nil, &closure)
     @closure = closure
     @needs = needs
     string ||= template_string
@@ -27,9 +27,9 @@ class Closure < Item
   def grab(object)
     if can_use?(object)
       if @needs.length > 1
-        Closure.new(@closure.curry[object],@needs.drop(1))
+        Closure.new(@needs.drop(1)) {@closure.curry[object]}
       else
-        @closure.curry[object]
+        @closure
       end
     else
       self

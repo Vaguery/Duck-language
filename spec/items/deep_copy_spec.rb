@@ -23,7 +23,7 @@ describe "Stack Item deep copy method" do
   end
   
   it "should work for Closures" do
-    i = Closure.new(Proc.new{|a| a.value + self.value},["be"],"foo")
+    i = Closure.new(["be"],"foo") {|a| a.value + self.value}
     j = i.deep_copy
     i.object_id.should_not == j.object_id
     i.value.should == j.value

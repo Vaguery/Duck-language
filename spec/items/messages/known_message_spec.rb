@@ -27,12 +27,14 @@ describe "Item" do
     it "should work for other subclasses of Item as expected" do
       Int.new.known.contents.length.should == Int.recognized_messages.length
       List.new.known.contents.length.should == List.recognized_messages.length
-      Closure.new(Proc.new {},[]).known.contents.length.should == Closure.recognized_messages.length
+      Closure.new([]) {}.known.contents.length.should == Closure.recognized_messages.length
     end
     
     
     describe "finicky bugs found" do
       it "should work in the previously buggy script" do
+        pending
+        
         d = DuckInterpreter.new("4 -7 shatter x x -3 known depth [] ) -5 ungreedy T x -6 know? x F T + greedy? quote pop quote x quote < -4 x reverse ≥ inc T x x x -7 swap ¬ - ungreedy -8 x if x")
         lambda do
           until d.script == ""

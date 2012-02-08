@@ -3,7 +3,7 @@ require_relative '../../spec_helper'
 describe "Closure" do
   describe ":zap message" do
     it "should be recognized by Closures" do
-      Closure.new(Proc.new {:foo},[],"").should respond_to(:zap)
+      Closure.new {:foo}.should respond_to(:zap)
     end
 
     it "should delete the closure" do

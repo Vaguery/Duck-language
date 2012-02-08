@@ -189,14 +189,12 @@ class DuckInterpreter
   end
   
   def []
-    @queue.unshift Closure.new(
-      Proc.new do |idx| 
-        index = idx.value.to_i
-        how_many = @stack.length
-        which = how_many == 0 ? 0 : index % how_many
-        @stack.delete_at(which)
-      end, ["inc"], "stack[?]")
-    
+    @queue.unshift Closure.new(["inc"], "stack[?]") do |idx| 
+      index = idx.value.to_i
+      how_many = @stack.length
+      which = how_many == 0 ? 0 : index % how_many
+      @stack.delete_at(which)
+    end
   end
   
   def reverse

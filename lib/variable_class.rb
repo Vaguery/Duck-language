@@ -30,11 +30,7 @@ class Variable < Item
   
   
   def rebind
-    Closure.new(
-      Proc.new {|new_value| Variable.new(@key, new_value)},
-      ["be"],
-      "#{@key}.bind(?)"
-    )
+    Closure.new(["be"],"#{@key}.bind(?)") {|new_value| Variable.new(@key, new_value)}
   end
   
   

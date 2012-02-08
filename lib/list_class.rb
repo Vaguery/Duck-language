@@ -20,18 +20,17 @@ class List < Item
   end
   
   def +
-    Closure.new(Proc.new {|other_list| List.new(other_list.contents + @contents)},
-      ["count"],"#{self.to_s}+(?)")
+    Closure.new(["count"],"#{self.to_s}+(?)") {|other_list| List.new(other_list.contents + @contents)}
   end
   
   def push
-    Closure.new(Proc.new {|item| List.new(@contents.clone<<item.clone)},
-      ["be"],"#{self.to_s}.push(?)")
+    Closure.new(["be"],"#{self.to_s}.push(?)") {|item| List.new(@contents.clone<<item.clone)}
   end
   
   def unshift 
-    Closure.new(Proc.new {|item| self.class.new(@contents.clone.unshift(item.deep_copy))},
-      ["be"],"#{self.to_s}.unshift(?)")
+    Closure.new(["be"],"#{self.to_s}.unshift(?)") do |item|
+      self.class.new(@contents.clone.unshift(item.deep_copy))
+    end
   end
   
   def shift # release the first item
@@ -72,104 +71,72 @@ class List < Item
   
   
   def []
-    Closure.new(
-      Proc.new do |idx| 
-        index = idx.value.to_i
-        how_many = self.contents.length
-        which = how_many == 0 ? 0 : index % how_many
-        self.contents[which].deep_copy unless how_many == 0
-      end, ["inc"], "#{self.to_s}[?]")
+    Closure.new(["inc"], "#{self.to_s}[?]") do |idx| 
+      index = idx.value.to_i
+      how_many = self.contents.length
+      which = how_many == 0 ? 0 : index % how_many
+      self.contents[which].deep_copy unless how_many == 0
+    end
   end
   
   
   def []=
-    Closure.new(
-      Proc.new do |idx,item|
-        index = idx.value.to_i
-        how_many = self.contents.length
-        which = how_many == 0 ? 0 : index % how_many
-        new_list = self.deep_copy
-        new_list.contents[which] = item.deep_copy
-        new_list
-      end,
-      ["inc","be"],
-      "(#{self.inspect}[?] = ?)"
-    )
+    Closure.new(['inc', 'be'],":I AM A []= CLOSURE") do |index, new_item|
+      new_contents = @contents.clone
+      new_contents[index] = new_item
+      List.new(new_contents)
+    end 
   end
   
   
   def give
-    Closure.new(
-      Proc.new do |item|
-        results = @contents.collect {|i| i.grab(item.deep_copy)}.flatten
-        new_contents = results.reject {|i| i.nil?}
-        List.new(new_contents)
-      end,
-      ["be"],
-      "give(#{self.inspect}, ?)"
-    )
+    Closure.new(["be"],"give(#{self.inspect}, ?)") do |item|
+      results = @contents.collect {|i| i.grab(item.deep_copy)}.flatten
+      new_contents = results.reject {|i| i.nil?}
+      List.new(new_contents)
+    end
   end
   
   
   def map
-    Closure.new(
-      Proc.new do |item|
-        results = @contents.collect {|i| item.deep_copy.grab(i.deep_copy)}.flatten
-        new_contents = results.reject {|i| i.nil?}
-        size = new_contents.inject("") {|rep,i| rep+(i.to_s)}.length
-        size < @@result_size_limit ? List.new(new_contents) : Error.new("OVERSIZE")
-      end,
-      ["be"],
-      "map(#{self.inspect}, ?)"
-    )
+    Closure.new(["be"],"map(#{self.inspect}, ?)") do |item|
+      results = @contents.collect {|i| item.deep_copy.grab(i.deep_copy)}.flatten
+      new_contents = results.reject {|i| i.nil?}
+      size = new_contents.inject("") {|rep,i| rep+(i.to_s)}.length
+      size < @@result_size_limit ? List.new(new_contents) : Error.new("OVERSIZE")
+    end
   end
   
   
   def useful
-    Closure.new(
-      Proc.new do |item|
-        results = @contents.group_by {|element| item.can_use?(element) ? "useful" : "unuseful"}
-        [self.class.new(results["useful"]||[]), self.class.new(results["unuseful"]||[])]
-      end,
-      ["be"],
-      "#useful({self.inspect}, ?)"
-    )
+    Closure.new(["be"],"#useful({self.inspect}, ?)") do |item|
+      results = @contents.group_by {|element| item.can_use?(element) ? "useful" : "unuseful"}
+      [self.class.new(results["useful"]||[]), self.class.new(results["unuseful"]||[])]
+    end
   end
   
   
   def users
-    Closure.new(
-      Proc.new do |item|
-        results = @contents.group_by {|element| element.can_use?(item) ? "users" : "nonusers"}
-        [List.new(results["users"]||[]), List.new(results["nonusers"]||[])]
-      end,
-      ["be"],
-      "#users({self.inspect}, ?)"
-    )
+    Closure.new(["be"],"#users({self.inspect}, ?)") do |item|
+      results = @contents.group_by {|element| element.can_use?(item) ? "users" : "nonusers"}
+      [List.new(results["users"]||[]), List.new(results["nonusers"]||[])]
+    end
   end
   
   
   def ∪
-    Closure.new(
-      Proc.new do |other_list|
-        aggregated = other_list.contents + @contents
-        self.class.new(aggregated.uniq {|element| element.inspect})
-      end,
-      ["count"],
-      "#{self.inspect} ∪ ?"
-    )
+    Closure.new(["count"],"#{self.inspect} ∪ ?") do |other_list|
+      aggregated = other_list.contents + @contents
+      self.class.new(aggregated.uniq {|element| element.inspect})
+    end
   end
   
   
   def ∩
-    Closure.new(
-      Proc.new do |other_list|
-        overlappers = other_list.contents.collect {|item| item.inspect}
-        self.class.new(@contents.select {|element| overlappers.include? element.inspect})
-      end,
-      ["count"],
-      "#{self.inspect} ∩ ?"
-    )
+    Closure.new(["count"],"#{self.inspect} ∩ ?") do |other_list|
+      overlappers = other_list.contents.collect {|item| item.inspect}
+      self.class.new(@contents.select {|element| overlappers.include? element.inspect})
+    end
   end
   
   
@@ -188,32 +155,24 @@ class List < Item
   end
   
   def snap
-    Closure.new(
-      Proc.new do |location|
-        if @contents.length > 0
-          where = location.value.to_i % @contents.length
-          [self.class.new(@contents[0...where]),self.class.new(@contents[where..-1])]
-        else
-          self
-        end
-      end,
-      ["inc"],
-      "snap#{self.inspect} at ?"
-    )
+    Closure.new(["inc"],"snap#{self.inspect} at ?") do |location|
+      if @contents.length > 0
+        where = location.value.to_i % @contents.length
+        [self.class.new(@contents[0...where]),self.class.new(@contents[where..-1])]
+      else
+        self
+      end
+    end
   end
   
   def rewrap_by
-    Closure.new(
-      Proc.new do |size|
-        slice_size = size.value.to_i
-        slice_size = @contents.length if slice_size < 1
-        @contents.empty? ?
+    Closure.new(["inc"], "rewrap#{self.inspect} by ?") do |size|
+      slice_size = size.value.to_i
+      slice_size = @contents.length if slice_size < 1
+      @contents.empty? ?
         self :
         @contents.each_slice(slice_size).collect {|chunk| self.class.new(chunk)}
-      end,
-      ["inc"],
-      "rewrap#{self.inspect} by ?"
-    )
+    end
   end
   
   

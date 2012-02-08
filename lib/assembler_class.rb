@@ -97,18 +97,15 @@ class Assembler < List
   #################
   
   def +
-    Closure.new(
-      Proc.new do |arg|
-        new_contents = @contents + arg.contents
-        new_buffer = @buffer
-        new_buffer += arg.buffer if arg.respond_to?(:buffer) # in case it's a List
-        result = Assembler.new(new_contents)
-        result.buffer = new_buffer
-        result
-      end,
-      ["count"],
-      "#{self.value} + ?"
-    )
+    Closure.new(["count"],"#{self.value} + ?") do |arg|
+      new_contents = @contents + arg.contents
+      new_buffer = @buffer
+      new_buffer += arg.buffer if arg.respond_to?(:buffer) # in case it's a List
+      result = Assembler.new(new_contents)
+      result.buffer = new_buffer
+      result
+    end
+    
   end
   
   def halt
@@ -120,21 +117,17 @@ class Assembler < List
   end
   
   def []=
-    Closure.new(
-      Proc.new do |idx,item|
-        index = idx.value.to_i
-        how_many = @contents.length + @buffer.length
-        which = (how_many == 0) ? 0 : index % how_many
-        
-        new_assembler = self.deep_copy
-        which < @contents.length ?
-          new_assembler.contents[which] = item.deep_copy :
-          new_assembler.buffer[which-@contents.length] = item.deep_copy
-        new_assembler
-      end,
-      ["inc","be"],
-      "(#{self.inspect}[?] = ?)"
-    )
+    Closure.new(["inc","be"],"(#{self.inspect}[?] = ?)") do |idx,item|
+      index = idx.value.to_i
+      how_many = @contents.length + @buffer.length
+      which = (how_many == 0) ? 0 : index % how_many
+      
+      new_assembler = self.deep_copy
+      which < @contents.length ?
+        new_assembler.contents[which] = item.deep_copy :
+        new_assembler.buffer[which-@contents.length] = item.deep_copy
+      new_assembler
+    end
   end
   
   def rotate
@@ -143,36 +136,32 @@ class Assembler < List
   
   
   def []
-    Closure.new(
-      Proc.new do |idx| 
-        index = idx.value.to_i
-        how_many = @contents.length + @buffer.length
-        which = how_many == 0 ? 0 : index % how_many
-        unless how_many == 0
-          if which < @contents.length
-            self.contents[which].deep_copy
-          else
-            self.buffer[which-@contents.length].deep_copy
-          end
+    Closure.new(["inc"], "#{self.to_s}[?]") do |idx| 
+      index = idx.value.to_i
+      how_many = @contents.length + @buffer.length
+      which = how_many == 0 ? 0 : index % how_many
+      unless how_many == 0
+        if which < @contents.length
+          self.contents[which].deep_copy
+        else
+          self.buffer[which-@contents.length].deep_copy
         end
-      end, ["inc"], "#{self.to_s}[?]")
+      end
+    end
   end
   
   
   def snap
-    Closure.new(
-      Proc.new do |location|
-        if @contents.length > 0
-          where = location.value.to_i % @contents.length
-          [self.class.new(@contents[0...where],[]),self.class.new(@contents[where..-1],@buffer)]
-        else
-          self
-        end
-      end,
-      ["inc"],
-      "snap#{self.inspect} at ?"
-    )
+    Closure.new(["inc"],"snap#{self.inspect} at ?") do |location|
+      if @contents.length > 0
+        where = location.value.to_i % @contents.length
+        [self.class.new(@contents[0...where],[]),self.class.new(@contents[where..-1],@buffer)]
+      else
+        self
+      end
+    end
   end
+  
   
   def flatten
     new_contents = @contents.inject([]) do |arr,item|
@@ -189,61 +178,45 @@ class Assembler < List
   end
   
   def rewrap_by
-    Closure.new(
-      Proc.new do |size|
-        slice_size = size.value.to_i
-        slice_size = @contents.length if slice_size < 1
-        if @contents.empty?
-          result = self
-        else
-          result = @contents.each_slice(slice_size).collect {|chunk| self.class.new(chunk)}
-          result[-1].buffer = @buffer
-        end
-        result
-      end,
-      ["inc"],
-      "rewrap#{self.inspect} by ?"
-    )
+    Closure.new(["inc"],"rewrap#{self.inspect} by ?") do |size|
+      slice_size = size.value.to_i
+      slice_size = @contents.length if slice_size < 1
+      if @contents.empty?
+        result = self
+      else
+        result = @contents.each_slice(slice_size).collect {|chunk| self.class.new(chunk)}
+        result[-1].buffer = @buffer
+      end
+      result
+    end
   end
   
   
   
   def ∩
-    Closure.new(
-      Proc.new do |arg|
-        other_contents = arg.contents.collect {|item| item.inspect}
-        other_buffer = arg.buffer.collect {|item| item.inspect} if arg.respond_to?(:buffer)
-        
-        Assembler.new(
-          @contents.select {|element| other_contents.include? element.inspect},
-          @buffer.select {|element| other_buffer.include? element.inspect})
-      end,
-      ["count"],
-      "#{self.inspect} ∩ ?"
-    )
+    Closure.new(["count"],"#{self.inspect} ∩ ?") do |arg|
+      other_contents = arg.contents.collect {|item| item.inspect}
+      other_buffer = arg.buffer.collect {|item| item.inspect} if arg.respond_to?(:buffer)
+      
+      Assembler.new(
+        @contents.select {|element| other_contents.include? element.inspect},
+        @buffer.select {|element| other_buffer.include? element.inspect})
+    end
   end
   
   def useful
-    Closure.new(
-      Proc.new do |item|
-        results = (@contents+@buffer).group_by {|element| item.can_use?(element) ? "useful" : "unuseful"}
-        [List.new(results["useful"]||[]), List.new(results["unuseful"]||[])]
-      end,
-      ["be"],
-      "#useful({self.inspect}, ?)"
-    )
+    Closure.new(["be"],"#useful({self.inspect}, ?)") do |item|
+      results = (@contents+@buffer).group_by {|element| item.can_use?(element) ? "useful" : "unuseful"}
+      [List.new(results["useful"]||[]), List.new(results["unuseful"]||[])]
+    end
   end
   
   
   def users
-    Closure.new(
-      Proc.new do |item|
-        results = (@contents+@buffer).group_by {|element| element.can_use?(item) ? "users" : "nonusers"}
-        [List.new(results["users"]||[]), List.new(results["nonusers"]||[])]
-      end,
-      ["be"],
-      "#users({self.inspect}, ?)"
-    )
+    Closure.new(["be"],"#users({self.inspect}, ?)") do |item|
+      results = (@contents+@buffer).group_by {|element| element.can_use?(item) ? "users" : "nonusers"}
+      [List.new(results["users"]||[]), List.new(results["nonusers"]||[])]
+    end
   end
   
   def swap
@@ -266,8 +239,9 @@ class Assembler < List
   end
   
   def unshift 
-    Closure.new(Proc.new {|item| Assembler.new(@contents.clone.unshift(item.deep_copy),@buffer)},
-      ["be"],"#{self.to_s}.unshift(?)")
+    Closure.new(["be"],"#{self.to_s}.unshift(?)") do |item|
+      Assembler.new(@contents.clone.unshift(item.deep_copy),@buffer)
+    end
   end
   
   def reverse
@@ -280,42 +254,30 @@ class Assembler < List
   end
   
   def ∪
-    Closure.new(
-      Proc.new do |other_list|
-        combined_contents = other_list.contents + @contents
-        combined_buffers = other_list.buffer + @buffer
-        self.class.new(combined_contents.uniq {|element| element.inspect},
-          combined_buffers.uniq {|element| element.inspect})
-      end,
-      ["count"],
-      "#{self.inspect} ∪ ?"
-    )
+    Closure.new(["count"],"#{self.inspect} ∪ ?") do |other_list|
+      combined_contents = other_list.contents + @contents
+      combined_buffers = other_list.buffer + @buffer
+      self.class.new(combined_contents.uniq {|element| element.inspect},
+        combined_buffers.uniq {|element| element.inspect})
+    end
   end
   
   
   def map
-    Closure.new(
-      Proc.new do |item|
-        results = (@contents+@buffer).collect {|i| item.deep_copy.grab(i.deep_copy)}.flatten
-        new_contents = results.reject {|i| i.nil?}
-        size = new_contents.inject("") {|rep,i| rep+(i.to_s)}.length
-        size < @@result_size_limit ? List.new(new_contents) : Error.new("OVERSIZE")
-      end,
-      ["be"],
-      "map(#{self.inspect}, ?)"
-    )
+    Closure.new(["be"],"map(#{self.inspect}, ?)") do |item|
+      results = (@contents+@buffer).collect {|i| item.deep_copy.grab(i.deep_copy)}.flatten
+      new_contents = results.reject {|i| i.nil?}
+      size = new_contents.inject("") {|rep,i| rep+(i.to_s)}.length
+      size < @@result_size_limit ? List.new(new_contents) : Error.new("OVERSIZE")
+    end
   end
   
   def give
-    Closure.new(
-      Proc.new do |item|
-        results = (@contents+@buffer).collect {|i| i.grab(item.deep_copy)}.flatten
-        new_contents = results.reject {|i| i.nil?}
-        List.new(new_contents)
-      end,
-      ["be"],
-      "give(#{self.inspect}, ?)"
-    )
+    Closure.new(["be"],"give(#{self.inspect}, ?)") do |item|
+      results = (@contents+@buffer).collect {|i| i.grab(item.deep_copy)}.flatten
+      new_contents = results.reject {|i| i.nil?}
+      List.new(new_contents)
+    end
   end
   
   def shatter

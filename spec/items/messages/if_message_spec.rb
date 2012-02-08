@@ -7,7 +7,7 @@ describe "Item" do
       [Int.new(192), 
         Bool.new(false), 
         Message.new("foo"),
-        Closure.new(Proc.new {:bar},[])].each do |i|
+        Closure.new {:bar}].each do |i|
         i.should respond_to(:if)
       end
     end

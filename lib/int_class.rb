@@ -8,37 +8,25 @@ class Int < Number
   
   
   def +
-    Closure.new(
-      Proc.new {|summand| type_cast_result(summand, :+)},
-      ["neg"],
-      "#{self.value} + ?")
+    Closure.new(["neg"],"#{self.value} + ?") {|summand| type_cast_result(summand, :+)}
   end
   
   
   def -
-    Closure.new(
-      Proc.new {|arg1| type_cast_result(arg1, :-)},
-      ["neg"],
-      "? - #{self.value}")
+    Closure.new(["neg"],"? - #{self.value}") {|arg1| type_cast_result(arg1, :-)}
   end
   
   
   def *
-    Closure.new(
-      Proc.new {|multiplier| type_cast_result(multiplier, :*)},
-      ["neg"],
-      "#{self.value} * ?")
+    Closure.new(["neg"], "#{self.value} * ?") {|multiplier| type_cast_result(multiplier, :*)}
   end
   
   
   def ÷
     if self.value != 0.0
-      Closure.new(
-        Proc.new {|numerator| type_cast_result(numerator, :/)},
-        ["neg"],
-        "? ÷ #{self.value}")
+      Closure.new(["neg"],"? ÷ #{self.value}") {|numerator| type_cast_result(numerator, :/)}
     else
-      Closure.new(Proc.new {|numerator| Error.new("DIV0")},["neg"],"? ÷ #{self.value}")
+      Closure.new(["neg"],"? ÷ #{self.value}") {|numerator| Error.new("DIV0")}
     end
   end
   
@@ -52,14 +40,11 @@ class Int < Number
   
   def copies
     i = self.value
-    Closure.new(
-      Proc.new do |item|
-        item.to_s.length * i <= @@result_size_limit ?
-        i.times.collect {|i| item.clone} :
-        Error.new("OVERSIZED RESULT")
-      end,
-      ["be"],
-      "#{i} of ?")
+    Closure.new(["be"],"#{i} of ?") do |item|
+      item.to_s.length * i <= @@result_size_limit ?
+      i.times.collect {|i| item.clone} :
+      Error.new("OVERSIZED RESULT")
+    end
   end
   
   def bundle

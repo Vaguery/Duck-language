@@ -18,7 +18,7 @@ describe "a Parser item" do
   
   
   it "should look different when it's 'active', with a needs array" do
-    Parser.new(Proc.new {}, ["lowercase"]).to_s.should == "π(?)"
+    Parser.new(["lowercase"]).to_s.should == "π(?)"
   end
   
   

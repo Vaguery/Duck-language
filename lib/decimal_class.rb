@@ -2,24 +2,24 @@
 class Decimal < Number
   def +
     needs = ["neg"]
-    Closure.new(Proc.new {|summand| Decimal.new(self.value + summand.value)},needs,"#{self.value} + ?")
+    Closure.new(needs,"#{self.value} + ?") {|summand| Decimal.new(self.value + summand.value)}
   end
   
   def -
     needs = ["neg"]
-    Closure.new(Proc.new {|arg1| Decimal.new(arg1.value - self.value)},needs,"? - #{self.value}")
+    Closure.new(needs,"? - #{self.value}") {|arg1| Decimal.new(arg1.value - self.value)}
   end
   
   def *
     needs = ["neg"]
-    Closure.new(Proc.new {|multiplier| Decimal.new(self.value * multiplier.value)},needs,"#{self.value} * ?")
+    Closure.new(needs,"#{self.value} * ?") {|multiplier| Decimal.new(self.value * multiplier.value)}
   end
   
   def ÷
     needs = ["neg"]
     self.value != 0 ? 
-      Closure.new(Proc.new {|numerator| Decimal.new(numerator.value / self.value)},needs,"? ÷ #{self.value}") :
-      Closure.new(Proc.new {|numerator| Error.new("DIV0")},needs,"? ÷ #{self.value}")
+      Closure.new(needs,"? ÷ #{self.value}") {|numerator| Decimal.new(numerator.value / self.value)}:
+      Closure.new(needs,"? ÷ #{self.value}") {|numerator| Error.new("DIV0")}
   end
   
   def trunc

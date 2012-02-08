@@ -23,25 +23,24 @@ class Parser < Closure
   @default_closure = Proc.new {}
   
   
-  def initialize(closure = Parser.default_closure, needs = [])
-    @closure = closure
+  def initialize(needs = [], &closure)
+    @closure = closure || Parser.default_closure
     @needs = needs
   end
   
   
   def step
-    closure = Proc.new do |script|
+    Parser.new(["lowercase"]) do |script|
       leader,token,remainder = script.value.partition(/\S+\s*/)
       result = [Parser.recognize(token.strip), Parser.new]
       result << Script.new(remainder) unless remainder == ""
       result
     end
-    Parser.new(closure,["lowercase"])
   end
   
   
   def parse
-    closure = Proc.new do |script|
+    Parser.new(["lowercase"]) do |script|
       tokens = []
       remainder = script.value
       while remainder.length > 0
@@ -50,7 +49,6 @@ class Parser < Closure
       end
       tokens
     end
-    Parser.new(closure,["lowercase"])
   end
   
   

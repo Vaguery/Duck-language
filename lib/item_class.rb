@@ -43,14 +43,13 @@ class Item
   end
   
   def if
-    Closure.new(Proc.new{|bool| bool.value ? self : Message.new("noop")},["¬"],"#{self.value} IF ?")
+    Closure.new(["¬"],"#{self.value} IF ?") {|bool| bool.value ? self : Message.new("noop")}
   end
   
   def know?
-    Closure.new(
-      Proc.new{|msg| Bool.new(self.class.recognized_messages.include?(msg.value))},
-      ["do"],
-      "#{self.value}.knows(?)")
+    Closure.new(["do"],"#{self.value}.knows(?)") do |msg|
+      Bool.new(self.class.recognized_messages.include?(msg.value))
+    end
   end
   
   # keep at end of class definition!
