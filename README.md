@@ -150,7 +150,6 @@ The Duck classes are provided as *self-contained abstractions*. As a matter of c
         - Message
         - Collector
         - Pipe
-        - Parser
     - Error
     - List
         - Assembler
