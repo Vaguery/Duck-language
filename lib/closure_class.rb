@@ -29,7 +29,7 @@ class Closure < Item
       if @needs.length > 1
         new_needs = @needs.drop(1)
         result = Closure.new(new_needs)
-        result.closure = @closure.curry[object] # this is a Ruby syntax workaround I hate
+        result.closure = @closure.curry[object] # this is a Ruby syntax workaround I am sorry about
         result
       else
         @closure.curry[object]
