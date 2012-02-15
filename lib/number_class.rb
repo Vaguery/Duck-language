@@ -1,33 +1,33 @@
 #encoding: utf-8
-class Number < Item
+module Duck
+  class Number < Item
+    duck_handle :< do
+      Closure.new(["neg"],"? < #{self.value}") {|arg1| Bool.new(arg1.value < self.value)}
+    end
   
-  def neg
-    self.class.new(-@value)
+  
+    duck_handle :≤ do
+      Closure.new(["neg"],"? ≤ #{self.value}") {|arg1| Bool.new(arg1.value <= self.value)}
+    end
+  
+  
+    duck_handle :≥ do
+      Closure.new(["neg"],"? ≥ #{self.value}") {|arg1| Bool.new(arg1.value >= self.value)}
+    end
+  
+  
+    duck_handle :> do
+      Closure.new(["neg"],"? > #{self.value}") {|arg1| Bool.new(arg1.value > self.value)}
+    end
+  
+  
+    duck_handle :eql do
+      Closure.new(["neg"],"? == #{self.value}") {|arg1| Bool.new(arg1.value == self.value)}
+    end
+  
+  
+    duck_handle :neg do
+      self.class.new(-@value)
+    end
   end
-  
-  def <
-    Closure.new(["neg"],"? < #{self.value}") {|arg1| Bool.new(arg1.value < self.value)}
-  end
-  
-  def ≤
-    Closure.new(["neg"],"? ≤ #{self.value}") {|arg1| Bool.new(arg1.value <= self.value)}
-  end
-  
-  def ≥
-    Closure.new(["neg"],"? ≥ #{self.value}") {|arg1| Bool.new(arg1.value >= self.value)}
-  end
-  
-  def >
-    Closure.new(["neg"],"? > #{self.value}") {|arg1| Bool.new(arg1.value > self.value)}
-  end
-  
-  def eql
-    Closure.new(["neg"],"? == #{self.value}") {|arg1| Bool.new(arg1.value == self.value)}
-  end
-  
-  # keep at end of class definition!
-  @recognized_messages = Item.recognized_messages + [:eql, :>, :<, :≥, :≤, :neg]
 end
-
-
-

@@ -4,12 +4,12 @@ require_relative '../../spec_helper'
 describe "List" do
   describe "the :pop message for Lists" do
     it "should be something a List recognizes" do
-      List.new.should respond_to(:pop)
+      List.recognized_messages.should include(:pop)
     end
 
     it "should produce an Array of results, a List and an item" do
       breaker = List.new
-      breaker.contents = [Int.new(8)]
+      breaker.contents = [int(8)]
       unshifted = breaker.pop
       unshifted.should be_a_kind_of(Array)
       unshifted[0].should be_a_kind_of(List)
@@ -17,18 +17,18 @@ describe "List" do
     end
 
     it "should produce the expected output" do
-      d = DuckInterpreter.new("( 1 2 ) pop").run
-      d.stack.inspect.should == "[(1), 2]"
+      d = interpreter(script:"( 1 2 ) pop").run
+      d.contents.inspect.should == "[(1), 2]"
     end
 
     it "should do nothing when received empty Lists (leaves the List intact)" do
-      d = DuckInterpreter.new("( ) pop").run
-      d.stack.inspect.should == "[()]"
+      d = interpreter(script:"( ) pop").run
+      d.contents.inspect.should == "[()]"
     end
 
     it "should work with nested Lists" do
-      d = DuckInterpreter.new("( ( 1 ) ( 2 ( 3 4 ) ) ) pop pop").run
-      d.stack.inspect.should == "[((1)), (2), (3, 4)]"
+      d = interpreter(script:"( ( 1 ) ( 2 ( 3 4 ) ) ) pop pop").run
+      d.contents.inspect.should == "[((1)), (2), (3, 4)]"
     end
   end
 end

@@ -8,7 +8,7 @@ describe "Script" do
     end
 
     it "should produce a new Script with the value downcased" do
-      lc = Script.new("Foo BAR").lowercase
+      lc = script("Foo BAR").lowercase
       lc.value.should == "foo bar"
     end
   end

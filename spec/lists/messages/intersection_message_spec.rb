@@ -4,33 +4,33 @@ require_relative '../../spec_helper'
 describe "List" do
   describe "the :∩ message for Lists" do
     it "should be something a List recognizes" do
-      List.new.should respond_to(:∩)
+      List.recognized_messages.should include(:∩)
     end
 
     it "should produce a closure looking for another List" do
       grabby = List.new.∩
       grabby.should be_a_kind_of(Closure)
-      grabby.needs.should == ["count"]
+      grabby.needs.should == ["shatter"]
     end
 
     it "should produce the expected output" do
-      d = DuckInterpreter.new("( 1 2 ) ( 2 3 4 ) ∩").run
-      d.stack.inspect.should == "[(2)]"
+      d = interpreter(script:"( 1 2 ) ( 2 3 4 ) ∩").run
+      d.contents.inspect.should == "[(2)]"
     end
 
     it "the Closure should be descriptive when printed" do
-      d = DuckInterpreter.new("( 1 2 3 ) ∩").run
-      d.stack.inspect.should == "[λ((1, 2, 3) ∩ ?,[\"count\"])]"
+      d = interpreter(script:"( 1 2 3 ) ∩").run
+      d.contents.inspect.should == "[λ((1, 2, 3) ∩ ?,[\"shatter\"])]"
     end
 
     it "should work with empty Lists" do
-      d = DuckInterpreter.new("( ) ( ) ∩").run
-      d.stack.inspect.should == "[()]"
+      d = interpreter(script:"( ) ( ) ∩").run
+      d.contents.inspect.should == "[()]"
     end
 
     it "should work with nested Lists" do
-      d = DuckInterpreter.new("( ( 1 ) 2 3 4 ) ( 3 ( 4 ) ) ∩").run
-      d.stack.inspect.should == "[(3)]"
+      d = interpreter(script:"( ( 1 ) 2 3 4 ) ( 3 ( 4 ) ) ∩").run
+      d.contents.inspect.should == "[(3)]"
     end
   end
 end

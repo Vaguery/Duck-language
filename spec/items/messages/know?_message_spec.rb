@@ -3,26 +3,23 @@ require_relative '../../spec_helper'
 describe "Item" do
   describe "the :know? message" do
     it "should be recognized by all Items" do
-      d = DuckInterpreter.new("1 F foo +").run
-      d.stack.each do |item|
-        item.should respond_to(:know?)
-      end
+      Item.recognized_messages.should include(:know?)
     end
 
     it "should return a Closure that wants something that responds to :do" do
-      d = DuckInterpreter.new("3 know?").run
-      d.stack[-1].needs.should == ["do"]
+      d = interpreter(script:"3 know?").run
+      d.contents[-1].needs.should == ["do"]
     end
 
     it "should return a Bool indicating whether the item recognizes that message" do
-      d = DuckInterpreter.new("3 know? inc").run
-      d.stack.inspect.should == "[T]"
-      d.reset("foo know? do").run.stack.inspect.should == "[T]"
+      d = interpreter(script:"3 know? inc").run
+      d.contents.inspect.should == "[T]"
+      interpreter(script:"foo know? do").run.contents.inspect.should == "[T]"
 
-      d.reset("3 know? do").run.stack.inspect.should == "[F]"
-      d.reset("foo know? inc").run.stack.inspect.should == "[F]"
+      interpreter(script:"3 know? do").run.contents.inspect.should == "[F]"
+      interpreter(script:"foo know? inc").run.contents.inspect.should == "[F]"
 
-      d.reset("know? know? do").run.stack.inspect.should == "[T]"
+      interpreter(script:"know? know? do").run.contents.inspect.should == "[T]"
       # go ahead, explain that one...
     end
   end

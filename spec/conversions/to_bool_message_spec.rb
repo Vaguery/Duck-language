@@ -7,13 +7,13 @@ describe "the :to_bool message" do
     end
     
     it "should produce a Bool item" do
-      Int.new(121).to_bool.should be_a_kind_of(Bool)
+      int(121).to_bool.should be_a_kind_of(Bool)
     end
     
     it "should have a value of true if non-negative, false if negative" do
-      Int.new(12).to_bool.value.should == true
-      Int.new(0).to_bool.value.should == true
-      Int.new(-3).to_bool.value.should == false
+      int(12).to_bool.value.should == true
+      int(0).to_bool.value.should == true
+      int(-3).to_bool.value.should == false
     end
   end
   
@@ -23,13 +23,13 @@ describe "the :to_bool message" do
     end
     
     it "should produce a Bool item" do
-      Decimal.new(12.3).to_bool.should be_a_kind_of(Bool)
+      decimal(12.3).to_bool.should be_a_kind_of(Bool)
     end
     
     it "should have a value of true if non-negative, false if negative" do
-      Decimal.new(12.0).to_bool.value.should == true
-      Decimal.new(0.0).to_bool.value.should == true
-      Decimal.new(-3.3).to_bool.value.should == false
+      decimal(12.0).to_bool.value.should == true
+      decimal(0.0).to_bool.value.should == true
+      decimal(-3.3).to_bool.value.should == false
     end
   end
 end

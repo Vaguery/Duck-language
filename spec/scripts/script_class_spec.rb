@@ -6,20 +6,25 @@ describe "the Script class" do
     Script.new.should be_a_kind_of(Item)
   end
   
+  it "should have a Duck shortcut" do
+    script.should be_a_kind_of(Script)
+    script("foo").value.should == "foo"
+  end
+  
   it "should have a @value" do
     Script.new.value.should == ""
-    Script.new("foo").value.should == "foo"
+    script("foo").value.should == "foo"
   end
   
   describe ":next_word" do
     it "should respond to :next_word by snipping off and returning its first word" do
-      s = Script.new("foo bar baz")
+      s = script("foo bar baz")
       s.next_word.should == "foo"
       s.inspect.should == "«bar baz»"
     end
     
     it "should work when there is leading space" do
-      s = Script.new(" \t\t\n foo bar baz")
+      s = script(" \t\t\n foo bar baz")
       s.next_word.should == "foo"
       s.inspect.should == "«bar baz»"
     end
@@ -33,7 +38,7 @@ describe "the Script class" do
   
   describe ":next_token" do
     it "should snip off the next word and return a parsed Duck token" do
-      s = Script.new("foo 12.34 F")
+      s = script("foo 12.34 F")
       s.next_token.should be_a_kind_of(Message)
       s.inspect.should == "«12.34 F»"
       s.next_token.should be_a_kind_of(Decimal)
@@ -46,9 +51,9 @@ describe "the Script class" do
   end
   
   it "should be represented on the Stack as being in guillemets" do
-    d = DuckInterpreter.new("")
-    d.queue.push Script.new("hi there")
+    d = interpreter(script:"")
+    d.buffer.push script("hi there")
     d.run
-    d.stack.inspect.should == "[«hi there»]"
+    d.contents.inspect.should == "[«hi there»]"
   end
 end

@@ -4,7 +4,7 @@ require_relative '../../spec_helper'
 describe "List" do
   describe "the :users message for Lists" do
     it "should be something Lists recognize" do
-      List.new.should respond_to(:users)
+      List.recognized_messages.should include(:users)
     end
 
     it "should produce a closure, looking for any item" do
@@ -13,23 +13,23 @@ describe "List" do
     end
 
     it "should produce two Lists, containing items that can use the external item, or not" do
-      d = DuckInterpreter.new("( - + ÷ foo ) 3 users").run
-      d.stack.inspect.should == "[(:-, :+, :÷), (:foo)]"
+      d = interpreter(script:"( - + ÷ foo ) 3 users").run
+      d.contents.inspect.should == "[(:-, :+, :÷), (:foo)]"
     end
 
     it "should produce two Lists when the thing isn't useful" do
-      d = DuckInterpreter.new("( foo bar baz ) foo users").run
-      d.stack.inspect.should == "[(), (:foo, :bar, :baz)]"
+      d = interpreter(script:"( foo bar baz ) foo users").run
+      d.contents.inspect.should == "[(), (:foo, :bar, :baz)]"
     end
 
     it "should produce two Lists when the item can be used by everything" do
-      d = DuckInterpreter.new("( + - - ) 8.1 users").run
-      d.stack.inspect.should == "[(:+, :-, :-), ()]"
+      d = interpreter(script:"( + - - ) 8.1 users").run
+      d.contents.inspect.should == "[(:+, :-, :-), ()]"
     end
 
     it "should work for empty Lists" do
-      d = DuckInterpreter.new("( ) 8 users").run
-      d.stack.inspect.should == "[(), ()]"
+      d = interpreter(script:"( ) 8 users").run
+      d.contents.inspect.should == "[(), ()]"
     end
   end
   

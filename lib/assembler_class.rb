@@ -1,301 +1,383 @@
 #encoding: utf-8
-class Assembler < List
-  # superclass has @contents
-  attr_accessor :buffer
-  attr_accessor :halted
+module Duck
   
-  
-  def initialize(contents = [], buffer = [])
-    @contents = contents
-    @buffer = buffer
-    @needs = []
-    @halted = false
+  def assembler(args = {})
+    Assembler.new(args)
   end
   
-  
-  def deep_copy
-    new_contents = @contents.collect {|i| i.deep_copy}
-    new_buffer = @buffer.collect {|i| i.deep_copy}
-    result = self.class.new(new_contents)
-    result.buffer = new_buffer
-    result.halted = @halted
-    result
-  end
-  
-  
-  def step
-    staged_item = @buffer.delete_at(0)
-    next_arg = index_of_next_useful_argument_for(staged_item)
-    if next_arg.nil?
-      wanted_by = index_of_next_item_that_wants(staged_item)
-      if wanted_by.nil?
-        @contents.push staged_item
-      else
-        curried_result = @contents.delete_at(wanted_by).grab(staged_item)
-        rebuffer_intermediate_result(curried_result)
-      end
-    else
-      curried_result = staged_item.grab(@contents.delete_at(next_arg))
-      rebuffer_intermediate_result(curried_result)
+  class Assembler < List
+    # superclass has @contents
+    attr_accessor :buffer
+    attr_accessor :halted
+    attr_accessor :ticks
+    attr_accessor :max_ticks
+    attr_accessor :greedy_flag
+    attr_accessor :staged_item
+    
+    
+    def initialize(args = {})
+      default_args = {
+        contents:[],
+        buffer:[]
+      }
+      args = default_args.merge(args)
+      @contents = args[:contents]
+      @buffer = args[:buffer]
+      @needs = []
+      @ticks = 0
+      @max_ticks = 6000
+      @halted = false
+      @greedy_flag = true
     end
-    self
-  end
-  
-  
-  def push(item)
-    item.class != Array ? @buffer.push(item) : @buffer += item
-    self.process_buffer
-    self
-  end
-  
-  
-  def index_of_next_useful_argument_for(some_item)
-    @contents.rindex {|arg| some_item.can_use?(arg)}
-  end
-  
-  
-  def index_of_next_item_that_wants(some_item)
-    @contents.rindex {|arg| arg.can_use?(some_item)}
-  end
-  
-  
-  def rebuffer_intermediate_result(result)
-    case
-    when result.kind_of?(Array)
-      @buffer = result + @buffer
-    when result.nil?
-      # do nothing
-    else
-      @buffer.unshift(result)
-    end
-  end
-  
-  
-  def process_buffer
-    until @buffer.empty? || @halted
-      self.step
-    end
-  end
-  
-  def run
-    @halted = false
-    self.process_buffer
-    self
-  end
-  
-  def to_s
-    rep = (@contents.inject("[") {|s,i| s+i.to_s+", "}).chomp(", ")
-    rep += @contents.empty? ? "::" : " ::"
-    rep += (@buffer.inject(" ") {|s,i| s+i.to_s+", "}).chomp(", ") unless @buffer.empty?
-    rep += "]"
-  end
-  
-  
-  #################
-  #
-  #  DUCK MESSAGES
-  #
-  #################
-  
-  def +
-    Closure.new(["count"],"#{self.value} + ?") do |arg|
-      new_contents = @contents + arg.contents
-      new_buffer = @buffer
-      new_buffer += arg.buffer if arg.respond_to?(:buffer) # in case it's a List
-      result = Assembler.new(new_contents)
-      result.buffer = new_buffer
+    
+    
+    def deep_copy
+      new_contents = @contents.collect {|i| i.deep_copy}
+      new_buffer = @buffer.collect {|i| i.deep_copy}
+      result = self.class.new(contents:new_contents, buffer:new_buffer)
+      result.halted = @halted
+      result.ticks = @ticks
+      result.max_ticks = @max_ticks
       result
     end
     
-  end
-  
-  def halt
-    @halted = true
-  end
-  
-  def count
-    Int.new(@contents.length + @buffer.length)
-  end
-  
-  def []=
-    Closure.new(["inc","be"],"(#{self.inspect}[?] = ?)") do |idx,item|
-      index = idx.value.to_i
-      how_many = @contents.length + @buffer.length
-      which = (how_many == 0) ? 0 : index % how_many
-      
-      new_assembler = self.deep_copy
-      which < @contents.length ?
-        new_assembler.contents[which] = item.deep_copy :
-        new_assembler.buffer[which-@contents.length] = item.deep_copy
-      new_assembler
+    
+    def next_contents_index_wanted_by(some_item)
+      @contents.rindex {|arg| some_item.can_use?(arg)}
     end
-  end
-  
-  def rotate
-    self.class.new(@contents.rotate(1), @buffer)
-  end
-  
-  
-  def []
-    Closure.new(["inc"], "#{self.to_s}[?]") do |idx| 
-      index = idx.value.to_i
-      how_many = @contents.length + @buffer.length
-      which = how_many == 0 ? 0 : index % how_many
-      unless how_many == 0
-        if which < @contents.length
-          self.contents[which].deep_copy
+    
+    
+    def next_contents_index_that_wants(some_item)
+      @contents.rindex {|arg| arg.can_use?(some_item)}
+    end
+    
+    
+    def rebuffer_intermediate_result(result)
+      case
+      when result.kind_of?(Array)
+        @buffer = result.compact + @buffer
+      when result.nil?
+        # do nothing
+      else
+        @buffer.unshift(result)
+      end
+    end
+    
+    
+    def process_buffer
+      until @buffer.empty? || @halted
+        process_next_buffer_item
+      end
+    end
+    
+    
+    def count_a_tick
+      @ticks += 1
+      if @ticks > @max_ticks
+        @staged_item = Error.new("over-complex: #{@ticks} ticks")
+        @halted = true
+      end
+    end
+    
+    
+    def rebuffer_result_when_staged_item_grabs_contents_item_at(position)
+      count_a_tick
+      curried_result = @staged_item.grab(@contents.delete_at(position))
+      rebuffer_intermediate_result(curried_result)
+    end
+    
+    
+    def rebuffer_result_when_staged_item_is_grabbed_by_contents_item_at(position)
+      count_a_tick
+      curried_result = @contents.delete_at(position).grab(@staged_item)
+      rebuffer_intermediate_result(curried_result)
+    end
+    
+    
+    def process_next_buffer_item
+      unless @buffer.empty?
+        @staged_item = @buffer.delete_at(0)
+        count_a_tick
+        next_arg_position = next_contents_index_wanted_by(@staged_item)
+        if next_arg_position.nil?
+          wanted_by_position = @greedy_flag ? next_contents_index_that_wants(@staged_item) : nil
+          if wanted_by_position.nil?
+            @contents.push @staged_item
+          else
+            rebuffer_result_when_staged_item_is_grabbed_by_contents_item_at wanted_by_position
+          end
         else
-          self.buffer[which-@contents.length].deep_copy
+          rebuffer_result_when_staged_item_grabs_contents_item_at next_arg_position
         end
       end
     end
-  end
-  
-  
-  def snap
-    Closure.new(["inc"],"snap#{self.inspect} at ?") do |location|
-      if @contents.length > 0
-        where = location.value.to_i % @contents.length
-        [self.class.new(@contents[0...where],[]),self.class.new(@contents[where..-1],@buffer)]
-      else
+    
+    
+    def to_s
+      rep = (@contents.inject("[") {|s,i| s+i.to_s+", "}).chomp(", ")
+      rep += @contents.empty? ? "::" : " ::"
+      rep += (@buffer.inject(" ") {|s,i| s+i.to_s+", "}).chomp(", ") unless @buffer.empty?
+      rep += "]"
+    end
+    
+    
+    #  DUCK MESSAGES
+    
+    duck_handle :[] do
+      Closure.new(["inc"], "#{self.to_s}[?]") do |idx| 
+        index = idx.value.to_i
+        how_many = @contents.length + @buffer.length
+        which = how_many == 0 ? 0 : index % how_many
+        unless how_many == 0
+          if which < @contents.length
+            self.contents[which].deep_copy
+          else
+            self.buffer[which-@contents.length].deep_copy
+          end
+        end
+      end
+    end
+    
+    duck_handle :[]= do
+      Closure.new(["inc","be"],"(#{self.inspect}[?] = ?)") do |index,item|
+        idx = index.value.to_i
+        how_many = @contents.length + @buffer.length
+        which = (how_many == 0) ? 0 : idx % how_many
+        
+        new_assembler = self.deep_copy
+        which < @contents.length ?
+          new_assembler.contents[which] = item.deep_copy :
+          new_assembler.buffer[which-@contents.length] = item.deep_copy
+        new_assembler
+      end
+    end
+    
+    
+    duck_handle :+ do
+      Closure.new(["shatter"],"#{self.value} + ?") do |arg|
+        @contents += arg.contents
+        @buffer += (arg.respond_to?(:buffer) ? arg.buffer : [])
         self
       end
     end
-  end
-  
-  
-  def flatten
-    new_contents = @contents.inject([]) do |arr,item|
-      case 
-      when item.kind_of?(Assembler)
-        arr + item.contents + item.buffer
-      when item.kind_of?(List)
-        arr + item.contents
-      else
-        arr << item
+    
+    
+    duck_handle :∩ do
+      Closure.new(["shatter"],"#{self.inspect} ∩ ?") do |arg|
+        other_contents = arg.contents.collect {|item| item.inspect}
+        other_buffer = arg.respond_to?(:buffer) ? arg.buffer.collect {|item| item.inspect} : []
+        @contents = @contents.select {|element| other_contents.include? element.inspect}
+        @buffer = @buffer.select {|element| other_buffer.include? element.inspect}
+        Assembler.new(contents:@contents, buffer:@buffer)
       end
     end
-    self.class.new(new_contents, @buffer)
-  end
-  
-  
-  def rewrap_by
-    Closure.new(["inc"],"rewrap#{self.inspect} by ?") do |size|
-      slice_size = size.value.to_i
-      slice_size = @contents.length if slice_size < 1
+    
+    
+    duck_handle :∪ do
+      Closure.new(["shatter"],"#{self.inspect} ∪ ?") do |arg|
+        combined_contents = arg.contents + @contents
+        combined_buffers = (arg.respond_to?(:buffer) ? arg.buffer : []) + @buffer
+        @contents = combined_contents.uniq {|element| element.inspect}
+        @buffer = combined_buffers.uniq {|element| element.inspect}
+        Assembler.new(contents:@contents, buffer:@buffer)
+      end
+    end
+    
+    
+    duck_handle :empty do
+      @contents = []
+      @buffer = []
+      self
+    end
+    
+    
+    duck_handle :flatten do
+      new_contents = @contents.inject([]) do |arr,item|
+        case 
+        when item.kind_of?(Interpreter)
+          arr + [item.binder] + item.contents + item.buffer + [item.script]
+        when item.kind_of?(Assembler)
+          arr + item.contents + item.buffer
+        when item.kind_of?(List)
+          arr + item.contents
+        else
+          arr << item
+        end
+      end
+      @contents = new_contents
+      self
+    end
+    
+    
+    duck_handle :give do
+      Closure.new(["be"],"give(#{self.inspect}, ?)") do |item|
+        results = (@contents+@buffer).collect {|i| i.grab(item.deep_copy)}.flatten.compact
+        List.new results
+      end
+    end
+    
+    
+    duck_handle :greedy do
+      @greedy_flag = true
+      self
+    end
+    
+    
+    duck_handle :greedy? do
+      Bool.new @greedy_flag
+    end
+    
+    
+    duck_handle :halt do
+      @halted = true
+      self
+    end
+    
+    
+    duck_handle :length do
+      Int.new (@contents + @buffer).length
+    end
+    
+    
+    duck_handle :map do
+      Closure.new(["be"],"map(#{self.inspect}, ?)") do |item|
+        results = (@contents+@buffer).collect {|i| item.deep_copy.grab(i)}.flatten.compact
+        size = results.inject("") {|rep,i| rep+(i.to_s)}.length
+        size < @@result_size_limit ? List.new(results) : Error.new("OVERSIZE")
+      end
+    end
+    
+    
+    duck_handle :pop do
       if @contents.empty?
-        result = self
+        self
       else
-        result = @contents.each_slice(slice_size).collect {|chunk| self.class.new(chunk)}
-        result[-1].buffer = @buffer
+        item = @contents.pop
+        return [self,item]
       end
-      result
     end
-  end
-  
-  
-  def ∩
-    Closure.new(["count"],"#{self.inspect} ∩ ?") do |arg|
-      other_contents = arg.contents.collect {|item| item.inspect}
-      other_buffer = arg.buffer.collect {|item| item.inspect} if arg.respond_to?(:buffer)
-      
-      Assembler.new(
-        @contents.select {|element| other_contents.include? element.inspect},
-        @buffer.select {|element| other_buffer.include? element.inspect})
+    
+    
+    duck_handle :push do
+      Closure.new(["be"],"#{self.to_s}.push(?)") do |item|
+        result = self.deep_copy
+        result.buffer << item.deep_copy
+        result.process_buffer
+        result
+      end
     end
-  end
-  
-  def useful
-    Closure.new(["be"],"#useful({self.inspect}, ?)") do |item|
-      results = (@contents+@buffer).group_by {|element| item.can_use?(element) ? "useful" : "unuseful"}
-      [List.new(results["useful"]||[]), List.new(results["unuseful"]||[])]
+    
+    
+    duck_handle :reverse do
+       @contents = @contents.reverse
+       self
     end
-  end
-  
-  
-  def users
-    Closure.new(["be"],"#users({self.inspect}, ?)") do |item|
-      results = (@contents+@buffer).group_by {|element| element.can_use?(item) ? "users" : "nonusers"}
-      [List.new(results["users"]||[]), List.new(results["nonusers"]||[])]
+    
+    
+    duck_handle :rewrap_by do
+      Closure.new(["inc"],"rewrap#{self.inspect} by ?") do |size|
+        slice_size = size.value.to_i
+        slice_size = @contents.length if slice_size < 1
+        if @contents.empty?
+          result = self
+        else
+          result = @contents.each_slice(slice_size).collect {|chunk| self.class.new(contents:chunk)}
+          result[-1].buffer = @buffer
+        end
+        result
+      end
     end
-  end
-  
-  def swap
-    if @contents.length > 1
-      new_contents = @contents.clone
-      new_contents[-1],new_contents[-2] = @contents[-2].clone,@contents[-1].clone
-      self.class.new(new_contents, @buffer)
-    else
+    
+    
+    duck_handle :rotate do
+      @contents = @contents.rotate(1)
       self
     end
-  end
-  
-  def pop # release the last item
-    if @contents.empty?
+    
+    
+    duck_handle :run do
+      @halted = false
+      self.process_buffer
       self
-    else
-      item = @contents.pop
-      return [Assembler.new(@contents,@buffer),item]
+    end
+    
+    
+    duck_handle :shatter do
+      @contents + @buffer
+    end
+    
+    
+    duck_handle :shift do
+      if @contents.empty?
+        self
+      else
+        released_item = @contents.delete_at(0)
+        [self,released_item]
+      end
+    end
+    
+    
+    duck_handle :snap do
+      Closure.new(["inc"],"snap#{self.inspect} at ?") do |location|
+        if @contents.length > 0
+          where = location.value.to_i % @contents.length
+          [self.class.new(contents:@contents[0...where],buffer:[]),
+            self.class.new(contents:@contents[where..-1],buffer:@buffer)]
+        else
+          self
+        end
+      end
+    end
+    
+    
+    duck_handle :step do
+      process_next_buffer_item
+      self
+    end
+    
+    
+    duck_handle :to_binder do
+      Binder.new @contents+@buffer
+    end
+    
+    
+    duck_handle :to_list do
+      List.new @contents+@buffer
+    end
+    
+    
+    duck_handle :to_interpreter do
+      Interpreter.new contents:@contents, buffer:@buffer
+    end
+    
+    
+    duck_handle :ungreedy do
+      @greedy_flag = false
+      self
+    end
+    
+    
+    duck_handle :unshift do
+      Closure.new(["be"],"#{self.to_s}.unshift(?)") do |item|
+        @contents.unshift item.deep_copy
+        self
+      end
+    end
+    
+    
+    duck_handle :useful do
+      Closure.new(["be"],"#useful({self.inspect}, ?)") do |item|
+        results = (@contents+@buffer).group_by {|element| item.can_use?(element) ? "useful" : "unuseful"}
+        [List.new(results["useful"]||[]), List.new(results["unuseful"]||[])]
+      end
+    end
+    
+    
+    duck_handle :users do
+      Closure.new(["be"],"#users({self.inspect}, ?)") do |item|
+        results = (@contents+@buffer).group_by {|element| element.can_use?(item) ? "users" : "nonusers"}
+        [List.new(results["users"]||[]), List.new(results["nonusers"]||[])]
+      end
     end
   end
-  
-  def unshift 
-    Closure.new(["be"],"#{self.to_s}.unshift(?)") do |item|
-      Assembler.new(@contents.clone.unshift(item.deep_copy),@buffer)
-    end
-  end
-  
-  def reverse
-    self.class.new(@contents.reverse, @buffer)
-  end
-  
-  def shift # release the first item
-    @contents.empty? ? self :
-      [self.class.new(@contents[1..-1],@buffer),@contents[0].deep_copy]
-  end
-  
-  def ∪
-    Closure.new(["count"],"#{self.inspect} ∪ ?") do |other_list|
-      combined_contents = other_list.contents + @contents
-      combined_buffers = other_list.buffer + @buffer
-      self.class.new(combined_contents.uniq {|element| element.inspect},
-        combined_buffers.uniq {|element| element.inspect})
-    end
-  end
-  
-  
-  def map
-    Closure.new(["be"],"map(#{self.inspect}, ?)") do |item|
-      results = (@contents+@buffer).collect {|i| item.deep_copy.grab(i.deep_copy)}.flatten
-      new_contents = results.reject {|i| i.nil?}
-      size = new_contents.inject("") {|rep,i| rep+(i.to_s)}.length
-      size < @@result_size_limit ? List.new(new_contents) : Error.new("OVERSIZE")
-    end
-  end
-  
-  def give
-    Closure.new(["be"],"give(#{self.inspect}, ?)") do |item|
-      results = (@contents+@buffer).collect {|i| i.grab(item.deep_copy)}.flatten
-      new_contents = results.reject {|i| i.nil?}
-      List.new(new_contents)
-    end
-  end
-  
-  def shatter
-    @contents + @buffer
-  end
-  
-  
-  
-  # special Assembler behaviors that differ from List:
-  # :push
-  # :+ (append-with-assembly)
-  # :give
-  # :map
-  
-  
-  # Lists do these [:count, :[], :empty, :reverse, :copy, :swap, :pop, :shift, :unshift, :shatter, :[]=, :useful, :users, :∪, :∩, :flatten, :snap, :rewrap_by, :rotate]
-  
-  # keep at end of class definition!
-  @recognized_messages = List.recognized_messages + [:push, :step, :run, :halt]
 end

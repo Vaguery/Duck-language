@@ -3,16 +3,16 @@ require_relative '../../spec_helper'
 describe "List" do
   describe "empty message" do
     before(:each) do
-      @d = DuckInterpreter.new("empty")
+      @d = interpreter(script:"empty")
     end
 
     it "should be recognized by List items" do
-      List.new.should respond_to(:empty)
+      List.recognized_messages.should include(:empty)
     end
 
     it "should queue the item's contents" do
-      @d.reset("( 1 2 ) empty").run
-      @d.stack.inspect.should == "[()]"
+      @d= interpreter(script:"( 1 2 ) empty").run
+      @d.contents.inspect.should == "[()]"
     end
 
     it "should work for an empty List" do

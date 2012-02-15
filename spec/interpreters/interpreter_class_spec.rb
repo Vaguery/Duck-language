@@ -2,36 +2,25 @@
 require_relative '../spec_helper'
 
 describe "Interpreter items" do
-  describe "initialization" do
+  describe "class hierarchy" do
     it "should be a subclass of Assembler" do
       Interpreter.new.should be_a_kind_of(Assembler)
     end
     
-    it "should allow a script to be passed in as a first arg" do
-      Interpreter.new("foo bar").script.inspect.should == "«foo bar»"
-    end
-    
-    it "should allow a stack array to be passed in" do
-      Interpreter.new("", [Int.new(9)]).contents.inspect.should == "[9]"
-    end
-    
-    it "should allow a buffer array to be passed in" do
-      Interpreter.new("", [], [Int.new(2)]).buffer.inspect.should == "[2]"
-    end
   end
   
   
   describe "processing" do
     describe ":next_token behavior" do
       it "should grab a word of the script and push it onto the buffer..." do
-        i = Interpreter.new("1 2 3")
+        i = interpreter(script:"1 2 3")
         i.stub!(:process_buffer) # blocks processing
         i.next_token
         i.inspect.should == "[:: 1 :: «2 3»]"
       end
       
       it "should clear the buffer like any Assembler would" do
-        i = Interpreter.new("1 2 3")
+        i = interpreter(script:"1 2 3")
         i.next_token
         i.inspect.should == "[1 :: :: «2 3»]"
       end
@@ -39,7 +28,7 @@ describe "Interpreter items" do
     
     describe ":step behavior" do
       it "should act like an Assembler, processing only one buffer item" do
-        i = Interpreter.new("1 2 3", [Int.new(111)], [Int.new(9999)])
+        i = interpreter(script:"1 2 3", contents:[int(111)], buffer:[int(9999)])
         i.inspect.should == "[111 :: 9999 :: «1 2 3»]"
         i.step
         i.inspect.should == "[111, 9999 :: :: «1 2 3»]"
@@ -48,14 +37,15 @@ describe "Interpreter items" do
     
     describe ":run behavior" do
       it "should process the buffer if it's not empty" do
-        i = Interpreter.new("", [], [Int.new(9), Int.new(10), Message.new("+")])
+        i = interpreter(script:"", buffer:[int(9), int(10), message("+")])
         i.stub!(:next_token) # blocks buffer handling, leaving things stuck there
         i.run
         i.inspect.should == "[19 :: :: «»]"
       end
       
       it "should stop when the script is gone and the buffer is empty" do
-        i = Interpreter.new("foo bar", [Int.new(3)], [Int.new(9), Int.new(10), Message.new("+")])
+        i = interpreter(script:"foo bar", contents:[int(3)],
+          buffer:[int(9), int(10), message("+")])
         i.run
         i.inspect.should == "[3, 19, :foo, :bar :: :: «»]"
       end
@@ -63,21 +53,78 @@ describe "Interpreter items" do
     
     describe ":halted Interpreters" do
       it "should just push items onto their buffers, without processing them" do
-        i = Interpreter.new("1 2 3", [Int.new(111)], [Int.new(9999)])
+        i = interpreter(script:"1 2 3", contents:[int(111)], buffer:[int(9999)])
         i.halt
-        i.push(Bool.new(false))
-        i.inspect.should == "[111 :: 9999, F :: «1 2 3»]"
-        i.halted = false
-        i.push(Bool.new(true))
-        i.inspect.should == "[111, 9999, F, T :: :: «1 2 3»]"
+        
+        d = interpreter(script:"F push", buffer:[i]).run
+        d.inspect.should == "[[111 :: 9999, F :: «1 2 3»] :: :: «»]" 
+      end
+    end
+    
+    describe "tick counting" do
+      it "should count every time any item is buffered or pushed to the contents" do
+        i = interpreter(script:"1 2 3 4 5 6").run
+        i.ticks.should == 6
+        
+        i = interpreter(contents:[int(3)]).run
+        i.ticks.should == 0
+        
+        i = interpreter(buffer:[int(3)]).run
+        i.ticks.should == 1
+        
+        i = interpreter(script:"1 2 +").run
+        i.ticks.should == 7
+      end
+      
+      it "should not run (but can #step) if ticks > max_ticks" do
+        i = interpreter(script:"1 2 3 4 5 6")
+        i.max_ticks = 3
+        i.run
+        i.inspect.should == "[1, 2, 3 :: :: «4 5 6»]"
+      end
+      
+      it "should halt infinite rebuffering loops" do
+        i = interpreter(script:"( 3 ) to_binder )") # "collect an infinite number of threes"
+        i.max_ticks = 13
+        i.run
+        i.inspect.should == "[:: err:[over-complex: 15 ticks] :: «»]"
       end
     end
   end
   
   
+  describe "greedy_flag " do
+    it "should be ON in a default interpreter" do
+      Interpreter.new.greedy_flag.should == true
+    end
+
+    it "should be resettable" do
+       d = Interpreter.new
+       d.greedy_flag = false
+       d.reset
+       d.greedy_flag.should == true
+    end
+
+    describe "behavior" do
+      it "should skip checking the staged item as an argument when set to false" do
+        ungreedy_interpreter = interpreter(script:"+ * 1 2 3")
+        if_it_were_greedy = ungreedy_interpreter.run.inspect
+        # "[5 :: :: «»]"  -> (1*2)+3
+        ungreedy_interpreter.reset
+        ungreedy_interpreter.greedy_flag = false
+        ungreedy_interpreter.run
+        ungreedy_interpreter.inspect.should_not == if_it_were_greedy
+        ungreedy_interpreter.inspect.should == "[:+, :*, 1, 2, 3 :: :: «»]"
+      end
+    end
+  end
+  
+  
+  
+  
   describe "visualization" do
     it "should look like an Assembler with an extra script displayed (at the end)" do
-      Interpreter.new("foo bar 1 2 +", [Int.new(9)], [Int.new(2)]).inspect.should == 
+      interpreter(script:"foo bar 1 2 +", contents:[int(9)], buffer:[int(2)]).inspect.should == 
         "[9 :: 2 :: «foo bar 1 2 +»]"
     end
     

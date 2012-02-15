@@ -4,7 +4,7 @@ require_relative '../../spec_helper'
 describe "List" do
   describe "the :map message for Lists" do
     it "should be something Lists recognize" do
-      List.new.should respond_to(:map)
+      List.recognized_messages.should include(:map)
     end
 
     it "should produce a closure, looking for any item" do
@@ -13,44 +13,37 @@ describe "List" do
     end
     
     it "should produce a new List that results from each List item grabbing the item" do
-      d = DuckInterpreter.new("( 2 3 4 ) - map").run
-      d.stack.inspect.should == "[(λ(? - 2,[\"neg\"]), λ(? - 3,[\"neg\"]), λ(? - 4,[\"neg\"]))]"
-    end
-    
-    it "should re deep_copies of each item" do
-      d = DuckInterpreter.new("( 3 2 ) * map").step.step.step.step.step
-      d.stack[0].contents[0].should_receive(:deep_copy).exactly(1).times.and_return(Int.new(3))
-      d.stack[0].contents[1].should_receive(:deep_copy).exactly(1).times.and_return(Int.new(2))
-      d.run
+      d = interpreter(script:"( 2 3 4 ) - map").run
+      d.contents.inspect.should == "[(λ(? - 2,[\"neg\"]), λ(? - 3,[\"neg\"]), λ(? - 4,[\"neg\"]))]"
     end
     
     
     it "should be possible to hand in multiple arguments sequentially and just have the salient ones connect" do
-      d = DuckInterpreter.new("( 1 2 3 4 ) * map 2 give").run
-      d.stack.inspect.should == "[(2, 4, 6, 8)]"
+      d = interpreter(script:"( 1 2 3 4 ) * map 2 give").run
+      d.contents.inspect.should == "[(2, 4, 6, 8)]"
     end
     
     it "should work for empty Lists" do
-      d = DuckInterpreter.new("( ) - map").run
-      d.stack.inspect.should == "[()]"
+      d = interpreter(script:"( ) - map").run
+      d.contents.inspect.should == "[()]"
     end
     
     it "should work when the result of a message is an Array of items" do
-      d = DuckInterpreter.new("( 0.62 ) map trunc").run
-      d.stack.inspect.should == "[(0, 0.62)]"
+      d = interpreter(script:"( 0.62 ) map trunc").run
+      d.contents.inspect.should == "[(0, 0.62)]"
     end
     
     it "should work when the result of a message is Nil" do
-      d = DuckInterpreter.new("( - ) zap map").run
-      d.stack.inspect.should == "[()]"
+      d = interpreter(script:"( - ) zap map").run
+      d.contents.inspect.should == "[()]"
     end
     
-    it "should work with Pipes" do
-      d = DuckInterpreter.new("( 1 2 3 4 )").run
-      d.stack.push(Collector.new(2))
-      d.script = "map foo give" # map the Collector to all items, then quickly give it the final "foo"
+    it "should work with Collectors (and Pipes, by extension)" do
+      d = interpreter(script:"( 1 2 3 4 )").run
+      d.contents.push(Collector.new(2))
+      d.script = script("map foo give") # map the Collector to all items, then quickly give it the final "foo"
       d.run
-      d.stack.inspect.should == "[((1, :foo), (2, :foo), (3, :foo), (4, :foo))]"
+      d.contents.inspect.should == "[((1, :foo), (2, :foo), (3, :foo), (4, :foo))]"
     end
   end
 end

@@ -4,21 +4,20 @@ require_relative '../../spec_helper'
 describe "Assembler" do
   describe ":rewrap_by" do
     it "should respond to :rewrap_by like a List does" do
-      d = DuckInterpreter.new("3 rewrap_by")
-      numbers = (0..10).collect {|i| Int.new(i*i)}
-      d.stack.push(Assembler.new(numbers))
+      numbers = (0..10).collect {|i| int(i*i)}
+      d = interpreter(script:"3 rewrap_by", contents:[assembler(contents:numbers)])
       d.run
-      d.stack.inspect.should == "[[0, 1, 4 ::], [9, 16, 25 ::], [36, 49, 64 ::], [81, 100 ::]]"
-      d.stack.each {|i| i.should be_a_kind_of(Assembler)}      
+      d.contents.inspect.should == "[[0, 1, 4 ::], [9, 16, 25 ::], [36, 49, 64 ::], [81, 100 ::]]"
+      d.contents.each {|i| i.should be_a_kind_of(Assembler)}      
     end
     
     it "should leave the buffer associated with the last result, and halt processing" do
-      d = DuckInterpreter.new("3 rewrap_by")
-      numbers = (3..10).collect {|i| Int.new(i*i)}
-      d.stack.push(Assembler.new(numbers, [Bool.new(false)]))
+      numbers = (3..10).collect {|i| int(i*i)}
+      d = interpreter(script:"3 rewrap_by",
+        contents:[assembler(contents:numbers, buffer:[bool(F)])])
       d.run
-      d.stack.inspect.should == "[[9, 16, 25 ::], [36, 49, 64 ::], [81, 100 :: F]]" 
-      d.stack.each {|i| i.should be_a_kind_of(Assembler)}      
+      d.contents.inspect.should == "[[9, 16, 25 ::], [36, 49, 64 ::], [81, 100 :: F]]" 
+      d.contents.each {|i| i.should be_a_kind_of(Assembler)}      
     end
   end
 end

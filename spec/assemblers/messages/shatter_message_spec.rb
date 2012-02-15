@@ -4,19 +4,17 @@ require_relative '../../spec_helper'
 describe "Assembler" do
   describe ":shatter" do
     it "should respond to :shatter like a List does" do
-      d = DuckInterpreter.new("shatter")
-      numbers = (0..10).collect {|i| Int.new(i*i)}
-      d.stack.push(Assembler.new(numbers))
+      numbers = (0..10).collect {|i| int(i*i)}
+      d = interpreter(script:"shatter",contents:[assembler(contents:numbers)])
       d.run
-      d.stack.inspect.should == "[0, 1, 4, 9, 16, 25, 36, 49, 64, 81, 100]"
+      d.contents.inspect.should == "[0, 1, 4, 9, 16, 25, 36, 49, 64, 81, 100]"
     end
     
     it "should release the buffered items as well" do
-      d = DuckInterpreter.new("shatter")
-      numbers = (0..10).collect {|i| Int.new(i*i)}
-      d.stack.push(Assembler.new(numbers, [Bool.new(false), Decimal.new(12.34)]))
+      numbers = (0..10).collect {|i| int(i*i)}
+      d = interpreter(script:"shatter",contents:[assembler(contents:numbers, buffer:[bool(F), decimal(12.34)])])
       d.run
-      d.stack.inspect.should == "[0, 1, 4, 9, 16, 25, 36, 49, 64, 81, 100, F, 12.34]"
+      d.contents.inspect.should == "[0, 1, 4, 9, 16, 25, 36, 49, 64, 81, 100, F, 12.34]"
     end
   end
 end

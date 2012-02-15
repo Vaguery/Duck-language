@@ -1,16 +1,19 @@
+#encoding: utf-8
 require_relative '../../spec_helper'
 
 describe "Interpreter" do
   describe ":empty" do
     it "should be recognized by Interpreter" do
-      DuckInterpreter.new.should respond_to(:empty)
+      Interpreter.recognized_messages.should include(:empty)
     end
-
-    it "should empty the stack entirely" do
-      d = DuckInterpreter.new("1 2 3 4 5 6 ( 7 8 )").run
-      d.stack.length.should  == 7
-      d.empty
-      d.stack.length.should == 0
+    
+    it "should clear the contents AND buffer, but not script" do
+      iwcbs = interpreter(
+        script:"foo bar baz",
+        contents:[int(1)]*10,
+        buffer:[bool(F)]*10)
+      iwcbs.script.should == iwcbs.empty.script
+      iwcbs.empty.inspect.should == "[:: :: «foo bar baz»]"
     end
   end
 end

@@ -7,13 +7,14 @@ describe "Assembler" do
       Assembler.recognized_messages.should include(:run)
     end
     
-    it "should process just one item from its buffer" do
-      wb = Assembler.new([Int.new(1), Int.new(2)], [Int.new(3), Int.new(4)])
+    it "should process all the items from its buffer" do
+      wb = assembler(contents:[int(1), int(2)], buffer:[int(3), int(4)])
       wb.run.inspect.should == "[1, 2, 3, 4 ::]"
     end
     
-    it "should stage the item fully and generate intermediate results, but not proceed" do
-      wb = Assembler.new([Message.new("*"), Message.new("+"),Int.new(1)], [Int.new(3), Int.new(4)])
+    it "should stage all buffered items fully and generate intermediate results" do
+      wb = assembler(contents:[message("*"), message("+"),int(1)],
+        buffer:[int(3), int(4)])
       wb.run.inspect.should == "[16 ::]"
     end
     

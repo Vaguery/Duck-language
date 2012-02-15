@@ -4,21 +4,22 @@ It's built to be easily extensible for domain modeling, and also non-brittle for
 
 ### Duck language features:
 
-* integer and floating-point arithmetic and numerical comparisons
-* boolean operators
 * stack-based, similar to Forth and Push
-* concatenative, like XY
-* passive collection structures (lists), and also more dynamic self-organizing collections (assemblers)
-* map/reduce and other list-based functional operations
+* strongly concatenative, like XY
 * uses _duck-typing_ to map arguments to function calls, not static type matching
 * uses [greedy] partial application to produce closures when objects respond to messages
+* integer and floating-point arithmetic and numerical comparisons
+* boolean operators
+* dynamic variable bindings
+* ordered collections (Lists)
+* special-purpose dynamic collections (Binders, Assemblers)
+* Interpreters, for recursive execution
+* higher-order functions (map, reduce, folds of various kinds)
 
 ### planned features (under [active development] (http://www.pivotaltracker.com/projects/448409))
 
-* local variable bindings
 * various modes of forking and recursion
 * string handling
-* higher-order functions
 * ranges and enumerators
 * lazy evaluation
 * direct programmatic manipulation of script text and queue items
@@ -147,12 +148,13 @@ The Duck classes are provided as *self-contained abstractions*. As a matter of c
 - Item
     - Bool
     - Closure
-        - Message
         - Collector
+        - Message
         - Pipe
     - Error
     - List
         - Assembler
+        - Binder
         - Interpreter
     - Number
         - Int

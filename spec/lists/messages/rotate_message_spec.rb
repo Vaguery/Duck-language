@@ -7,13 +7,13 @@ describe "List" do
     end
 
     it "should rotate the contents of the List" do
-      d = DuckInterpreter.new("( 1 2 3 4 5 ) rotate").run
-      d.stack.inspect.should == "[(2, 3, 4, 5, 1)]"
+      d = interpreter(script:"( 1 2 3 4 5 ) rotate").run
+      d.contents.inspect.should == "[(2, 3, 4, 5, 1)]"
     end
 
     it "should work for an empty List" do
-      d = DuckInterpreter.new("( ) rotate").run
-      d.stack.inspect.should == "[()]"
+      d = interpreter(script:"( ) rotate").run
+      d.contents.inspect.should == "[()]"
     end
   end
 end

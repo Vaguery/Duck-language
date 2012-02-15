@@ -1,5 +1,7 @@
+#encoding: utf-8
 require_relative '../lib/duck'
-require_relative './conveniences'
+require 'timeout'
+include Duck
 
 
 #   A trivial (and not at all smart!) implementation of genetic programming in Duck:
@@ -26,12 +28,22 @@ require_relative './conveniences'
 #   the implications might be apparent to GP practitioners.
 
 
+# first we add a simplifying convenience or two to the Interpreter class
+
+class Interpreter
+  def topmost_number
+    @contents.rindex {|item| item.kind_of?(Number)}
+  end
+end
+
+
 class Answer
   @@evaluations = 0
   attr_accessor :score
   attr_accessor :script
   attr_accessor :tokens
   attr_accessor :birth_order
+  
   
   def initialize(tokens)
     @tokens = tokens
@@ -60,18 +72,30 @@ class Answer
   
   
   def evaluate(x_y_pairs_hash={},out_file = nil)
-    residuals = x_y_pairs_hash.collect do |x,y|
-      d = DuckInterpreter.new(@script,{"x" => Int.new(x)}).run
-      observed_y_location = d.topmost_respondent("neg")
-      observed_y = observed_y_location.nil? ? 1000000 :
-        (x_y_pairs_hash[x] - d.stack[observed_y_location].value).abs
-    end
-    @score = residuals.inject(:+)
-    # EXERCISE (resonance) @score += rand(@score/100)
-    @@evaluations += 1
-    @birth_order = @@evaluations
-
-    out_file.puts "#{@@evaluations},#{self.score},#{self.script.length}" unless out_file.nil?
+      residuals = x_y_pairs_hash.collect do |x,y|
+        begin
+        Timeout::timeout(20) do
+          @d = Interpreter.new(script:@script,binder:{x:int(x)}).run
+        end
+        
+        observed_y_location = @d.topmost_number
+        observed_y_value = observed_y_location.nil? ? 1000000 :
+          (x_y_pairs_hash[x] - @d.contents[observed_y_location].value).abs
+        rescue Timeout::Error
+          puts "TIMEOUT evaluating #{@script.inspect} with x=#{x}, in state #{@d.inspect}"
+          raise
+        rescue
+          puts "ERROR evaluating #{@script.inspect} with x=#{x}, in state #{@d.inspect}"
+          raise
+        end  
+      end
+      @score = residuals.inject(:+)
+      @@evaluations += 1
+      @birth_order = @@evaluations
+      
+      
+      puts "#{@@evaluations},#{self.score},#{self.script.length}"
+      out_file.puts "#{@@evaluations},#{self.score},#{self.script.length}" unless out_file.nil?
   end
 end
 
@@ -89,17 +113,38 @@ end
 #
 #####
 
-SIMPLE_TOKENS = ["+","-","*","/","inc","dec","if"]+['k','k','k','x','x','x']*2  # EXERCISE (toolkit)
+SIMPLE_TOKENS = ["+","-","*","/","inc","dec","if"]+['k','b','f','x']*10  # EXERCISE (toolkit)
 NUMBERLESS_TOKENS = ["+","-","*","/","inc","dec"]+['x']*4  # EXERCISE (one hand tied)
-ALL_TOKENS = @all_functions+@biased_literals
+ALL_MESSAGES =
+  [Assembler,Binder,Bool,Closure,Collector,
+  Decimal,Error,Int,Interpreter,Item,List,
+  Message,Number,Pipe,Script,Variable].inject([]) {|messages,klass| (messages | klass.recognized_messages)}
 
-@experiment_tokens = ALL_TOKENS
+@experiment_tokens = ALL_MESSAGES + SIMPLE_TOKENS
 
-# EXERCISE (time and materials)
-pop_size = 200
+def random_tokens(how_many,source_list)
+  tokens = how_many.times.collect do
+    t = source_list.sample
+    case
+    when t=="k"
+      "#{(0..9).to_a.sample}"
+    when t=="b"
+      rand < 0.5 ? "T" : "F"
+    when t=="f"
+      val = "#{(0..9).to_a.sample}.#{(0..9).to_a.sample}"
+      rand < 0.5 ? val : "-#{val}"
+    else
+      t.to_s
+    end
+  end
+end
+
+
+pop_size = 100
 updates = pop_size*3
 cycles = 500
-population = pop_size.times.collect {Answer.new(random_tokens(30,@experiment_tokens))}
+standard_length = 45
+population = pop_size.times.collect {Answer.new(random_tokens(standard_length,@experiment_tokens))}
 
 File.open("./data/scores.csv", "w") do |tracefile|
 
@@ -107,45 +152,45 @@ File.open("./data/scores.csv", "w") do |tracefile|
   population.each do |a|
     a.evaluate(@x_y_values,tracefile) if a.score.nil?
   end
-
+  
   cycles.times do |c|
     population.sort_by! {|a| a.score}
     puts "# After #{c*updates} updates"
     population.each do |a|
       puts "# #{a.birth_order} : #{a.score} : #{a.script.inspect}"
     end
-
+  
     # EXERCISE (new blood)
     (pop_size-10..pop_size-6).each do |i|
-      population[i] = Answer.new(random_tokens(30,@experiment_tokens))
+      population[i] = Answer.new(random_tokens(standard_length,@experiment_tokens))
     end
-
+      
     # EXERCISE (polishing)
     template_source = rand(10)
     (pop_size-5..-1).each do |i|
       population[i] = Answer.new((population[template_source].script.gsub(/\d/) {|d| rand(10).to_s}).split)
     end
-
+      
     updates.times do |g|
       population.each do |a|
         a.evaluate(@x_y_values,tracefile) if a.score.nil?
       end
-
+      
       mom_index, dad_index = rand(pop_size), rand(pop_size)
       mom, dad = population[mom_index], population[dad_index]
-  
+      
       # EXERCISE (recombination)
       crossover1,crossover2 = mom.crossover_result(dad)
       baby1 = Answer.new(crossover1).mutant(3,@experiment_tokens) # EXERCISE (ontological creep)
       baby2 = Answer.new(crossover2).mutant(3,@experiment_tokens)
-  
+      
       baby1.evaluate(@x_y_values,tracefile)
       baby2.evaluate(@x_y_values,tracefile)
-
+      
       family = [baby1,baby2,mom,dad].sort_by {|a| a.score}  # EXERCISE (selection pressure)
       population[mom_index] = family[0]                     # EXERCISE (selection off)
       population[dad_index] = family[1]
     end
-
+  
   end
 end  # end of file writing

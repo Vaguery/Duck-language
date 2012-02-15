@@ -1,32 +1,58 @@
 #encoding: utf-8
-class Bool < Item
+module Duck
   
-  def ¬
-    Bool.new(!@value)
+  
+  class T; end
+  
+  class F; end  
+  
+  def bool(value)
+    value = true if value == T
+    value = false if value == F
+    Bool.new(value)
   end
   
-  def ∧
-    needs = ["¬"]
-    Closure.new(needs,"#{self.value} ∧ ?") {|arg2| Bool.new(self.value && arg2.value)}
-  end
   
-  def ∨
-    needs = ["¬"]
-    Closure.new(needs,"#{self.value} ∨ ?") {|arg2| Bool.new(self.value || arg2.value)}
-  end
+  class Bool < Item
+    def deep_copy
+      Bool.new(@value)
+    end
   
-  def to_int
-    Int.new(@value ? 1 : 0)
-  end
   
-  def to_decimal
-    Decimal.new(@value ? 1.0 : 0.0)
-  end
+    def to_s
+      "#{@value ? 'T' : 'F'}"
+    end
   
-  def to_s
-    "#{@value ? 'T' : 'F'}"
-  end
+    # DUCK METHODS
   
-  # keep at end of class definition!
-  @recognized_messages = Item.recognized_messages + [:¬, :∧, :∨, :to_int, :to_decimal]
+    duck_handle :¬ do
+      Bool.new(!@value)
+    end
+  
+  
+    duck_handle :∧ do
+      needs = ["¬"]
+      Closure.new(needs,"#{self.value} ∧ ?") {|arg2| Bool.new(self.value && arg2.value)}
+    end
+  
+    duck_handle :∨ do
+      needs = ["¬"]
+      Closure.new(needs,"#{self.value} ∨ ?") {|arg2| Bool.new(self.value || arg2.value)}
+    end
+    
+    
+    duck_handle :rand do
+      Bool.new(Random.rand() < 0.5 ? false : true)
+    end
+    
+    
+    duck_handle :to_decimal do
+      Decimal.new(@value ? 1.0 : 0.0)
+    end
+  
+  
+    duck_handle :to_int do
+      Int.new(@value ? 1 : 0)
+    end
+  end
 end
