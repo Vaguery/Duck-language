@@ -91,8 +91,18 @@ module Duck
       @contents = new_contents
       self
     end
-  
-  
+    
+    
+    duck_handle :fold_up do
+      @contents.inject {|memo, item| memo.grab(item)}
+    end
+    
+    
+    duck_handle :fold_down do
+      @contents.reverse.inject {|memo, item| memo.grab(item)}
+    end
+    
+    
     duck_handle :give do
       Closure.new(["be"],"give(#{self.inspect}, ?)") do |item|
         results = @contents.collect {|i| i.grab(item.deep_copy)}.flatten.compact
