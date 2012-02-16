@@ -92,5 +92,11 @@ module Duck
         Bool.new(self.class.recognized_messages.include?(msg.value))
       end
     end
+    
+    
+    duck_handle :wrap do
+      List.new( [self] )
+    end
+    
   end
 end
