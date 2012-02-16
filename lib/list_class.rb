@@ -94,12 +94,30 @@ module Duck
     
     
     duck_handle :fold_up do
-      @contents.inject {|memo, item| memo.grab(item)}
+      @contents.inject do |memo, item|
+        case
+          when memo.nil?
+            item
+          when memo.kind_of?(Array)
+            memo.collect {|branch| branch.grab(item)}.flatten.compact
+          else
+            memo.grab(item)
+          end
+      end
     end
     
     
     duck_handle :fold_down do
-      @contents.reverse.inject {|memo, item| memo.grab(item)}
+      @contents.reverse.inject do |memo, item|
+        case
+          when memo.nil?
+            item
+          when memo.kind_of?(Array)
+            memo.collect {|branch| branch.grab(item)}.flatten.compact
+          else
+            memo.grab(item)
+          end
+      end
     end
     
     

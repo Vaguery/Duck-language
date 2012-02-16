@@ -26,5 +26,21 @@ describe "List" do
     it "should work even when things don't technically #grab one another, since that's how grab works" do
       interpreter(contents:[list([int(9)]*7)], script:"fold_up").run.inspect.should == "[9 :: :: «»]"
     end
+    
+    it "should work when an intermediate result returns an Array" do
+      cause_havoc = list( [message("shatter"),
+        list( [message("trunc"), message("*"), message("foo")] ),
+        decimal(12.34)])
+      interpreter(contents:[cause_havoc]).inspect.should == "[(:shatter, (:trunc, :*, :foo), 12.34) :: :: «»]"
+      interpreter(contents:[cause_havoc], script:"fold_up").run.inspect.should ==
+        "[12, 4.195599999999998, :foo :: :: «»]"
+    end
+    
+    it "should work when an intermediate result returns nil" do
+      cause_havoc = list( [message("zap"), message("foo"), int(4)])
+      interpreter(contents:[cause_havoc]).inspect.should == "[(:zap, :foo, 4) :: :: «»]"
+      interpreter(contents:[cause_havoc], script:"fold_up").run.inspect.should == "[4 :: :: «»]"
+    end
+    
   end
 end
