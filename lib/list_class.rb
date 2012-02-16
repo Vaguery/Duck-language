@@ -128,13 +128,41 @@ module Duck
         size < @@result_size_limit ? List.new(results) : Error.new("OVERSIZE")
       end
     end
-  
-  
+    
+    
+    duck_handle :infold_down do
+      @contents.reverse.inject do |memo, item|
+        case
+          when memo.nil?
+            item
+          when memo.kind_of?(Array)
+            memo.collect {|branch| item.grab(branch)}.flatten.compact
+          else
+            item.grab(memo)
+          end
+      end
+    end
+    
+    
+    duck_handle :infold_up do
+      @contents.inject do |memo, item|
+        case
+          when memo.nil?
+            item
+          when memo.kind_of?(Array)
+            memo.collect {|branch| item.grab(branch)}.flatten.compact
+          else
+            item.grab(memo)
+          end
+      end
+    end
+    
+    
     duck_handle :length do
       Int.new(@contents.length)
     end
-  
-  
+    
+    
     duck_handle :map do
       Closure.new(["be"],"map(#{self.inspect}, ?)") do |item|
         new_contents = @contents.collect {|i| i.deep_copy}
