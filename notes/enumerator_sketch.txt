@@ -1,0 +1,49 @@
+:next
+:prev
+:run
+:halt
+:rewind
+:fast_forward
+:successor
+:zap (or something like it)
+
+
+
+
+"iterate over a range of integers"
+something like: int(a).through(int(b)) do |Local| Item
+  
+  creates an Enumerator
+  @index starts at int(a)
+  @index ends at int(b)
+  every step:
+    binds local:=int as a Variable
+    increments index
+    produces [self(updated), Variable, Item] in that order
+
+
+
+"iterate over a range of Decimals"
+something like: decimal(a).through(decimal(b)).int(c).times do |Local| Item
+
+    creates an Enumerator
+    @index starts at decimal(a)
+    @index ends at decimal(b)
+    @increment is |b-a|/int(c)
+    every step:
+      binds local:=@index as a Variable
+      increments index by one increment
+      produces [self(updated), Variable, Item] in that order
+
+
+"iterate over the elements of a list"
+something like: list.each do |local| Item
+  
+  creates an Enumerator
+  no @index used
+  every step:
+    snips off first (remaining) element of list
+    binds local:=element as a Variable
+    produces [self(updated), Variable, Item]
+    
+
