@@ -17,8 +17,15 @@ module Duck
       new_contents = @contents.collect {|i| i.deep_copy}
       self.class.new(new_contents)
     end
-  
-  
+    
+    
+    def emit!(msg)
+      reply = @contents.rindex {|item| item.recognize_message?(msg.intern)}
+      item = @contents.delete_at(reply) unless reply.nil?
+      item
+    end
+    
+    
     def to_s
       (@contents.inject("(") {|s,i| s+i.to_s+", "}).chomp(", ") + ")"
     end

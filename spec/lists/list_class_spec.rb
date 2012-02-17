@@ -33,6 +33,27 @@ describe "List objects" do
   end
   
   
+  describe "emit! method (a convenience for developers)" do
+    it "should delete and return the rightmost item responding to the arg message" do
+      will_work = list([int(1),int(2)])
+      will_work.emit!("inc").inspect.should == "2"
+      will_work.inspect.should == "(1)"
+    end
+    
+    it "should work with empty lists" do
+      wont_work = list()
+      wont_work.emit!("inc").should == nil
+      wont_work.inspect.should == "()"
+    end
+    
+    it "should return nil when there is no respondent" do
+      wont_work = list([int(3)])
+      wont_work.emit!("foo").should == nil
+      wont_work.inspect.should == "(3)"
+    end
+  end
+  
+  
   describe "needs" do
     it "should have no @needs" do
       List.new.needs.should == []
