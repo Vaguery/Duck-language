@@ -80,8 +80,21 @@ module Duck
       @contents = []
       self
     end
-  
-  
+    
+    
+    duck_handle :emit do
+      Closure.new(["do"], "#{self.inspect}.emit(?)") do |msg|
+        reply = @contents.rindex {|item| item.recognize_message?(msg.value)}
+        if reply.nil?
+          self
+        else
+          item = @contents.delete_at(reply)
+          [self, item]
+        end
+      end
+    end
+    
+    
     duck_handle :flatten do
       new_contents = @contents.inject([]) do |arr,item|
         item.kind_of?(List) ?
