@@ -139,17 +139,17 @@ module Duck
     end
     
     duck_handle :[]= do
-      Closure.new(["inc","be"],"(#{self.inspect}[?] = ?)") do |index,item|
-        idx = index.value.to_i
-        how_many = @contents.length + @buffer.length
-        which = (how_many == 0) ? 0 : idx % how_many
-        
-        new_assembler = self.deep_copy
-        which < @contents.length ?
-          new_assembler.contents[which] = item.deep_copy :
-          new_assembler.buffer[which-@contents.length] = item.deep_copy
-        new_assembler
-      end
+      Closure.new(['inc'], "(#{self.inspect}[?2] = ?1)") do |index|
+        Closure.new(['be'],"(#{self.inspect}[#{index}] = ?1)") do |new_item|
+          results = (@contents+@buffer).collect {|i| i.deep_copy}
+          idx = index.value.to_i
+          which = (results.length == 0) ? 0 : (idx % results.length)
+          results[which] = new_item.deep_copy
+          @contents = results[0...@contents.length]
+          @buffer = results[@contents.length..results.length]
+          self
+        end
+      end 
     end
     
     
