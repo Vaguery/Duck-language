@@ -24,30 +24,30 @@ module Duck
         Message.new(string) unless string.strip==""
       end
     end
-  
+    
     def init(value="")
       @value = value
     end
-  
+    
     def next_word
       leader,word,@value = @value.partition(/\S+\s*/)
       word.strip
     end
-  
+    
     def next_token
       Script.recognize(next_word)
     end
-  
+    
     def length
       @value.length
     end
-  
+    
     def to_s
       "«#{self.value}»"
     end
-  
+    
     # DUCK METHODS
-  
+    
     duck_handle :lowercase do
       Script.new(@value.downcase)
     end
