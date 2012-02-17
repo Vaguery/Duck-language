@@ -87,6 +87,11 @@ module Duck
     end
     
     
+    duck_handle :keep do
+      Binder.new [self]
+    end
+    
+    
     duck_handle :know? do
       Closure.new(["do"],"#{self.value}.knows(?)") do |msg|
         Bool.new(self.class.recognized_messages.include?(msg.value))

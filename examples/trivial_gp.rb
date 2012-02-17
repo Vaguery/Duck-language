@@ -74,7 +74,7 @@ class Answer
   def evaluate(x_y_pairs_hash={},out_file = nil)
       residuals = x_y_pairs_hash.collect do |x,y|
         begin
-        Timeout::timeout(20) do
+        Timeout::timeout(10) do
           @d = Interpreter.new(script:@script,binder:{x:int(x)}).run
         end
         
