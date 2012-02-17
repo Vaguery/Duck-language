@@ -18,33 +18,37 @@ module Duck
       @value = value
       @needs = []
     end
-  
+    
     def deep_copy
       self.clone
     end
-  
+    
     def grab(object)
       self
     end
-  
+    
     def recognize_message?(string)
       msg = string.intern
       self.class.recognized_messages.include?(msg) ||
         self.singleton_methods.include?(msg)
     end
-  
+    
+    def messages
+      self.class.recognized_messages | self.singleton_methods
+    end
+    
     def personally_recognizes?(string)
       recognize_message?(string)
     end
-  
+    
     def can_use?(object)
       !@needs.empty? && object.recognize_message?(@needs[0])
     end
-  
+    
     def to_s
       "#{self.class.to_s.downcase}(#{value})"
     end
-  
+    
     def self.duck_handle(name, &block)
       define_method(name, &block)
       @recognized_messages << name
@@ -77,8 +81,12 @@ module Duck
     end
     
     
-    duck_handle :known do
-      List.new(self.class.recognized_messages.collect {|msg| Message.new(msg)})
+    duck_handle "known[]".intern do
+      Closure.new(["inc"], "#{self.inspect}.known[?]") do |index|
+        which_one = index.value.to_i
+        how_many = self.messages.length
+        Message.new(messages[which_one % how_many])
+      end
     end
     
     

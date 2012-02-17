@@ -62,4 +62,14 @@ describe "Stack Item deep copy method" do
     end
   end
   
+  
+  describe "#messages call" do
+    it "should return the class messages" do
+      Bool.new(T).messages.should include(:above)
+    end
+    
+    it "should include the item's singleton methods, if any" do
+      Variable.new(:x, Int.new(9)).messages.should include(:x)
+    end
+  end
 end

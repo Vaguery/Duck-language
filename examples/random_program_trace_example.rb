@@ -39,4 +39,4 @@ def random_script(how_many, source_list=@everything)
 end
 
 
-interpreter(script:random_script(50), binder:{x:int(10)}).trace!.run
+# interpreter(script:random_script(50), binder:{x:int(10)}).trace!.run

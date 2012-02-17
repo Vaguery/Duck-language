@@ -35,7 +35,8 @@ describe "List" do
     end
 
     it "should work when the result of a message is an Array of items" do
-      d = interpreter(script:") known give -")
+      d = interpreter(script:"( trunc trunc ) give 1.25")
+      d.run.inspect.should == "[(1, 0.25, 1, 0.25) :: :: «»]"
       lambda { d.run }.should_not raise_error
     end
   end

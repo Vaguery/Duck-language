@@ -2,33 +2,42 @@
 require_relative '../../spec_helper'
 
 describe "Item" do
-  describe ":known" do
+  describe ":known[]" do
+    before(:each) do
+      @easier = "known[]".intern
+    end
     it "should be something Items recognize" do
-      Item.recognized_messages.should include(:known)
+      Item.recognized_messages.should include("known[]".intern)
     end
 
-    it "should produce a List" do
-      Item.new.known.should be_a_kind_of(List)
+    it "should produce a Closure, looking for an Int" do
+      Item.new.send(@easier).should be_a_kind_of(Closure)
     end
 
-    it "should contain Messages" do
-      Item.new.known.contents.each do |msg|
-        msg.should be_a_kind_of(Message)
-      end
-    end
-
-    it "should contain one Message for every thing the Item knows" do
-      Item.new.known.contents.length.should == Item.recognized_messages.length
-      Item.new.known.contents.each do |msg|
-        Item.recognized_messages.should include(msg.value)
-      end
-    end
-
-    it "should work for other subclasses of Item as expected" do
-      Int.new.known.contents.length.should == Int.recognized_messages.length
-      List.new.known.contents.length.should == List.recognized_messages.length
-      closure([]) {}.known.contents.length.should == Closure.recognized_messages.length
+    it "should result in a Message" do
+      show_me = interpreter(contents:[int(2), int(2)], script:"known[]")
+      show_me.run
+      show_me.inspect.should == "[:below :: :: «»]"
     end
     
-   end
+    it "should use the Int value modulo the number of messages known" do
+      list_length = int(3).messages.length
+      
+      show_me = interpreter(contents:[int(list_length), int(2)], script:"known[]")
+      show_me.run
+      show_me.contents[0].value.should == int(2).messages[0]
+    end
+    
+    it "should work for negatives" do
+      show_me = interpreter(contents:[int(-1), int(2)], script:"known[]")
+      show_me.run
+      show_me.contents[0].value.should == int(2).messages[-1]
+    end
+    
+    it "should work for 0" do
+      show_me = interpreter(contents:[int(0), int(2)], script:"known[]")
+      show_me.run
+      show_me.contents[0].value.should == int(2).messages[0]
+    end
+  end
 end
