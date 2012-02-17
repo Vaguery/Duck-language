@@ -11,6 +11,7 @@ module Duck
   require_relative './closure_class'
   require_relative './error_class'
   require_relative './message_class'
+  require_relative './local_class'
   require_relative './list_class'
   require_relative './assembler_class'
   require_relative './collector_class'

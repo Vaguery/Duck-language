@@ -35,16 +35,6 @@ module Duck
   
     # DUCK METHODS
   
-    duck_handle :bind do
-      Closure.new(["be"],"#{@value}.bind(?)") do |new_value|
-        if new_value.value == @value
-          Error.new("RECURSIVE VARIABLE")
-        else
-          Variable.new(@value, new_value)
-        end
-      end
-    end
-  
   
     duck_handle :do do
       self

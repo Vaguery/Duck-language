@@ -6,7 +6,7 @@ include Duck
 ARITHMETIC_TOKENS = ["+","-","*","/","inc","dec","if"] + ['k','f','x'] * 5
 ALL_MESSAGES =
   [Assembler,Binder,Bool,Closure,Collector,
-  Decimal,Error,Int,Interpreter,Item,List,
+  Decimal,Error,Int,Interpreter,Item,List,Local,
   Message,Number,Pipe,Script,Variable].inject([]) {|messages,klass| (messages | klass.recognized_messages)}
 
 @everything = 
