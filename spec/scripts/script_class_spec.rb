@@ -48,6 +48,12 @@ describe "the Script class" do
       s.next_token.should == nil
       s.value.should == ""
     end
+    
+    it "should return a Local when the string starts with an underscore" do
+      script("_foo").next_token.should be_a_kind_of(Local)
+      script("_1").next_token.should be_a_kind_of(Local)
+      script("_").next_token.should_not be_a_kind_of(Local)
+    end
   end
   
   it "should be represented on the Stack as being in guillemets" do

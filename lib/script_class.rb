@@ -10,7 +10,7 @@ module Duck
   
     def self.recognize(string)
       case string
-      when /^_/
+      when /^_[^_]/
         Local.new(string) unless string.strip==""
       when /^\)$/
         Pipe.new()

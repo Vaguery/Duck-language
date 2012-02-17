@@ -20,7 +20,7 @@ def random_tokens(how_many,source_list)
       val = "#{(0..9).to_a.sample}"
       rand < 0.5 ? val : "-#{val}"
     when t=="m" # some random message
-      "_#{('a'..'z').to_a.sample}#{('a'..'z').to_a.sample}#{('a'..'z').to_a.sample}"
+      "_#{('a'..'g').to_a.sample}"
     when t=="b" # some random boolean
       rand < 0.5 ? "T" : "F"
     when t=="f" # some random float
@@ -39,4 +39,4 @@ def random_script(how_many, source_list=@everything)
 end
 
 
-# interpreter(script:random_script(50), binder:{x:int(10)}).trace!.run
+interpreter(script:random_script(50), binder:{x:int(10)}).trace!.run
