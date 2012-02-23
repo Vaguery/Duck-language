@@ -74,7 +74,7 @@ class Answer
   def evaluate(x_y_pairs_hash={},out_file = nil)
       residuals = x_y_pairs_hash.collect do |x,y|
         begin
-        Timeout::timeout(10) do
+        Timeout::timeout(@script.length/5) do
           @d = Interpreter.new(script:@script,binder:{x:int(x)}).run
         end
         
@@ -143,7 +143,7 @@ end
 pop_size = 100
 updates = pop_size*3
 cycles = 500
-standard_length = 45
+standard_length = 100
 population = pop_size.times.collect {Answer.new(random_tokens(standard_length,@experiment_tokens))}
 
 File.open("./data/scores.csv", "w") do |tracefile|
@@ -180,7 +180,7 @@ File.open("./data/scores.csv", "w") do |tracefile|
       mom, dad = population[mom_index], population[dad_index]
       
       # EXERCISE (recombination)
-      crossover1,crossover2 = mom.crossover_result(dad)
+      crossover1,crossover2 = mom.crossover_result(dad, false)
       baby1 = Answer.new(crossover1).mutant(3,@experiment_tokens) # EXERCISE (ontological creep)
       baby2 = Answer.new(crossover2).mutant(3,@experiment_tokens)
       

@@ -48,7 +48,7 @@ module Duck
     def curry_the(object)
       begin
         @closure.clone.curry[object]
-      rescue NoMethodError, TypeError => e
+      rescue NoMethodError,TypeError => e
         Error.new("#{e.class.inspect}: #{e}")
       end
     end

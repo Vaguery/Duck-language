@@ -54,6 +54,21 @@ describe "the Assembler item" do
       i.run
       i.inspect.should == "[{3}, err:[over-complex: 1001 ticks] ::]"
     end
+    
+    it "should count steps made by Assemblers it contains" do
+      a = assembler(buffer:(0..9).collect {|i| int(i)})
+      a2 = assembler(buffer:[message(:run),a]).run
+      a2.ticks.should == 14
+    end
+    
+    it "should count steps made by Assemblers INSIDE Interpreters it contains" do
+      a = assembler(buffer:(0..9).collect {|i| int(i)})
+      i = interpreter(buffer:[message(:run),a])
+      a2 = assembler(buffer:[message(:run), i]).run
+      a2.inspect.should == "[[[0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ::] :: :: «»] ::]"
+      a2.ticks.should == 18
+    end
+    
   end
   
   describe "processing the buffer" do
@@ -118,7 +133,18 @@ describe "the Assembler item" do
       zapped = Assembler.new contents:[zapper], buffer:[message("zap")]
       lambda { zapped.run }.should_not raise_error
     end
+    
+    it "should work when there is a Binder staged, responding to a contents item" do
+      bound = assembler(contents:[message(:neg)], buffer:[Binder.new([int(3), int(4)])])
+      bound.run.inspect.should == "[{3, 4}, -4 ::]"
+    end
+    
+    it "should work when there is a Binder in the contents, responding to a staged item" do
+      bound = assembler(buffer:[message(:neg)], contents:[Binder.new([int(3), int(4)])])
+      bound.run.inspect.should == "[{3, 4}, -4 ::]"
+    end
   end
+  
   
   describe "the greedy_flag" do
     # should act as it did above

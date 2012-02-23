@@ -33,6 +33,16 @@ describe "Interpreter items" do
         i.step
         i.inspect.should == "[111, 9999 :: :: «1 2 3»]"
       end
+      
+      it "should work when there is a Binder staged, responding to a contents item" do
+        bound = interpreter(contents:[message(:neg)], buffer:[Binder.new([int(3), int(4)])])
+        bound.run.inspect.should == "[{3, 4}, -4 :: :: «»]"
+      end
+
+      it "should work when there is a Binder in the contents, responding to a staged item" do
+        bound = interpreter(buffer:[message(:neg)], contents:[Binder.new([int(3), int(4)])])
+        bound.run.inspect.should == "[{3, 4}, -4 :: :: «»]"
+      end
     end
     
     describe ":run behavior" do
@@ -74,6 +84,20 @@ describe "Interpreter items" do
         
         i = interpreter(script:"1 2 +").run
         i.ticks.should == 7
+      end
+      
+      it "should count steps made by Assemblers it contains" do
+        a = assembler(buffer:(0..9).collect {|i| int(i)})
+        i = interpreter(buffer:[message(:run),a]).run
+        i.ticks.should == 14
+      end
+      
+      it "should count steps made by Assemblers INSIDE Interpreters it contains" do
+        a = assembler(buffer:(0..9).collect {|i| int(i)})
+        i = interpreter(buffer:[message(:run),a])
+        i2 = interpreter(buffer:[message(:run), i]).run
+        i2.inspect.should == "[[[0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ::] :: :: «»] :: :: «»]"
+        i2.ticks.should == 18
       end
       
       it "should not run (but can #step) if ticks > max_ticks" do

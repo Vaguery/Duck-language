@@ -31,6 +31,10 @@ module Duck
       @value = value
     end
     
+    def empty?
+      @value.strip == ""
+    end
+    
     def next_word
       leader,word,@value = @value.partition(/\S+\s*/)
       word.strip
@@ -48,6 +52,9 @@ module Duck
       "«#{self.value}»"
     end
     
+    def deep_copy
+      Script.new(@value.clone)
+    end
     # DUCK METHODS
     
     duck_handle :lowercase do

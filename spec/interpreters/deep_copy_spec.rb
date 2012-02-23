@@ -28,19 +28,25 @@ describe "Interpreter" do
     end
     
     
-    describe "deep_copy" do
-      it "should transfer #ticks" do
-        a = interpreter(buffer:[int(3)]*122)
-        a.run
-        a.ticks.should == 122
-        a.deep_copy.ticks.should == 122
-      end
+    it "should make a NEW Proxy element in the new one" do
+      anti = @i.deep_copy
+      anti.binder.contents[0].value.object_id.should_not ==
+        @i.binder.contents[0].value.object_id
+      anti.binder.contents[0].should be_a_kind_of(Proxy)
+      anti.binder.contents[0].value.object_id.should == anti.object_id
+    end
+    
+    it "should transfer #ticks" do
+      a = interpreter(buffer:[int(3)]*122)
+      a.run
+      a.ticks.should == 122
+      a.deep_copy.ticks.should == 122
+    end
 
-      it "should transfer max_ticks" do
-        a = assembler
-        a.max_ticks = 9000
-        a.deep_copy.max_ticks.should == 9000
-      end
+    it "should transfer max_ticks" do
+      a = assembler
+      a.max_ticks = 9000
+      a.deep_copy.max_ticks.should == 9000
     end
   end
 end

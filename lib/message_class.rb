@@ -26,7 +26,8 @@ module Duck
         if object.personally_recognizes?(@value)
           @closure.curry[object]
         else
-          [object, @closure.curry[object.produce_respondent(value)]].flatten
+          results = [object, @closure.curry[object.produce_respondent(@value)]].flatten
+          results
         end
       else
         self

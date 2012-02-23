@@ -18,5 +18,8 @@ module Duck
   require_relative './pipe_class'
   require_relative './interpreter_class'
   require_relative './variable_class'
+  require_relative './span_class'
+  require_relative './iterator_class'
+  require_relative './proxy_class'
   require_relative './binder_class'
 end

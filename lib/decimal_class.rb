@@ -58,8 +58,15 @@ module Duck
     duck_handle :to_int do
       Int.new(self.value.to_i)
     end
-  
-  
+    
+    
+    duck_handle :to_span do
+      Closure.new(["trunc"],"(#{self.inspect}..?)") do |float|
+        Span.new(@value, float.value)
+      end
+    end
+    
+    
     duck_handle :trunc do
       [Int.new(self.value.to_i), Decimal.new(self.value-self.value.to_i)]
     end

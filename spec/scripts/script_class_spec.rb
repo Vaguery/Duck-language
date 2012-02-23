@@ -36,6 +36,13 @@ describe "the Script class" do
     end
   end
   
+  describe ":empty?" do
+    it "should check to see if the string is empty of words" do
+      script("    ").empty?.should == true
+      script("  f ").empty?.should == false
+    end
+  end
+  
   describe ":next_token" do
     it "should snip off the next word and return a parsed Duck token" do
       s = script("foo 12.34 F")
@@ -54,6 +61,7 @@ describe "the Script class" do
       script("_1").next_token.should be_a_kind_of(Local)
       script("_").next_token.should_not be_a_kind_of(Local)
     end
+    
   end
   
   it "should be represented on the Stack as being in guillemets" do

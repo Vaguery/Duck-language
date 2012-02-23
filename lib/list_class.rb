@@ -49,14 +49,20 @@ module Duck
           idx = index.value.to_i
           which = (results.length == 0) ? 0 : (idx % results.length)
           results[which] = new_item.deep_copy
-          List.new(results)
+          return_value = self.deep_copy
+          return_value.contents = results
+          return_value
         end
       end 
     end
   
   
     duck_handle :+ do
-      Closure.new(["shatter"],"#{self.to_s}+(?)") {|other_list| List.new(other_list.contents + @contents)}
+      Closure.new(["shatter"],"#{self.to_s}+(?)") do |other_list|
+        return_value = self.deep_copy
+        return_value.contents = @contents + other_list.contents
+        return_value
+      end
     end
   
   
@@ -229,7 +235,9 @@ module Duck
   
   
     duck_handle :rotate do
-      self.class.new(@contents.rotate(1))
+      return_value = self.deep_copy
+      return_value.contents = @contents.rotate(1)
+      return_value
     end
   
   
@@ -277,7 +285,7 @@ module Duck
     duck_handle :useful do
       Closure.new(["be"],"#useful(#{self.inspect}, ?)") do |item|
         results = @contents.group_by {|element| item.can_use?(element) ? "useful" : "unuseful"}
-        [self.class.new(results["useful"]||[]), self.class.new(results["unuseful"]||[])]
+        [List.new(results["useful"]||[]), List.new(results["unuseful"]||[])]
       end
     end
   
@@ -288,18 +296,18 @@ module Duck
         [List.new(results["users"]||[]), List.new(results["nonusers"]||[])]
       end
     end
-  
-  
+    
+    
     duck_handle :to_assembler do
       Assembler.new contents:@contents
     end
-  
-  
+    
+    
     duck_handle :to_binder do
       Binder.new @contents
-    end
-  
-  
+    end 
+    
+    
     duck_handle :to_interpreter do
       Interpreter.new contents:@contents
     end

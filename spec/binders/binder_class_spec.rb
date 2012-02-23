@@ -54,11 +54,13 @@ describe "Binder class" do
       
     end
     
-    it "should #produce_arg(msg) for any message its contents 'recognizes'" do
+    it "should return what you get tracing the path to an item inside it that recognizes a message" do
       @two_things.produce_respondent("¬").should be_a_kind_of(Bool)
+      @two_things.produce_respondent("¬").inspect.should == "F"
     end
     
     it "should be consumed if it responded itself to the message" do
+      @two_things.personally_recognizes?("length").should == true
       @two_things.produce_respondent("length").should == @two_things
     end
     
@@ -70,7 +72,27 @@ describe "Binder class" do
       d = interpreter(script:"* - - - * * + length ",contents:[Binder.new([int(8)])])
       d.run
       d.inspect.should == "[-3576, 1 :: :: «»]"
-      
+    end
+  end
+
+  
+  describe "nested Binders" do
+    it "should return the internal binder before returning itself" do
+      two_things = Binder.new([int(9), bool(F)])
+      and_one_more = Binder.new([two_things])
+      interpreter(script:"shatter", contents:[and_one_more]).run.inspect.should ==
+        "[{{9, F}}, 9, F :: :: «»]"
+    end
+    
+    it "should recognize a message even when an item INSIDE a nested Binder does so" do
+      nested = Binder.new([Binder.new([int(9)])])
+      nested.contains_an_arg_for?(message(:neg)).should == true
+    end
+    
+    it "should respond with the entire (depth-first) tree to the responding item" do
+      nested = Binder.new([Binder.new([int(9)])])
+      lots_of_responses = interpreter(contents:[nested], script:"neg").run
+      lots_of_responses.inspect.should == "[{{9}}, -9 :: :: «»]"
     end
   end
   

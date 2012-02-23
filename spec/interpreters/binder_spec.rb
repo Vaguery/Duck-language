@@ -15,7 +15,7 @@ describe "Interpreter" do
           ducky = Interpreter.new
           ducky.binder.contents << variable("x", int(9))
           ducky.binder.contents << variable("y", bool(F))
-          ducky.binder.inspect.should == "{:x=9, :y=F}"
+          ducky.binder.inspect.should == "{<PROXY>, :x=9, :y=F}"
         end
       end
       

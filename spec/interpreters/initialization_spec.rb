@@ -15,8 +15,9 @@ describe "new Duck interpreter" do
       Interpreter.new.buffer.should == []
     end
     
-    it "should have an empty binder" do
-      Interpreter.new.binder.contents.should == []
+    it "should have a binder that contains only a Proxy" do
+      Interpreter.new.binder.contents.length.should == 1
+      Interpreter.new.binder.contents[0].details.should include "↑(Duck::Interpreter="
     end
     
     it "should record all those as empty 'originals' for resetting" do
@@ -72,22 +73,33 @@ describe "new Duck interpreter" do
       v = variable("x",int(9))
       b = Binder.new( [v, bool(F)] )
       ibv = interpreter(binder:b)
-      ibv.binder.inspect.should == "{:x=9, F}"
+      ibv.binder.inspect.should == "{<PROXY>, :x=9, F}"
     end
     
     it "should let you pass in a Hash of key/value pairs that become Variables" do
       h = {x:int(11), "in_list" => list((0..10).collect {|i| int(i)})}
       ibh = interpreter(binder:h)
-      ibh.binder.inspect.should == "{:x=11, :in_list=(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)}"
+      ibh.binder.inspect.should == "{<PROXY>, :x=11, :in_list=(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)}"
     end
     
-    it "should save (a clone of) the initial binder for resetting" do
+    it "should save (a clone of) the initial binder for resetting, less the Proxy" do
       h = {x:int(11), y:bool(F)}
       ibh = interpreter(binder:h)
       (0..1).each do |i|
         ibh.binder.contents[i].object_id.should_not == ibh.initial_binder.contents[i].object_id
-        ibh.binder.contents[i].value.should == ibh.initial_binder.contents[i].value
+        ibh.binder.contents[i+1].value.should == ibh.initial_binder.contents[i].value
       end
+    end
+  end
+  
+  
+  describe "putting a little Proxy on the Binder" do
+    it "should have a Proxy (to the Interpreter itself) as the first element of its binder" do
+      Interpreter.new.binder.inspect.should == "{<PROXY>}"
+    end
+    
+    it "should not save the proxy to the saved initial state" do
+      Interpreter.new.initial_binder.inspect.should_not include "PROXY"
     end
   end
   

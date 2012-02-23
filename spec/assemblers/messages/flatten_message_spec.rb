@@ -40,7 +40,7 @@ describe "Assembler" do
       @d.contents[0].should be_a_kind_of(Assembler)
     end
     
-    it "should release the script and binder of an Interpreter it flattens away" do
+    it "should release the script and binder of an Interpreter it flattens away, but remove the PROXY" do
       an_interpreter = interpreter(script:"foo bar", 
         contents:[int(9)], buffer:[decimal(12.34)], binder:{x:bool(F)})
       contains_an_interpreter = Assembler.new contents:[an_interpreter]

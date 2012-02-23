@@ -53,13 +53,12 @@ module Duck
       define_method(name, &block)
       @recognized_messages << name
     end
-  
-  
-    ###############
-    #
+    
+    def give_ticks
+      0
+    end
+    
     # DUCK METHODS
-    #
-    ###############
     
     
     duck_handle :above do

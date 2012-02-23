@@ -51,15 +51,15 @@ describe "Interpreter" do
     it "should be possible to change bindings when resetting" do
       ducky = interpreter(script:"2 x +", binder:{x:int(12)})
       ducky.reset(script:"2 x +", binder:{x:int(33), y:bool(F)})
-      ducky.binder.inspect.should == "{:x=33, :y=F}"
+      ducky.binder.inspect.should == "{<PROXY>, :x=33, :y=F}"
     end
     
     it "should reset any temporary bindings established while running the previous state" do
       ducky = interpreter(script:"2 x +", binder:{x:int(12)})
       ducky.binder.contents << variable(:y, int(7)) # simulated a 'temp' value
-      ducky.binder.inspect.should == "{:x=12, :y=7}"
+      ducky.binder.inspect.should == "{<PROXY>, :x=12, :y=7}"
       ducky.reset
-      ducky.binder.inspect.should == "{:x=12}"
+      ducky.binder.inspect.should == "{<PROXY>, :x=12}"
     end
     
     

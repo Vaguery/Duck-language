@@ -5,7 +5,9 @@ module Duck
     Assembler.new(args)
   end
   
+  
   class Assembler < List
+    
     # superclass has @contents
     attr_accessor :buffer
     attr_accessor :halted
@@ -55,10 +57,12 @@ module Duck
     def rebuffer_intermediate_result(result)
       case
       when result.kind_of?(Array)
+        result.compact.each {|item| @ticks += item.give_ticks}
         @buffer = result.compact + @buffer
       when result.nil?
         # do nothing
       else
+        @ticks += result.give_ticks
         @buffer.unshift(result)
       end
     end
@@ -80,17 +84,24 @@ module Duck
     end
     
     
+    def give_ticks
+      recorded_ticks = @ticks
+      @ticks = 0
+      return recorded_ticks
+    end
+    
+    
     def rebuffer_result_when_staged_item_grabs_contents_item_at(position)
       count_a_tick
       curried_result = @staged_item.grab(@contents.delete_at(position))
-      rebuffer_intermediate_result(curried_result)
+      rebuffer_intermediate_result curried_result
     end
     
     
     def rebuffer_result_when_staged_item_is_grabbed_by_contents_item_at(position)
       count_a_tick
       curried_result = @contents.delete_at(position).grab(@staged_item)
-      rebuffer_intermediate_result(curried_result)
+      rebuffer_intermediate_result curried_result
     end
     
     
@@ -195,6 +206,7 @@ module Duck
       new_contents = @contents.inject([]) do |arr,item|
         case 
         when item.kind_of?(Interpreter)
+          item.binder.contents.delete_at(0)
           arr + [item.binder] + item.contents + item.buffer + [item.script]
         when item.kind_of?(Assembler)
           arr + item.contents + item.buffer
@@ -332,6 +344,11 @@ module Duck
     
     duck_handle :step do
       process_next_buffer_item
+      self
+    end
+    
+    
+    duck_handle :to_assembler do
       self
     end
     

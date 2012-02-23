@@ -1,17 +1,20 @@
-:next
-:prev
-:run
-:halt
-:rewind
-:fast_forward
-:successor
-:zap (or something like it)
+Special messages:
+  :step
+  :run
+  :halt
+  :reset
+  :ff
+  :contents
+  :start_value
+  :end_value
+  :index
+  :increment
+  - a bunch of List methods (:shatter, )
 
 
-
-
-"iterate over a range of integers"
-something like: int(a).through(int(b)) do |Local| Item
+SpanIterator
+  "iterate over a range of integers"
+  something like: int(a).through(int(b)) do |Local| Item
   
   creates an Enumerator
   @index starts at int(a)

@@ -86,13 +86,29 @@ module Duck
     end
     
     
+    duck_handle :times_do do
+      Closure.new(["be"], "#{self.inspect}.times_do(?)") do |item|
+        @value > 0 ?
+          [Iterator.new(start:0, end:@value, contents:[item]), Message.new("run")] :
+          self
+      end
+    end
+    
+    
     duck_handle :to_bool do
       Bool.new(@value.to_i >= 0)
     end
-  
-  
+    
+    
     duck_handle :to_decimal do
       Decimal.new(@value.to_f)
+    end
+    
+    
+    duck_handle :to_span do
+      Closure.new(["inc"],"(#{@value}..?)") do |int|
+        Span.new(@value, int.value)
+      end
     end
   end
 end

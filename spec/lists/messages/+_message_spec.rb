@@ -14,7 +14,7 @@ describe "List" do
     end
 
     it "should produce the expected output" do
-      d = interpreter(script:"( 1 2 ) ( 3 4 ) +").run
+      d = interpreter(script:"( 3 4 ) ( 1 2 ) +").run
       d.inspect.should == "[(1, 2, 3, 4) :: :: «»]"
     end
 
@@ -29,7 +29,7 @@ describe "List" do
     end
 
     it "should work with nested Lists" do
-      d = interpreter(script:"( ( 1 ) 2 ) ( 3 ( 4 ) ) +").run
+      d = interpreter(script:" ( 3 ( 4 ) ) ( ( 1 ) 2 ) +").run
       d.inspect.should == "[((1), 2, 3, (4)) :: :: «»]"
     end
   end
