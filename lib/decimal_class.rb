@@ -37,6 +37,11 @@ module Duck
     end
     
     
+    duck_handle :ceiling do
+      Decimal.new(@value.ceil)
+    end
+    
+    
     duck_handle :count do
       Iterator.new(start:0.0, end:@value, inc:1.0,:response => :index).run
     end
@@ -48,6 +53,10 @@ module Duck
       end
     end
     
+    
+    duck_handle :floor do
+      Decimal.new(@value.floor)
+    end
     
     
     duck_handle :rand do

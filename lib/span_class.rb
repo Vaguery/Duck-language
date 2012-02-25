@@ -39,5 +39,15 @@ module Duck
         bool(rubified_range.cover?(other_span.start_value) && rubified_range.cover?(other_span.end_value))
       end
     end
+    
+    
+    duck_handle :include? do
+      Closure.new(["neg"], "#{self.inspect}.include?(?)") do |num|
+        sorted = [@start_value,@end_value].sort
+        rubified_range = (sorted[0]..sorted[1])
+        Bool.new(rubified_range.cover? num.value)
+      end
+    end
+    
   end
 end

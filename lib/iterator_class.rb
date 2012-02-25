@@ -157,6 +157,8 @@ module Duck
     end
     
     
+    
+    
     duck_handle :step do
       if index_in_range?
         output_array = self.output_value
@@ -187,6 +189,12 @@ module Duck
     duck_handle :to_list do
       List.new(@contents.unshift Span.new(@start, @end))
     end
+    
+    
+    duck_handle :to_span do
+      Span.new(@start, @end)
+    end
+    
     
   end
 end
