@@ -117,8 +117,8 @@ SIMPLE_TOKENS = ["+","-","*","/","inc","dec","if"]+['k','b','f','x']*10  # EXERC
 NUMBERLESS_TOKENS = ["+","-","*","/","inc","dec"]+['x']*4  # EXERCISE (one hand tied)
 ALL_MESSAGES =
   [Assembler,Binder,Bool,Closure,Collector,
-  Decimal,Error,Int,Interpreter,Item,List,
-  Message,Number,Pipe,Script,Variable].inject([]) {|messages,klass| (messages | klass.recognized_messages)}
+  Decimal,Error,Int,Interpreter,Item,Iterator,List,Local,
+  Message,Number,Pipe,Proxy,Script,Span,Variable].inject([]) {|messages,klass| (messages | klass.recognized_messages)}
 
 @experiment_tokens = ALL_MESSAGES + SIMPLE_TOKENS
 
@@ -140,10 +140,10 @@ def random_tokens(how_many,source_list)
 end
 
 
-pop_size = 100
+pop_size = 50
 updates = pop_size*3
 cycles = 500
-standard_length = 100
+standard_length = 40
 population = pop_size.times.collect {Answer.new(random_tokens(standard_length,@experiment_tokens))}
 
 File.open("./data/scores.csv", "w") do |tracefile|
@@ -180,7 +180,7 @@ File.open("./data/scores.csv", "w") do |tracefile|
       mom, dad = population[mom_index], population[dad_index]
       
       # EXERCISE (recombination)
-      crossover1,crossover2 = mom.crossover_result(dad, false)
+      crossover1,crossover2 = mom.crossover_result(dad)
       baby1 = Answer.new(crossover1).mutant(3,@experiment_tokens) # EXERCISE (ontological creep)
       baby2 = Answer.new(crossover2).mutant(3,@experiment_tokens)
       

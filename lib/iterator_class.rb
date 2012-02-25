@@ -8,6 +8,7 @@ module Duck
     attr_accessor :index
     attr_accessor :contents
     attr_accessor :min_value, :max_value
+    attr_accessor :response
     
     def initialize(args = {})
       default_args = {start:0, end:0, inc:1, index:nil}
@@ -23,6 +24,7 @@ module Duck
         end 
       @index = args[:index] || @start
       @contents = args[:contents] || []
+      @response = args[:response] || :contents
       @min_value,@max_value = [@start,@end].minmax
       @needs = []
     end
@@ -34,20 +36,24 @@ module Duck
         end:@end,
         inc:@inc,
         index:@index,
-        contents:@contents.collect {|item| item.deep_copy}
+        contents:@contents.collect {|item| item.deep_copy},
+        response:@response,
       )
     end
     
     
     def to_s
-      "(#{@start}..#{@index}..#{@end})=>#{@contents.inspect}"
+      rounded_index = @index.kind_of?(Float) ? "~(#{@index.round(3)})" : "#{@index}"
+      return "(#{@start}..#{rounded_index}..#{@end})=>#{@contents}"
     end
+    
     
     def index_in_range?
       @start < @end ?
       @min_value <= @index && @index < @max_value :
       @min_value < @index && @index <= @max_value 
     end
+    
     
     def reset_index_within_range
       if !index_in_range?
@@ -56,14 +62,48 @@ module Duck
       end
     end
     
+    
+    def output_value
+      case @response
+      when :element
+        output =  @contents.empty? ? [] : [@contents[@index % @contents.length].deep_copy]
+      when :index
+        output = @index.kind_of?(Float) ? [Decimal.new(@index)] : [Int.new(@index)]
+      else
+        output = @contents.collect {|item| item.deep_copy}
+      end
+      return output
+    end
+    
+    
     # DUCK HANDLERS
     
     
     duck_handle :∪ do
       Closure.new(["shatter"], "#{self.inspect} ∪ ?") do |listy_thing|
-        aggregated = listy_thing.contents + @contents
+        result_iterator = self.deep_copy
+        aggregated = listy_thing.contents + result_iterator.contents
         unionized = aggregated.uniq {|element| element.inspect}
-        @contents = unionized
+        result_iterator.contents = unionized
+        result_iterator
+      end
+    end
+    
+    
+    duck_handle :again do
+      if index_in_range?
+        output_array = self.output_value
+        output_array.unshift(self)
+      else
+        reset_index_within_range
+        self
+      end
+    end
+    
+    
+    duck_handle :index= do
+      Closure.new(["neg"], "#{self.inspect}.index=?") do |int|
+        @index = int.value
         self
       end
     end
@@ -119,9 +159,9 @@ module Duck
     
     duck_handle :step do
       if index_in_range?
-        output = @contents.collect {|item| item.deep_copy}
+        output_array = self.output_value
         @index += @actual_inc
-        output.unshift(self)
+        output_array.unshift(self)
       else
         reset_index_within_range
         self

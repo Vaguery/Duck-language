@@ -1,10 +1,10 @@
 #encoding:utf-8
-
-def list(contents=[])
-  List.new(contents)
-end
-
 module Duck
+  def list(contents=[])
+    List.new(contents)
+  end
+  
+  
   class List < Item
     attr_accessor :contents
   
@@ -19,8 +19,12 @@ module Duck
     end
     
     
-    def emit!(msg)
-      reply = @contents.rindex {|item| item.recognize_message?(msg.intern)}
+    def emit!(key)
+      if key.class == String
+        reply = @contents.rindex {|item| item.recognize_message?(key.intern)}
+      elsif key.class == Class
+        reply = @contents.rindex {|item| item.kind_of?(key)}
+      end
       item = @contents.delete_at(reply) unless reply.nil?
       item
     end
@@ -87,8 +91,13 @@ module Duck
       @contents << @contents[-1].deep_copy unless @contents.empty?
       self
     end
-  
-  
+    
+    
+    duck_handle :each do
+      Iterator.new(start:0, end:@contents.length, :response => :element, contents:@contents).run
+    end
+    
+    
     duck_handle :empty do
       @contents = []
       self
@@ -119,13 +128,15 @@ module Duck
     end
     
     
-    duck_handle :fold_up do
-      @contents.inject do |memo, item|
+    duck_handle :fold_down do
+      @contents.reverse.inject do |memo, item|
         case
           when memo.nil?
             item
           when memo.kind_of?(Array)
-            memo.collect {|branch| branch.grab(item)}.flatten.compact
+            memo.collect do |branch|
+              branch.nil? ? item : branch.grab(item)
+            end.flatten.compact
           else
             memo.grab(item)
           end
@@ -133,13 +144,15 @@ module Duck
     end
     
     
-    duck_handle :fold_down do
-      @contents.reverse.inject do |memo, item|
+    duck_handle :fold_up do
+      @contents.inject do |memo, item|
         case
           when memo.nil?
             item
           when memo.kind_of?(Array)
-            memo.collect {|branch| branch.grab(item)}.flatten.compact
+            memo.collect do |branch|
+              branch.nil? ? item : branch.grab(item)
+            end.flatten.compact
           else
             memo.grab(item)
           end

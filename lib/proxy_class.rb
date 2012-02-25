@@ -28,6 +28,14 @@ module Duck
     end
     
     
+    duck_handle "^greedy=".intern do
+      Closure.new(["¬"], "<INTERPRETER>.greedy=(?)") do |bool|
+        @value.greedy_flag = bool.value
+        nil
+      end
+    end
+    
+    
     duck_handle "^length".intern do
       @value.length
     end
@@ -36,7 +44,10 @@ module Duck
     duck_handle "^quote".intern do
       Closure.new(["inc"], "<SCRIPT>.quote(?)") do |int|
         how_many = int.value
-        new_string = how_many.times.inject("") {|memo,word| memo + " #{@value.script.next_word}"}
+        new_string = how_many.times.inject("") do |memo,word|
+          break memo if @value.script.value.strip.empty?
+          memo + " #{@value.script.next_word}"
+        end
         Script.new(new_string.strip)
       end
     end
@@ -45,7 +56,7 @@ module Duck
     duck_handle "^rescript".intern do
       Closure.new(["lowercase"], "<SCRIPT>.prepend(?)") do |other_script|
         old_script = @value.script.value
-        if other_script.length + old_script.length < 32000
+        if other_script.length + old_script.length < 20000
           @value.script = Script.new(other_script.value + " " + old_script)
           nil
         else
@@ -58,5 +69,11 @@ module Duck
     duck_handle "^script".intern do
       @value.script.deep_copy
     end
+    
+    
+    duck_handle "^ticks".intern do
+      Int.new( @value.ticks )
+    end
+    
   end
 end

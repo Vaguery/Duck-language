@@ -22,7 +22,7 @@ describe "Iterator" do
     
     
     describe ":+" do
-      it "should respond to :+ as a List does, concatenating the contents" do
+      it "should respond to :+ as a List does, concatenating the contents into itself" do
         itty = Iterator.new(start:3, end:11, contents:[bool(F), message(:foo), int(-99)])
         bitty = Iterator.new(start:1, end:-22, contents:[message(:bar)])
         
@@ -226,8 +226,5 @@ describe "Iterator" do
           "[(:*, λ(2 + ?,[\"neg\"])), (:length) :: :: «»]"
       end
     end
-    
-    
-    
   end
 end

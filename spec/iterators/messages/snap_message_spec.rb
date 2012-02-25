@@ -17,5 +17,11 @@ describe "Iterator" do
       snap_it = interpreter(script:"5 snap", contents:[makes_numbers]).run
       snap_it.inspect.should == "[(3..3..5)=>[0, 1, 2, 3, 4], (3..3..5)=>[5, 6, 7, 8, 9, 10, 11] :: :: «»]"
     end
+    
+    it "should retain the :response mode in both" do
+      makes_a_number = Iterator.new(start:3, end:5, contents:(0..11).collect {|i| int(i)}, :response => :element)
+      snap_it = interpreter(script:"5 snap", contents:[makes_a_number]).run
+      snap_it.contents.each {|iterator| iterator.response.should == :element}
+    end
   end
 end

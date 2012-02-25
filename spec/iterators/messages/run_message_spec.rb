@@ -29,11 +29,17 @@ describe "Iterator" do
         loopy.inspect.should == "[11, 2, 2, 2, 2, (1..5..5)=>[2] :: :: «»]"
     end
     
-    it "should execute the bound_item" do
+    it "should produce the expected contents, based on the :response mode" do
       loopy = interpreter(script:"11 run",
         contents:[Iterator.new(start:1,end:5,contents:[message(:zap)])])
         loopy.run
         loopy.inspect.should == "[11, (1..5..5)=>[:zap] :: :: «»]"
+    end
+    
+    it "should work for counters" do
+      counter = Iterator.new(start:9.25, end:223.25, inc:53.0, :response => :index)
+      i = interpreter(script:"run", contents:[counter]).run
+      i.inspect.should == "[9.25, 62.25, 115.25, 168.25, 221.25, (9.25..~(223.25)..223.25)=>[] :: :: «»]"
     end
     
   end

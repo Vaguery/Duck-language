@@ -1,10 +1,9 @@
 #encoding: utf-8
-
-def decimal(value)
-  Decimal.new(value)
-end
-
 module Duck
+  def decimal(value)
+    Decimal.new(value)
+  end
+
   class Decimal < Number
     def to_s
       "#{@value}"
@@ -36,6 +35,19 @@ module Duck
         Closure.new(needs,"? ÷ #{self.value}") {|numerator| Decimal.new(numerator.value / self.value)}:
         Closure.new(needs,"? ÷ #{self.value}") {|numerator| Error.new("DIV0")}
     end
+    
+    
+    duck_handle :count do
+      Iterator.new(start:0.0, end:@value, inc:1.0,:response => :index).run
+    end
+    
+    
+    duck_handle :count_by do
+      Closure.new(["neg"], "#{self.inspect}.count_by(?)") do |number|
+        Iterator.new(start:0.0, end:@value, inc:number.value.to_f, :response => :index).run
+      end
+    end
+    
     
     
     duck_handle :rand do

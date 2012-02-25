@@ -1,11 +1,10 @@
 #encoding: utf-8
-
-def int(value)
-  Int.new(value)
-end
-
-
 module Duck
+  
+  def int(value)
+    Int.new(value)
+  end
+  
   class Int < Number
     def type_cast_result(arg, operator)
       arg.class == Decimal ?
@@ -58,12 +57,24 @@ module Duck
       i = self.value
       Closure.new(["be"],"#{i} of ?") do |item|
         item.to_s.length * i <= @@result_size_limit ?
-        i.times.collect {|i| item.clone} :
+        i.times.collect {|i| item.deep_copy} :
         Error.new("OVERSIZED RESULT")
       end
     end
-  
-  
+    
+    
+    duck_handle :count do
+      Iterator.new(start:0, end:@value, inc:1,:response => :index).run
+    end
+    
+    
+    duck_handle :count_by do
+      Closure.new(["inc"],"#{self.inspect}.count_by(?)") do |increment|
+        Iterator.new(start:0, end:@value, inc:increment.value, :response => :index).run
+      end
+    end
+    
+    
     duck_handle :dec do
       Int.new @value - 1
     end
@@ -89,7 +100,7 @@ module Duck
     duck_handle :times_do do
       Closure.new(["be"], "#{self.inspect}.times_do(?)") do |item|
         @value > 0 ?
-          [Iterator.new(start:0, end:@value, contents:[item]), Message.new("run")] :
+          Iterator.new(start:0, end:@value, contents:[item]).run :
           self
       end
     end

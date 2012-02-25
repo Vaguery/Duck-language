@@ -54,5 +54,10 @@ module Duck
     duck_handle :to_int do
       Int.new(@value ? 1 : 0)
     end
+    
+    
+    duck_handle :to_script do
+      Script.new(@value ? 'T' : 'F')
+    end
   end
 end

@@ -12,7 +12,7 @@ describe "Int" do
       int(8).times_do.needs.should == ["be"]
     end
     
-    it "should produce an Iterator item and a :run" do
+    it "should produce running Iterator" do
       interpreter(script:"9.2 1 times_do").run.inspect.should == "[9.2, (0..1..1)=>[9.2] :: :: «»]"
     end
     

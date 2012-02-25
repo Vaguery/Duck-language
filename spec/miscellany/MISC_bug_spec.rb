@@ -16,5 +16,12 @@ describe "various bad behaviors that cropped up during stress-testing" do
     binder:{x:int(3)})
     lambda { bad_boy.run }.should_not raise_error
   end
+  
+  it "should be able to manage :fold_down sent to Bad Boy 31" do
+    bad_boy31 = interpreter(buffer:[message(:fold_down)],
+      contents:[list([message(:fold_down),Binder.new([Iterator.new]), message(:fold_down)])]).run
+    bad_boy31.inspect.should == "[{(0..0..0)=>[]} :: :: «»]"
+  end
+  
 end
 

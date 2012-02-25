@@ -193,12 +193,7 @@ module Duck
     def trace_uses_arg(position)
       write_to_trace "   ... grabbed the #{@contents[position].class} #{@contents[position].inspect}" unless position.nil?
     end
-    
-    
-    def trace_entire_buffer
-      write_to_trace "   ... the buffer is now #{@buffer.inspect}"
-    end
-    
+        
     
     
     def trace_pushed_item(item)
@@ -215,7 +210,6 @@ module Duck
       unless buffer.empty?
         count_a_tick
         @staged_item = @buffer.delete_at(0)
-        trace_entire_buffer if @trace
         trace_staging if @trace
         next_arg_position = next_contents_index_wanted_by(@staged_item)
         if next_arg_position.nil? 

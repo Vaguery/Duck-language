@@ -43,6 +43,5 @@ describe "List" do
       interpreter(contents:[cause_havoc]).inspect.should == "[(:zap, :foo, 4) :: :: «»]"
       interpreter(contents:[cause_havoc], script:"infold_down").run.inspect.should == "[:: :: «»]"
     end
-    
   end
 end

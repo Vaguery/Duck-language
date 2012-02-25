@@ -34,11 +34,21 @@ describe "List objects" do
   
   
   describe "emit! method (a convenience for developers)" do
-    it "should delete and return the rightmost item responding to the arg message" do
+    it "should delete and return the rightmost item responding to the arg message, if arg is a string" do
       will_work = list([int(1),int(2)])
       will_work.emit!("inc").inspect.should == "2"
       will_work.inspect.should == "(1)"
     end
+    
+    
+    it "should delete and return the rightmost item of a given class, if arg is a class" do
+      will_work = list([int(1),int(2)])
+      will_work.emit!(Int).inspect.should == "2"
+      will_work.inspect.should == "(1)"
+      will_work.emit!(Number).inspect.should == "1"
+      will_work.inspect.should == "()"
+    end
+    
     
     it "should work with empty lists" do
       wont_work = list()

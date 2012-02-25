@@ -43,5 +43,11 @@ describe "List" do
       interpreter(contents:[cause_havoc], script:"fold_down").run.inspect.should == "[:: :: «»]"
     end
     
+    it "should work when an intermediate result is an Array that has a nil in it" do
+      bad_boy31 = interpreter(buffer:[message(:fold_down)],
+        contents:[list([message(:fold_down),Binder.new([Iterator.new]), message(:fold_down)])]).run
+      bad_boy31.inspect.should == "[{(0..0..0)=>[]} :: :: «»]"
+    end
+    
   end
 end

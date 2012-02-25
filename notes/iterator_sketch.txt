@@ -3,7 +3,7 @@ Special messages:
   :run
   :halt
   :reset
-  :ff
+  :fast_forward
   :contents
   :start_value
   :end_value
@@ -11,42 +11,31 @@ Special messages:
   :increment
   - a bunch of List methods (:shatter, )
 
-
-SpanIterator
-  "iterate over a range of integers"
-  something like: int(a).through(int(b)) do |Local| Item
-  
-  creates an Enumerator
-  @index starts at int(a)
-  @index ends at int(b)
-  every step:
-    binds local:=int as a Variable
-    increments index
-    produces [self(updated), Variable, Item] in that order
-
-
-
-"iterate over a range of Decimals"
-something like: decimal(a).through(decimal(b)).int(c).times do |Local| Item
-
-    creates an Enumerator
-    @index starts at decimal(a)
-    @index ends at decimal(b)
-    @increment is |b-a|/int(c)
-    every step:
-      binds local:=@index as a Variable
-      increments index by one increment
-      produces [self(updated), Variable, Item] in that order
-
-
-"iterate over the elements of a list"
-something like: list.each do |local| Item
-  
-  creates an Enumerator
-  no @index used
-  every step:
-    snips off first (remaining) element of list
-    binds local:=element as a Variable
-    produces [self(updated), Variable, Item]
+Int.times_do
+  creates an Iterator, with
+    Span (0..int.value)
+    _i = 0
+    increment = +1
+    contents = any item
+  step:
+    produces [self, _i, contents].flatten
     
-
+    
+List.each
+  creates an Iterator with
+    Span (0..list.length)
+    _i = 0
+    increment = +1
+    contents = list contents
+  step:
+    produces [self, _i, contents[i]].flatten
+    
+    
+Span.each
+  creates an Iterator with
+    Span = the span
+    _i = start_value
+    increment = some float
+    contents = nil
+  step:
+    produces [self, _i, (nil)].flatten

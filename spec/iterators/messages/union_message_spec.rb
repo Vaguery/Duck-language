@@ -26,5 +26,11 @@ describe "Iterator" do
       interpreter(script:"∪", contents:[i2,i1]).run.inspect.should ==
         "[(0..0..10)=>[11, 9, 8] :: :: «»]"
     end
+    
+    it "should keep the calling Iterator's :response mode" do
+      i1 = Iterator.new(start:0,end:10,contents:[int(8),int(9)], :response => :index)
+      i2 = Iterator.new(start:-2,end:-12, contents:[int(11),int(9)])
+      interpreter(script:"∪", contents:[i2,i1]).run.contents[0].response.should == :index
+    end
   end
 end

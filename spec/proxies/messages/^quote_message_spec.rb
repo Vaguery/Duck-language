@@ -30,7 +30,7 @@ describe "Proxy" do
     end
     
     it "should work when the integer is bigger than the script length" do
-      quoted = interpreter(script:"124 ^quote a b c d e f g h").run
+      quoted = interpreter(script:"444444 ^quote a b c d e f g h").run
       quoted.inspect.should == "[«a b c d e f g h» :: :: «»]"
     end
   end

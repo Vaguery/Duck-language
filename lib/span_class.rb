@@ -10,6 +10,11 @@ module Duck
       @needs = []
     end
     
+    def deep_copy
+      Span.new(@start_value, @end_value)
+    end
+    
+    
     def to_s
       "(#{@start_value}..#{@end_value})"
     end

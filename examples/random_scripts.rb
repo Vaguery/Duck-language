@@ -3,7 +3,15 @@ require_relative '../lib/duck'
 require 'timeout'
 include Duck
 
+############
+# A simple experiment in the diversity of Duck scripts.
+#
+# We generate Duck scripts from random tokens, run them with different inputs 'x'
+#   to observe how many act differently with just the change in inputs value.
 
+
+######
+# some conveniences, first:
 
 ARITHMETIC_TOKENS = ["+","-","*","/","inc","dec","if"] + ['k','f','x'] * 5
 ALL_MESSAGES =
@@ -40,23 +48,28 @@ def random_script(how_many, source_list=@everything)
   parts.join(" ")
 end
 
+############
+#
+# We generate 500 random 50-token scripts
+# set variable :x1 and :x2
+# run each script, and count the number of ticks execution takes,
+# and report the top two Number values present on the interpreter when it's done
 
-500.times do
-  (1..20).each do |len|
-    begin
-      pts = len*(10)
-      script = random_script(pts)
-      begin
-        Timeout::timeout(10) do
-          puts"#{pts}, #{interpreter(script:script, binder:{x:int(3)}).run.ticks}"
-        end
-      rescue Timeout::Error
-        puts "TIMEOUT: #{script.inspect}"
-        raise
-      end
-    rescue
-      puts "ERROR: #{script.inspect}"
-      raise
+
+puts "trial, ticks(x1), ticks(x2), y1(x1), y1(x2), y2(x1), y2(x2)"
+(0..500).each do |i|
+  pts = 100
+  x1 = 16
+  x2 = 19
+  script = random_script(pts)
+  begin
+    Timeout::timeout(120) do
+      random_one = interpreter(script:script, binder:{x:int(x1)}).run
+      random_two = interpreter(script:script, binder:{x:int(x2)}).run
+      puts"#{i}: #{random_one.ticks}, #{random_two.ticks}, #{random_one.emit!(Number)||'nil'}, #{random_two.emit!(Number)||'nil'}, #{random_one.emit!(Number)||'nil'}, #{random_two.emit!(Number)||'nil'}"
     end
+  rescue Exception => e
+    puts "ERROR:#{e.message} -- #{e.backtrace} #{script.inspect}"
+    raise
   end
 end

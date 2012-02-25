@@ -22,7 +22,7 @@ describe "Message" do
     it "should be able to bind even another Local" do
       d = Interpreter.new script:"_foo bind _bar _baz bind _baz bind _foo"
       d.run
-      d.contents.inspect.should == "[:_baz=:_foo=:_bar, :_bar=:_foo=:_bar]"
+      d.inspect.should ==  "[:_baz=:_foo=:_bar, :_bar=:_foo=:_bar :: :: «»]"
       # no, really, it totally should be that
     end
     

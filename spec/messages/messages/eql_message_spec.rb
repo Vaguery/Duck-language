@@ -2,6 +2,10 @@ require_relative '../../spec_helper'
 
 describe "Message" do
   describe ":eql" do
+    it "should be recognized by Message items" do
+      Message.recognized_messages.should include("eql".intern)
+    end
+    
     it "should create a Closure looking for a second Message" do
       m = message("foo").eql
       m.should be_a_kind_of(Closure)

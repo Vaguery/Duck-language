@@ -59,9 +59,10 @@ describe "Binder class" do
       @two_things.produce_respondent("¬").inspect.should == "F"
     end
     
-    it "should be consumed if it responded itself to the message" do
+    it "should be consumed (producing a deep_copy) if it responded itself to the message" do
       @two_things.personally_recognizes?("length").should == true
-      @two_things.produce_respondent("length").should == @two_things
+      @two_things.produce_respondent("length").should_not === @two_things
+      @two_things.produce_respondent("length").inspect.should == @two_things.inspect
     end
     
     it "should work in situ" do

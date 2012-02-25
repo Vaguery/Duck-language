@@ -1,10 +1,10 @@
 #encoding: utf-8
-
-def script(value="")
-  Script.new(value)
-end
-
 module Duck
+  def script(value="")
+    Script.new(value)
+  end
+  
+  
   class Script < Item
     attr_accessor :value
   

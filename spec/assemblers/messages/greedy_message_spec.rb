@@ -15,7 +15,7 @@ describe "Assembler" do
       ungreedy.greedy_flag = false
       ungreedy.run
       ungreedy.inspect.should == "[:*, 9 ::]" 
-
+      
       ungreedy.greedy
       ungreedy.buffer = [int(2)]
       ungreedy.run

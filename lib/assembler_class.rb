@@ -85,9 +85,7 @@ module Duck
     
     
     def give_ticks
-      recorded_ticks = @ticks
-      @ticks = 0
-      return recorded_ticks
+      return @ticks
     end
     
     

@@ -15,7 +15,7 @@ module Duck
       Pipe.new(new_contents)
     end
   
-    define_method( "(".intern ) {List.new(@contents.clone)}
+    define_method( "(".intern ) {List.new(@contents)}
   
     def to_s
       "λ( " + (@contents.inject("(") {|s,i| s+i.to_s+", "}).chomp(", ") + ", ?) )"

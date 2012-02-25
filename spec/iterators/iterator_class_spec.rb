@@ -12,6 +12,10 @@ describe "the Iterator class" do
       ns.contents.should == []
     end
     
+    it "should have a :response mode to determine what to return" do
+      Iterator.new.response.should == :contents
+    end
+    
     it "should set the index to the start_value if not specified" do
       Iterator.new(start:11, end:8).index.should == 11
     end

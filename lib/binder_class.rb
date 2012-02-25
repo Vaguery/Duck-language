@@ -2,11 +2,18 @@
 module Duck
   class Binder < List
     attr_accessor :contents
-  
+    
+    
     def initialize(contents=[])
       @contents = contents
       @needs = []
     end
+    
+    
+    def deep_copy
+      Binder.new( @contents.collect {|item| item.deep_copy})
+    end
+    
     
     
     def recognize_message?(string)
@@ -38,7 +45,7 @@ module Duck
     def produce_respondent(msg)
       which = index_of_next_respondent_to(msg.intern)
       if which.nil?
-        result = personally_recognizes?(msg) ? self : nil
+        result = personally_recognizes?(msg) ? self.deep_copy : nil
       else
         if @contents[which].kind_of?(Binder)
           result = @contents[which].produce_respondent(msg)

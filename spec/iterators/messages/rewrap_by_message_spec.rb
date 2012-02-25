@@ -17,5 +17,11 @@ describe "Iterator" do
       interpreter(script:"3 rewrap_by", contents:[makes_numbers]).run.inspect.should ==
         "[(3..3..5)=>[0, 1, 2], (3..3..5)=>[3, 4, 5], (3..3..5)=>[6, 7, 8], (3..3..5)=>[9, 10, 11] :: :: «»]"
     end
+    
+    it "should retain the response mode in all results" do
+      makes_a_number = Iterator.new(start:3, end:5, contents:(0..11).collect {|i| int(i)}, :response => :element)
+      chunked = interpreter(script:"3 rewrap_by", contents:[makes_a_number]).run
+      chunked.contents.each {|iterator| iterator.response.should == :element}
+    end
   end
 end
