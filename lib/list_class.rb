@@ -175,7 +175,9 @@ module Duck
           when memo.nil?
             item
           when memo.kind_of?(Array)
-            memo.collect {|branch| item.grab(branch)}.flatten.compact
+            memo.collect do |branch|
+              branch.nil? ? item : item.grab(branch)
+            end.flatten.compact
           else
             item.grab(memo)
           end
@@ -189,7 +191,9 @@ module Duck
           when memo.nil?
             item
           when memo.kind_of?(Array)
-            memo.collect {|branch| item.grab(branch)}.flatten.compact
+            memo.collect do |branch|
+              branch.nil? ? item : item.grab(branch)
+            end.flatten.compact
           else
             item.grab(memo)
           end

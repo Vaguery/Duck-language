@@ -5,6 +5,7 @@ include Duck
 bad_boy = interpreter(script: "-2.3 ^fork -9.2 9 ∩ run x ^fork 3.0 inc 6.2 8 F to_span T copy -7.5 - x 8.3 step step push 5 ∧ if to_binder []= each 7 x 5.1 rewrap_by emit F / 6.9 dec know? ^ticks", binder:{x:int(27)})
 
 
+
 begin
   bad_boy.trace!.run
 rescue NoMethodError => e
@@ -13,6 +14,7 @@ end
 
 
 # NOT FIXED: 
+
 
 interpreter(script: "¬ shatter ^length - bundle 8 bundle x to_binder reverse eql count_by step x zap rotate to_binder > ^rescript infold_down ∩ reverse to_binder times_do know? if again 7 fold_down 7 emit 7.3 map to_decimal dec bundle 6 rewrap_by do x", binder:{x:int(27)})
 
@@ -28,6 +30,8 @@ interpreter(script: "below -7.2 T above cover? flatten to_span fold_down 8 x ∨
 
 
 # FIXED ?
+
+# interpreter(script: "4 infold_up x ^greedy= _v do shift map ^fork ≥ again neg 7.8 x index= 8.5 bind rewrap_by _n rand empty ^fork x x copy ^quote 3.7 _z reverse bundle -3 shatter 7.7 []= bind _q keep T ∪ lowercase ÷ cover? ∪ + -0 trunc _b ∪ bundle 9 x rewrap_by infold_down to_binder bundle x to_interpreter 0.3 ^greedy= to_interpreter x eql dec ceiling ^rescript ^script ¬ x eql copies to_interpreter x count ∪ x ¬ to_assembler each copy [] to_decimal 8 dec F _f trunc 9.3 give empty x push pop eql -3 push rebind _d _b above -0.6 wrap count_by ^script -5.6 -3.1 T x infold_up push greedy? x ungreedy flatten x x trunc below zap -6.9 eql ¬ floor count dec []= rebind x to_interpreter -1.2 run to_bool to_int lowercase x -8 T to_list run -9 if * snap shatter -4 ^quote lowercase to_assembler _y x rebind + below -2 run T 1 dec above -8.1 rotate", binder:{x:int(3)})
 
 # interpreter(script: "F F - to_span 1.8 wrap ^length T pop fold_down -9 x _k x ^fork -7 map [] emit shatter x trunc _m ^script step + count_by copy > swap copy _f T x lowercase 5.5 to_int ∪ F swap F fold_down x 0.2 -4.1 to_bool inc be ∪ infold_down _u length ^script ≤ 2 F _q to_span _g shatter ^rescript fold_down below _a ^quote infold_down count_by _y -3.5 ^greedy= rand _s rebind < x neg 7.6 shatter -3 useful T below - empty ≥ F inc -7 copies halt to_list F 8 infold_up each count lowercase neg x length ∪ copy ^script bind > run index= _i ^ticks < _s _j _f ^fork to_binder ∪ users useful -0.3 fold_down 4.2 fold_down > < F x x _y < if < ^fork ^length -2.0 again count ≥ ^ticks pop step _f rebind cover? x 4 give count_by ∨ ^ticks reverse * 8 snap T -3.9 _h greedy useful give T", binder:{x:int(3)})
 
