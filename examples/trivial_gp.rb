@@ -28,15 +28,6 @@ include Duck
 #   the implications might be apparent to GP practitioners.
 
 
-# first we add a simplifying convenience or two to the Interpreter class
-
-class Interpreter
-  def topmost_number
-    @contents.rindex {|item| item.kind_of?(Number)}
-  end
-end
-
-
 class Answer
   @@evaluations = 0
   attr_accessor :score
@@ -78,9 +69,10 @@ class Answer
           @d = Interpreter.new(script:@script,binder:{x:int(x)}).run
         end
         
-        observed_y_location = @d.topmost_number
-        observed_y_value = observed_y_location.nil? ? 1000000 :
-          (x_y_pairs_hash[x] - @d.contents[observed_y_location].value).abs
+        observed_y = @d.emit!(Number)
+        error = observed_y.nil? ? 1000000 : (x_y_pairs_hash[x] - observed_y.value).abs
+        error
+        
         rescue Timeout::Error
           puts "TIMEOUT evaluating #{@script.inspect} with x=#{x}, in state #{@d.inspect}"
           raise
@@ -181,7 +173,7 @@ File.open("./data/scores.csv", "w") do |tracefile|
       
       # EXERCISE (recombination)
       crossover1,crossover2 = mom.crossover_result(dad)
-      baby1 = Answer.new(crossover1).mutant(3,@experiment_tokens) # EXERCISE (ontological creep)
+      baby1 = Answer.new(crossover1).mutant(3,SIMPLE_TOKENS) # EXERCISE (ontological creep)
       baby2 = Answer.new(crossover2).mutant(3,@experiment_tokens)
       
       baby1.evaluate(@x_y_values,tracefile)

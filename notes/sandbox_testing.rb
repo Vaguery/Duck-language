@@ -2,8 +2,7 @@
 require_relative '../lib/duck'
 include Duck
 
-bad_boy = interpreter(script: "to_int below -8.2 to_interpreter to_interpreter each []= 4 F to_span x ≥ 8 F _o x _v eql 4.6 cover? count ^rescript shatter shift ∨ pop 7 ≤ push 6 - -7 zap push map _s -1 inc cover? give flatten bundle above trunc to_interpreter rotate ∨ above to_script _k each eql _j < do ∧ be T -5.1 _w x ∧ ∪ bind count F ^fork to_bool zap push be _q 1 each ^ticks bundle above useful F halt know? to_interpreter to_binder -3 push F each map inc x -8.4 x map pop T to_span 3 x _g 2.5 neg infold_down x F greedy useful copy ^rescript x x F F F F flatten emit each 2.2 map F to_binder 5 9 _p -5 greedy? x F -0.8 x ∩ greedy each to_script ∪ + lowercase x F 3 + _y ^greedy= empty halt rewrap_by unshift x ^rescript copies x -1.3 halt 1.3 lowercase neg 4 _s ^rescript T flatten ^script push 1.5 ^greedy= ^greedy= F T to_binder 8", binder:{x:int(3)})
-
+bad_boy = interpreter(script: "-2.3 ^fork -9.2 9 ∩ run x ^fork 3.0 inc 6.2 8 F to_span T copy -7.5 - x 8.3 step step push 5 ∧ if to_binder []= each 7 x 5.1 rewrap_by emit F / 6.9 dec know? ^ticks", binder:{x:int(27)})
 
 
 begin
@@ -15,7 +14,9 @@ end
 
 # NOT FIXED: 
 
+interpreter(script: "¬ shatter ^length - bundle 8 bundle x to_binder reverse eql count_by step x zap rotate to_binder > ^rescript infold_down ∩ reverse to_binder times_do know? if again 7 fold_down 7 emit 7.3 map to_decimal dec bundle 6 rewrap_by do x", binder:{x:int(27)})
 
+interpreter(script: "to_int below -8.2 to_interpreter to_interpreter each []= 4 F to_span x ≥ 8 F _o x _v eql 4.6 cover? count ^rescript shatter shift ∨ pop 7 ≤ push 6 - -7 zap push map _s -1 inc cover? give flatten bundle above trunc to_interpreter rotate ∨ above to_script _k each eql _j < do ∧ be T -5.1 _w x ∧ ∪ bind count F ^fork to_bool zap push be _q 1 each ^ticks bundle above useful F halt know? to_interpreter to_binder -3 push F each map inc x -8.4 x map pop T to_span 3 x _g 2.5 neg infold_down x F greedy useful copy ^rescript x x F F F F flatten emit each 2.2 map F to_binder 5 9 _p -5 greedy? x F -0.8 x ∩ greedy each to_script ∪ + lowercase x F 3 + _y ^greedy= empty halt rewrap_by unshift x ^rescript copies x -1.3 halt 1.3 lowercase neg 4 _s ^rescript T flatten ^script push 1.5 ^greedy= ^greedy= F T to_binder 8", binder:{x:int(3)})
 
 
 
