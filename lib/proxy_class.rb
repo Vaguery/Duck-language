@@ -56,8 +56,9 @@ module Duck
     duck_handle "^rescript".intern do
       Closure.new(["lowercase"], "<SCRIPT>.prepend(?)") do |other_script|
         old_script = @value.script.value
+        other_script = other_script.value
         if other_script.length + old_script.length < 20000
-          @value.script = Script.new(other_script.value + " " + old_script)
+          @value.script = Script.new(other_script + " " + old_script)
           nil
         else
           Error.new("OVERSIZED SCRIPT")

@@ -45,10 +45,6 @@ module Duck
       Script.recognize(next_word)
     end
     
-    def length
-      @value.length
-    end
-    
     def to_s
       "«#{self.value}»"
     end
@@ -57,6 +53,11 @@ module Duck
       Script.new(@value.clone)
     end
     # DUCK METHODS
+    
+    
+    duck_handle :length do
+      Int.new(@value.split.length)
+    end
     
     
     duck_handle :lowercase do
