@@ -3,7 +3,7 @@ require_relative '../../spec_helper'
 
 describe "Proxy" do
   describe ":^greedy=" do
-    it "should be recognized by an Interpreter item" do
+    it "should be recognized by an Proxy item" do
       Proxy.recognized_messages.should include("^greedy=".intern)
     end
     

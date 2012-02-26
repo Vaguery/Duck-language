@@ -21,11 +21,30 @@ module Duck
     
     # DUCK METHODS
     
+    
+    duck_handle "^clear".intern do
+      @value.contents << List.new(@value.buffer)
+      @value.buffer = []
+      nil
+    end
+    
+    
+    duck_handle "^flush".intern do
+      @value.halted = true
+      @value.contents << List.new(@value.buffer)
+      @value.buffer = []
+      @value.contents << @value.script.deep_copy
+      @value.script = Script.new
+      nil
+    end
+    
+    
     duck_handle "^fork".intern do
       forked_interpreter = @value.deep_copy
       forked_interpreter.max_ticks = @value.max_ticks/2
       [message(:run), forked_interpreter]
     end
+    
     
     
     duck_handle "^greedy=".intern do

@@ -66,7 +66,7 @@ puts "trial, ticks(x1), ticks(x2), y1(x1), y1(x2), y2(x1), y2(x2)"
     Timeout::timeout(120) do
       random_one = interpreter(script:script, binder:{x:int(x1)}).run
       random_two = interpreter(script:script, binder:{x:int(x2)}).run
-      puts"#{i}: #{random_one.ticks}, #{random_two.ticks}, #{random_one.emit!(Number)||'nil'}, #{random_two.emit!(Number)||'nil'}, #{random_one.emit!(Number)||'nil'}, #{random_two.emit!(Number)||'nil'}"
+      puts"#{i}, #{random_one.ticks}, #{random_two.ticks}, #{random_one.emit!(Number)||'nil'}, #{random_two.emit!(Number)||'nil'}, #{random_one.emit!(Number)||'nil'}, #{random_two.emit!(Number)||'nil'}"
     end
   rescue Exception => e
     puts "ERROR:#{e.message} -- #{e.backtrace} #{script.inspect}"

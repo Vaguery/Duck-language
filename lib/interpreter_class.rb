@@ -177,7 +177,7 @@ module Duck
     
     
     def trace_staging
-      write_to_trace "   #{@ticks}: staging the #{@staged_item.class} #{@staged_item.inspect}" unless @staged_item.nil?
+      write_to_trace "   #{@ticks}: staging the #{@staged_item.class} (size #{@staged_item.size[1].value} ) #{@staged_item.inspect}" unless @staged_item.nil?
     end
     
     

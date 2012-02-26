@@ -3,7 +3,7 @@ require_relative '../../spec_helper'
 
 describe "Proxy" do
   describe ":^length" do
-    it "should be recognized by a Script item" do
+    it "should be recognized by a Proxy item" do
       Proxy.recognized_messages.should include("^length".intern)
     end
     

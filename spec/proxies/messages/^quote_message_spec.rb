@@ -6,7 +6,7 @@ describe "Proxy" do
     @easy_version = "^quote".intern
   end
   describe ":^quote" do
-    it "should be recognized by a Script item" do
+    it "should be recognized by a Proxy item" do
       Proxy.recognized_messages.should include("^quote".intern)
     end
     

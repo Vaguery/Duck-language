@@ -2,7 +2,7 @@
 require_relative '../lib/duck'
 include Duck
 
-bad_boy = interpreter(script: "^script 0.6 F * ^greedy= F x emit F T x x ^ticks keep 1.6 swap 9 / x []= x 1 fold_up x dec count_by F 1 - -5.3 7.2 halt []= x - ∩ to_interpreter 0 copies ^length -0.7 2 ^fork T 7 7 copies give index= T to_list greedy 3 3 give ^script be rewrap_by -1.0 -1.2 7 ^rescript F -2.7 6 step 9.6 inc give 0 ÷ * x F T 2 halt - greedy? dec x dec T x ^script / bundle times_do if zap ungreedy x 0.2 if x 1.1 unshift index= 5.3 shift", binder:{x:int(27)})
+bad_boy = interpreter(script: "neg to_script below size ungreedy if ≥ to_int rewrap_by ^fork ≤ know? rebind F []= rand index= x 1 6.8 F _f ∧ ^script greedy -9 ^greedy= greedy _n be wrap ^rescript x F 0.7 push to_script copies dec inc F rewrap_by flatten again []= rewrap_by - to_int ^greedy= F x ^greedy= rand x x + to_int wrap run give < times_do dec x shift below -5.5 ≥ ^script x T to_interpreter 5 push copies index= -1 T ^rescript rebind", binder:{x:int(0)})
 
 
 
@@ -15,6 +15,9 @@ end
 
 
 # NOT FIXED: 
+
+interpreter(script: "^script 0.6 F * ^greedy= F x emit F T x x ^ticks keep 1.6 swap 9 / x []= x 1 fold_up x dec count_by F 1 - -5.3 7.2 halt []= x - ∩ to_interpreter 0 copies ^length -0.7 2 ^fork T 7 7 copies give index= T to_list greedy 3 3 give ^script be rewrap_by -1.0 -1.2 7 ^rescript F -2.7 6 step 9.6 inc give 0 ÷ * x F T 2 halt - greedy? dec x dec T x ^script / bundle times_do if zap ungreedy x 0.2 if x 1.1 unshift index= 5.3 shift", binder:{x:int(27)})
+
 interpreter(script: "5 index= wrap run T ¬ times_do ceiling rebind keep to_script -8.8 ≤ reverse be ∧ infold_up above push ^fork ∩ to_binder eql x dec infold_down dec infold_up / -5.3 step x / ≤ 0.7 flatten to_interpreter 0 -2.5 ^length 1.0 < ^fork 8 4 0.3 2 > T ungreedy 8 useful x eql ^script F -8.7 x ¬ 8 dec shift ∧ rebind - F 6 to_decimal each 0.2 length F trunc 0.1 0 -8.9 do -0.5 x dec [] 6.9 snap ^ticks cover? ceiling F to_interpreter 8 if eql - flatten T above T [] bundle x to_binder", binder:{x:int(27)})
 
 

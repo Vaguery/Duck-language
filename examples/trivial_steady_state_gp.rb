@@ -4,7 +4,7 @@ require 'timeout'
 include Duck
 
 
-#   A trivial (and not at all smart!) implementation of genetic programming in Duck:
+#   A trivial (and not at all smart!) implementation of steady state genetic programming in Duck:
 #   
 #   A population of Answer objects is created at random, evaluated, and
 #   then pairs are chosen at random for "breeding" by one-point crossover
@@ -135,7 +135,7 @@ end
 pop_size = 50
 updates = pop_size*3
 cycles = 500
-standard_length = 100
+standard_length = 40
 population = pop_size.times.collect {Answer.new(random_tokens(standard_length,@experiment_tokens))}
 
 File.open("./data/scores.csv", "w") do |tracefile|
