@@ -18,7 +18,6 @@ module Duck
     attr_accessor :binder
     attr_accessor :halted
     attr_accessor :trace
-    attr_accessor :trace_string
     attr_accessor :staged_item
     
     def initialize(args = {})
@@ -59,7 +58,6 @@ module Duck
       @needs = [] # whew
       
       @trace = false
-      @trace_string = StringIO.new
     end
     
     def replace_proxy_in_binder
@@ -128,7 +126,6 @@ module Duck
       @ticks = opts[:ticks]
       @max_ticks = opts[:max_ticks]
       
-      @trace_string = StringIO.new
       self
     end
     
@@ -171,12 +168,11 @@ module Duck
     
     def write_to_trace(text)
       puts text
-      @trace_string.write(text + "\n")
     end
     
     
     def cartoon_of_state
-      write_to_trace "Interpreter #{self.object_id} #{@ticks}/#{@max_ticks} : #{self.inspect}" 
+      write_to_trace "Interpreter #{self.object_id} #{@ticks}/#{@max_ticks} : #{self.inspect}..." 
     end
     
     
@@ -197,12 +193,7 @@ module Duck
     
     
     def trace_pushed_item(item)
-      write_to_trace "   ... #{item.class} #{item.inspect} was moved to contents"
-    end
-    
-    
-    def saved_trace
-      @trace_string.string || ""
+      write_to_trace "   ... #{item.class} #{item.inspect}... was moved to contents"
     end
     
     
