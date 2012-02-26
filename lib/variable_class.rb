@@ -48,5 +48,10 @@ module Duck
     duck_handle :rebind do
       Closure.new(["be"],"#{@key}.bind(?)") {|new_value| Variable.new(@key, new_value)}
     end
+    
+    
+    duck_handle :size do
+      [self,Int.new(2 + @value.size[1].value)]
+    end
   end
 end

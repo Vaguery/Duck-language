@@ -271,8 +271,14 @@ module Duck
         [self,released_item]
       end
     end
-  
-  
+    
+    
+    duck_handle :size do
+      count = (@contents).inject(1) {|sum,item| sum + item.size[1].value}
+      [self, Int.new(count)]
+    end
+    
+    
     duck_handle :snap do
       Closure.new(["inc"],"snap#{self.inspect} at ?") do |location|
         if @contents.length > 0

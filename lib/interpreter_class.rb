@@ -283,6 +283,14 @@ module Duck
     end
     
     
+    duck_handle :size do
+      count = (@contents+@buffer).inject(1) {|sum,item| sum + item.size[1].value}
+      count += @binder.size[1].value
+      count += @script.size[1].value
+      [self, Int.new(count)]
+    end
+    
+    
     duck_handle :step do
       process_next_buffer_item
       self

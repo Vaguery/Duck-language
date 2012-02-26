@@ -49,5 +49,10 @@ module Duck
       end
     end
     
+    
+    duck_handle :size do
+      [self, Int.new(2)]
+    end
+    
   end
 end

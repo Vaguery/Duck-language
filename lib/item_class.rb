@@ -106,6 +106,11 @@ module Duck
     end
     
     
+    duck_handle :size do
+      [self, Int.new(1)]
+    end
+    
+    
     duck_handle :wrap do
       List.new( [self] )
     end

@@ -7,7 +7,7 @@ module Duck
   
   class Script < Item
     attr_accessor :value
-  
+    
     def self.recognize(string)
       case string
       when /^_[^_]/
@@ -27,8 +27,9 @@ module Duck
       end
     end
     
-    def init(value="")
+    def initialize(value="")
       @value = value
+      @needs = []
     end
     
     def empty?
@@ -57,8 +58,14 @@ module Duck
     end
     # DUCK METHODS
     
+    
     duck_handle :lowercase do
       Script.new(@value.downcase)
+    end
+    
+    
+    duck_handle :size do
+      [self, Int.new(@value.length + 1)]
     end
   end
 end

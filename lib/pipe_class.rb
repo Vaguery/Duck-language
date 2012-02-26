@@ -20,5 +20,13 @@ module Duck
     def to_s
       "λ( " + (@contents.inject("(") {|s,i| s+i.to_s+", "}).chomp(", ") + ", ?) )"
     end
+    
+    # DUCK MESSAGES
+    
+    duck_handle :size do
+      count = (@contents).inject(1) {|sum,item| sum + item.size[1].value}
+      [self, Int.new(count)]
+    end
+    
   end
 end
