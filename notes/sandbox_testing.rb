@@ -2,7 +2,7 @@
 require_relative '../lib/duck'
 include Duck
 
-bad_boy = interpreter(script: "neg to_script below size ungreedy if ≥ to_int rewrap_by ^fork ≤ know? rebind F []= rand index= x 1 6.8 F _f ∧ ^script greedy -9 ^greedy= greedy _n be wrap ^rescript x F 0.7 push to_script copies dec inc F rewrap_by flatten again []= rewrap_by - to_int ^greedy= F x ^greedy= rand x x + to_int wrap run give < times_do dec x shift below -5.5 ≥ ^script x T to_interpreter 5 push copies index= -1 T ^rescript rebind", binder:{x:int(0)})
+bad_boy = interpreter(script: "YOUR SCRIPT HERE", binder:{x:int(-39)})
 
 
 
@@ -15,6 +15,8 @@ end
 
 
 # NOT FIXED: 
+
+interpreter(script: "neg to_script below size ungreedy if ≥ to_int rewrap_by ^fork ≤ know? rebind F []= rand index= x 1 6.8 F _f ∧ ^script greedy -9 ^greedy= greedy _n be wrap ^rescript x F 0.7 push to_script copies dec inc F rewrap_by flatten again []= rewrap_by - to_int ^greedy= F x ^greedy= rand x x + to_int wrap run give < times_do dec x shift below -5.5 ≥ ^script x T to_interpreter 5 push copies index= -1 T ^rescript rebind", binder:{x:int(0)})
 
 interpreter(script: "^script 0.6 F * ^greedy= F x emit F T x x ^ticks keep 1.6 swap 9 / x []= x 1 fold_up x dec count_by F 1 - -5.3 7.2 halt []= x - ∩ to_interpreter 0 copies ^length -0.7 2 ^fork T 7 7 copies give index= T to_list greedy 3 3 give ^script be rewrap_by -1.0 -1.2 7 ^rescript F -2.7 6 step 9.6 inc give 0 ÷ * x F T 2 halt - greedy? dec x dec T x ^script / bundle times_do if zap ungreedy x 0.2 if x 1.1 unshift index= 5.3 shift", binder:{x:int(27)})
 
@@ -31,6 +33,8 @@ interpreter(script: "to_int below -8.2 to_interpreter to_interpreter each []= 4 
 
 
 # JUST SLOW
+
+interpreter(script: "size 5 x ∧ neg rotate unshift if include? count know? 8 2 to_list x push shatter to_script to_span if bundle halt ungreedy * again rewrap_by to_decimal users dec x count swap ¬ count ^greedy= push x 9.9 eql useful 7 snap do length to_decimal users dec F below shift if include? 0 < to_script to_span if ∧ -0.9 if 3 again reverse to_decimal users dec F 6 to_binder ¬ swap ¬ dec to_binder x below to_decimal neg rotate swap 4 ∧ 7 again infold_down T -6.8 neg to_int x ∧ keep -6.0 include? ^length / to_span T x count swap times_do to_span if ∧ halt * x again 8 ∧ -7.4 dec T 8 to_binder ¬ ≥ 1 dec rewrap_by x below ∩ neg rotate shift do include? 5 < dec F 0 to_binder ¬ 4 6.2 dec to_binder infold_down below ∧ neg rotate shift if include? 8 < to_script to_span if bundle halt if 5 again x to_int users dec F 6 to_binder ¬ x ¬ dec to_binder x below to_decimal neg rotate shift 9 include? 4 include? infold_down T -4.9 neg ∪ x know? x 1 ∪ ^length / to_span T x count swap times_do to_span if ∧ halt * reverse again 2 ∧ users dec T 8 to_binder ¬ 6 8 dec to_binder x below ∧ neg rotate shift do include? 0 < include? T above step swap infold_up 6 rebind floor x -3.9 reverse to_interpreter infold_up infold_up 3.6 floor x -6.8 reverse x ungreedy ceiling to_interpreter ∧ 2 ^fork 0 emit times_do infold_down to_list index= 8 ¬ F bind each -2.9 know? x 2 ∪ ^length users to_span T x count swap to_binder count ^greedy= push x 8.3 to_binder to_binder shatter -6.1 times_do ^length 1 5 ^ticks ^ticks", binder:{x:int(-39)})
 
 interpreter(script: "below -7.2 T above cover? flatten to_span fold_down 8 x ∨ if ^script greedy? infold_down emit ∧ be - neg 0.5 keep snap ^script swap if empty -4.9 infold_down ¬ x x x ≥ T cover? T x -7.6 to_binder 5.7 zap pop 7.4 to_decimal ^rescript _v F T _s snap step emit -3 to_interpreter push -4 ≥ users ^script ^greedy= ∧ x keep length -8 ^ticks step shift map step emit rebind ^rescript -5 ^script F -7 F + x infold_up < infold_up snap do x wrap ^greedy= bundle", binder:{x:int(30)})
 

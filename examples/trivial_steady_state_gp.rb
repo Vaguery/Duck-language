@@ -153,13 +153,13 @@ File.open("./data/scores.csv", "w") do |tracefile|
     end
   
     # EXERCISE (new blood)
-    (pop_size-10..pop_size-6).each do |i|
+    (-10..-6).each do |i|
       population[i] = Answer.new(random_tokens(standard_length,@experiment_tokens))
     end
       
     # EXERCISE (polishing)
     template_source = rand(10)
-    (pop_size-5..-1).each do |i|
+    (-5..-1).each do |i|
       population[i] = Answer.new((population[template_source].script.gsub(/\d/) {|d| rand(10).to_s}).split)
     end
       
