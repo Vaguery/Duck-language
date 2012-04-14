@@ -2,6 +2,7 @@
 require_relative '../spec_helper'
 
 describe "initialization" do
+  
   it "should have a #closure attribute, which is a Proc" do
     Closure.new {:foo}.closure.call.should == :foo
   end
