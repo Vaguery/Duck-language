@@ -30,7 +30,7 @@ include Duck
 
 # first we add a simplifying convenience or two to the Interpreter class
 
-class Interpreter
+class Duck::Interpreter
   def topmost_number
     @contents.rindex {|item| item.kind_of?(Number)}
   end
