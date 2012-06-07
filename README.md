@@ -4,16 +4,15 @@ It's built to be easily extensible for domain modeling, and also non-brittle for
 
 ### Duck language features:
 
-* stack-based, similar to Forth and Push
-* strongly concatenative, like XY
-* uses _duck-typing_ to map arguments to function calls, not static type matching
-* uses [greedy] partial application to produce closures when objects respond to messages
+* it is stack-based, similar to [Forth](http://en.wikipedia.org/wiki/Forth_(programming_language)) and [Push](http://hampshire.edu/lspector/push3-description.html)
+* it is strongly concatenative, like [XY](http://www.nsl.com/k/xy/xy.htm)
+* uses [duck-typing](http://en.wikipedia.org/wiki/Duck_typing) to map arguments to function calls, not static type matching
+* uses greedy [partial application](http://en.wikipedia.org/wiki/Partial_application) to produce closures when objects respond to messages
 * integer and floating-point arithmetic and numerical comparisons
 * boolean operators
 * dynamic variable bindings
 * ordered collections (Lists)
-* special-purpose dynamic collections (Binders, Assemblers)
-* Interpreters, for recursive execution
+* special-purpose dynamic collections with varying behavior (Binders, Assemblers, Interpreters)
 * higher-order functions (map, reduce, folds of various kinds)
 
 ### planned features (under [active development] (http://www.pivotaltracker.com/projects/448409))
