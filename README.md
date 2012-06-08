@@ -26,17 +26,23 @@ It's built to be easily extensible for domain modeling, and also non-brittle for
 
 ### Executing scripts
 
-A Duck script is interpreted as a series of *words* separated by whitespace, which are removed from the script one at a time from left to right. Each word is parsed to create a single *token* representing a Duck function call, and is pushed onto a processing queue.
+A Duck script is interpreted as a series of *tokens* separated by whitespace, which are removed from the script one at a time, from left to right. Each token is immediately interpreted as a self-contained *message*, which is sent to component objects in the Interpreter in a fixed order.
 
-Queued tokens are *staged* for execution, one at a time, in FIFO order. Each staged token is first permitted to examine and remove the items currently on the stack (in top-down order) for use as its *missing arguments*; if it can use one of the stack items, that is removed from the stack and the *curried* result of the pending item "using" the stack item is calculated and replaces it in the staging area.
+Queued messages are *staged* for execution, one at a time, in FIFO order. The bottom-most staged message is first permitted to examine all of the objects currently on the stack (in top-down order) in a search for a *receiver*. If the message finds a receiver, the receiving object is removed from the stack, and the original message is replaced in the queue with the *results* of its response to the message.
 
-Once the queued item has gathered as many arguments as it can from the stack, it is then *presented* to each item on the stack, to be used as *that item's* next missing argument. If it can be used, it is removed from the queue and the *curried* result of applying the stack item to the waiting item is shifted onto the bottom of the queue.
+In the case of function messages with multiple arguments (such as `:+`), the response a receiver has to the message is a *partial application of the function*. The resulting curried function object (itself a "message") subsequently "wants" its next argument(s) as receivers.
 
-Note that in both cases, argument-matching occurs by checking whether an object *responds to a specified message call*, not a type check.
+If no receiver is found in the stack, then the Interpreter itself is checked to see whether it can act as a receiver.
 
-If the staged object is not consumed as an argument by another item on the stack, then it *modifies* the stack (typically by pushing itself to the top), and execution continues with the next token of the script.
+After a queued item has gathered as many arguments as it can from the stack, it is then *presented* to each item on the stack, to determine whether it (in turn) responds to the messages on the stack. If it does respond, it is removed from the queue and the message in question is removed from the stack, and the result of its response to the message replaces it as the next queued item.
 
-For example, `"3 2 1 - +"` contains five tokens. The first three represent integers, and they are parsed, queued, staged and pushed onto the stack in the order they appear. The token `-` is not recognized as a literal, so it is used to create a Message object, which lacks (and therefore "wants") a *target* that responds to the message `-`. When the Message object is staged, it's first allowed to examine the stacked integers; the topmost `1` literal responds to `-`, so it is consumed by the staged Message, which is replaced with a Closure object representing the partial application `?-1`, which "wants" something that responds to the message `neg` (implying it's a number of some sort). The newly-staged Closure is allowed to check the stack for arguments, and it finds the `2` literal this time, which it consumes to produce a new Int literal `1` (2 minus 1). This "wants" nothing on the stack, and isn't "wanted" by the remaining `1` literal, so it is pushed to the top.
+Only when no receiver is found (among the items on the stack, or the Interpreter itself), and the item is shown not to respond to any item in the stack, is a queued object is pushed *onto* the stack.
+
+Note that in all cases, "argument-matching" occurs by checking whether an object *responds to a specified message call*, not a type check. The message being checked may not always be identical to the message looking for a match. A "pure" message such as `:+` might be recognized by an `Int`, `List`, or `Script` item; a curried result such as `λ(3+?)` (the result of `:3` responding to `:+`) is actually looking for items that respond to the message `:neg` (indicating they are numeric).
+
+This network of responses, used to manage syntactic and semantic consistency, is handled by convention only.
+
+For example, `"3 2 1 - +"` contains five tokens. The first three represent messages that are converted by the Interpreter into integers, and they are parsed, queued, staged and pushed onto the stack in the order they appear. The token `-` is not recognized as a literal, so it is used to create a Message object, which lacks (and therefore "wants") a *target* that responds to the message `-`. When the Message object is staged, it's first allowed to examine the stacked integers; the topmost `1` literal responds to `-`, so it is consumed by the staged Message, which is replaced with a Closure object representing the partial application `?-1`, which "wants" something that responds to the message `neg` (implying it's a number of some sort). The newly-staged Closure is allowed to check the stack for arguments, and it finds the `2` literal this time, which it consumes to produce a new Int literal `1` (2 minus 1). This "wants" nothing on the stack, and isn't "wanted" by the remaining `1` literal, so it is pushed to the top.
 
     running "3 2 1 - +":
     (stack) <<< (staged)  <<< (queue)  <<< (script)         (notes)
