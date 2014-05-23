@@ -26,6 +26,10 @@ module Duck
     def grab(object)
       self
     end
+
+    def inspect
+      self.to_s
+    end
     
     def recognize_message?(string)
       msg = string.intern

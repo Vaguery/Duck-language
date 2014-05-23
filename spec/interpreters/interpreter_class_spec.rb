@@ -14,7 +14,7 @@ describe "Interpreter items" do
     describe ":next_token behavior" do
       it "should grab a word of the script and push it onto the buffer..." do
         i = interpreter(script:"1 2 3")
-        i.stub!(:process_buffer) # blocks processing
+        i.stub(:process_buffer) # blocks processing
         i.next_token
         i.inspect.should == "[:: 1 :: «2 3»]"
       end
@@ -48,7 +48,7 @@ describe "Interpreter items" do
     describe ":run behavior" do
       it "should process the buffer if it's not empty" do
         i = interpreter(script:"", buffer:[int(9), int(10), message("+")])
-        i.stub!(:next_token) # blocks buffer handling, leaving things stuck there
+        i.stub(:next_token) # blocks buffer handling, leaving things stuck there
         i.run
         i.inspect.should == "[19 :: :: «»]"
       end

@@ -12,9 +12,9 @@ describe "Bool" do
     end
     
     it "should return a true or false depending on a call to Random#rand" do
-      Random.stub!(:rand).and_return(0.4999)
+      Random.stub(:rand).and_return(0.4999)
       100.times { bool(T).rand.value.should == false }
-      Random.stub!(:rand).and_return(0.5)
+      Random.stub(:rand).and_return(0.5)
       100.times { bool(T).rand.value.should == true }
     end
   end
